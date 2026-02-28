@@ -2,37 +2,45 @@
 Main orchestrator for the Multi-Agent Deliberation Framework.
 
 Phase 0   — Classify the question (FACTUAL / ANALYTICAL / CREATIVE / JUDGMENT)
-Phase 0.5 — Detect ambiguities and optionally ask the user for clarification
-Phase 1   — Run the appropriate workflow (A / B / C / D)
+Phase 0.5 — Detect ambiguities; optionally ask the user for clarification
+Phase 1   — Run the appropriate workflow (A / B / C / D) with the active ModelConfig
 Phase 2   — Return structured result with answer, confidence, dissent, and full trace
 """
 
 from typing import Optional
 from classifier import classify_question, detect_ambiguities
+from model_config import ModelConfig, load_config, print_active_config, validate_config
 from workflows import workflow_a, workflow_b, workflow_c, workflow_d
 
 _WORKFLOW_MAP = {
-    "FACTUAL": workflow_a,
+    "FACTUAL":    workflow_a,
     "ANALYTICAL": workflow_b,
-    "CREATIVE": workflow_c,
-    "JUDGMENT": workflow_d,
+    "CREATIVE":   workflow_c,
+    "JUDGMENT":   workflow_d,
 }
 
 _WORKFLOW_LABELS = {
-    "FACTUAL": "A — Factual Verification",
+    "FACTUAL":    "A — Factual Verification",
     "ANALYTICAL": "B — Analytical Reasoning",
-    "CREATIVE": "C — Creative / Strategic",
-    "JUDGMENT": "D — Judgment / Evaluation",
+    "CREATIVE":   "C — Creative / Strategic",
+    "JUDGMENT":   "D — Judgment / Evaluation",
 }
 
 
-def run_deliberation(question: str, interactive: bool = True) -> dict:
+def run_deliberation(
+    question: str,
+    *,
+    config: Optional[ModelConfig] = None,
+    interactive: bool = True,
+) -> dict:
     """
     Run the full multi-agent deliberation pipeline on a question.
 
     Parameters
     ----------
     question    : The question to deliberate on.
+    config      : ModelConfig specifying which model each role uses.
+                  Defaults to load_config() (reads MODEL_PRESET / *_MODEL env vars).
     interactive : When True, prompts the user for clarification if ambiguities
                   are detected (Phase 0.5). Set to False for programmatic use.
 
@@ -45,14 +53,26 @@ def run_deliberation(question: str, interactive: bool = True) -> dict:
         question_type   — str: FACTUAL / ANALYTICAL / CREATIVE / JUDGMENT
         reasoning_trace — list: full audit trail of every round
     """
+    if config is None:
+        config = load_config()
+
+    # Warn early if API keys are missing
+    warnings = validate_config(config)
+    if warnings:
+        print("\n[Warning] Missing API keys:")
+        for w in warnings:
+            print(w)
+        print()
+
     print(f"\n{'═' * 64}")
     print(f"QUESTION: {question[:110]}{'...' if len(question) > 110 else ''}")
     print('═' * 64)
+    print_active_config(config)
 
     # ── Phase 0: Classify ──────────────────────────────────────────
     print("\n[Phase 0] Classifying question...")
     q_type = classify_question(question)
-    print(f"          → {_WORKFLOW_LABELS.get(q_type, q_type)}")
+    print(f"          → Workflow {_WORKFLOW_LABELS.get(q_type, q_type)}")
 
     # ── Phase 0.5: Ambiguity detection (interactive only) ──────────
     if interactive:
@@ -69,7 +89,7 @@ def run_deliberation(question: str, interactive: bool = True) -> dict:
 
     # ── Phase 1: Run workflow ───────────────────────────────────────
     workflow_fn = _WORKFLOW_MAP.get(q_type, workflow_b)
-    result = workflow_fn(question)
+    result = workflow_fn(question, config)
     result["question_type"] = q_type
 
     # ── Phase 2: Display result ────────────────────────────────────
@@ -79,8 +99,7 @@ def run_deliberation(question: str, interactive: bool = True) -> dict:
     print(result["answer"])
     print(f"\nConfidence : {result.get('confidence', 'MEDIUM')}")
     print(f"Type       : {q_type}")
-    rounds = len(result.get("reasoning_trace", []))
-    print(f"Rounds     : {rounds}")
+    print(f"Rounds     : {len(result.get('reasoning_trace', []))}")
     if result.get("dissent"):
         print(f"\n[Minority dissent]\n{result['dissent']}")
     print('═' * 64)
