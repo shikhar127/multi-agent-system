@@ -170,7 +170,7 @@
     /* ════════════════════════════════
        BATTLE RESULTS
     ════════════════════════════════ */
-    #battle-results { display: none; }
+    #battle-results { display: none; flex-direction: column; }
 
     /* Loading */
     #loading-panel {
@@ -268,6 +268,73 @@
     .solver-tag { color: #8A6A00; border-color: #F5C800; }
     .challenger-tag { color: #CC1A1A; border-color: #CC1A1A; }
     .scout-tag { color: #4A6FD4; border-color: #4A6FD4; }
+
+    /* Attack target callout inside Challenger card */
+    .attack-target {
+      background: #FEFAEC; border-left: 3px solid #C85C1A;
+      padding: 12px 16px; margin-bottom: 4px;
+      display: flex; flex-direction: column; gap: 5px;
+    }
+    .attack-target-label {
+      font-family: 'Bebas Neue', sans-serif; font-size: 10px;
+      letter-spacing: 0.22em; color: #C85C1A;
+    }
+    .attack-target-quote {
+      font-family: 'Inter Tight', sans-serif; font-size: 13px;
+      color: #7A6A50; line-height: 1.5; font-style: italic;
+    }
+
+    /* Scout independent badge */
+    .independent-badge {
+      display: inline-flex; align-items: center;
+      font-family: 'Bebas Neue', sans-serif; font-size: 10px;
+      letter-spacing: 0.18em; color: #4A6FD4;
+      background: rgba(74,111,212,0.08); border: 1px solid rgba(74,111,212,0.25);
+      padding: 3px 10px; align-self: flex-start; margin-bottom: 2px;
+    }
+
+    /* Scout body expander */
+    .scout-overflow {
+      overflow: hidden; max-height: 80px;
+      -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+      mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+    }
+    .scout-overflow.expanded { max-height: none; -webkit-mask-image: none; mask-image: none; }
+    .read-more-btn {
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
+      letter-spacing: 0.18em; color: #4A6FD4; background: none;
+      border: none; cursor: pointer; padding: 6px 0 2px; display: block;
+    }
+    .read-more-btn:hover { color: #2A4FAA; }
+
+    /* Round 3 position delta */
+    .position-delta {
+      background: rgba(245,200,0,0.06); border: 1px solid rgba(245,200,0,0.2);
+      border-left: 3px solid #F5C800; padding: 14px 16px;
+      display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px;
+    }
+    .delta-label {
+      font-family: 'Bebas Neue', sans-serif; font-size: 10px;
+      letter-spacing: 0.22em; color: #D4A800;
+    }
+    .delta-row { display: flex; align-items: flex-start; gap: 10px; }
+    .delta-badge {
+      font-family: 'Bebas Neue', sans-serif; font-size: 9px;
+      letter-spacing: 0.15em; padding: 2px 7px; flex-shrink: 0; margin-top: 2px;
+    }
+    .delta-r1 { background: rgba(200,92,26,0.12); color: #C85C1A; border: 1px solid rgba(200,92,26,0.3); }
+    .delta-r3 { background: rgba(245,200,0,0.12); color: #D4A800; border: 1px solid rgba(245,200,0,0.3); }
+    .delta-text {
+      font-family: 'Inter Tight', sans-serif; font-size: 13px;
+      color: #7A7268; line-height: 1.5; font-style: italic;
+    }
+    .changed-pill {
+      display: inline-flex; align-items: center;
+      font-family: 'Bebas Neue', sans-serif; font-size: 10px;
+      letter-spacing: 0.18em; background: rgba(34,197,94,0.1);
+      color: #22C55E; border: 1px solid rgba(34,197,94,0.25);
+      padding: 3px 9px; align-self: flex-start;
+    }
 
     /* skeleton loader for cards */
     .skeleton { background: linear-gradient(90deg, #2A2A25 25%, #3A3A35 50%, #2A2A25 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 2px; color: transparent !important; }
@@ -407,6 +474,43 @@
       color: #F5C800; letter-spacing: 0.12em;
     }
     .try-again-btn:hover { background: #F5C800; color: #0A0A0A; }
+
+    /* Next question suggestions */
+    #next-questions {
+      background: #0E0D0C; padding: 36px 60px 48px;
+      border-bottom: 1px solid #2A2825;
+    }
+    .nq-header {
+      font-family: 'Bebas Neue', sans-serif; font-size: 12px;
+      letter-spacing: 0.22em; color: #5A5650; margin-bottom: 20px;
+    }
+    .nq-grid { display: flex; gap: 16px; }
+    .nq-chip {
+      flex: 1; background: #1A1917; border: 1px solid #2A2825;
+      border-left: 3px solid #2A2825; padding: 20px 22px;
+      cursor: pointer; display: flex; flex-direction: column; gap: 14px;
+      transition: border-left-color 0.15s, background 0.15s;
+    }
+    .nq-chip:hover { border-left-color: #F5C800; background: #222018; }
+    .nq-question {
+      font-family: 'Inter', sans-serif; font-size: 14px;
+      color: #D8D4CC; line-height: 1.55; flex: 1;
+    }
+    .nq-action {
+      font-family: 'Bebas Neue', sans-serif; font-size: 12px;
+      color: #5A5650; letter-spacing: 0.15em;
+    }
+    .nq-chip:hover .nq-action { color: #F5C800; }
+    .nq-chip.loading .nq-question {
+      background: #2A2825; border-radius: 2px; min-height: 56px; color: transparent;
+    }
+    .nq-chip.loading .nq-action {
+      background: #2A2825; border-radius: 2px; width: 72px; height: 14px; color: transparent;
+    }
+    @media (max-width: 700px) {
+      .nq-grid { flex-direction: column; }
+      #next-questions { padding: 28px 20px 36px; }
+    }
 
     /* error */
     .error-panel {
@@ -778,21 +882,24 @@
         <div class="round-num-text" style="color:#F5F5F0;">ROUND 02</div>
       </div>
       <div class="round-cards" id="round2-cards">
-        <div class="arg-card" style="background:#FAFAF5;opacity:0.75;">
-          <div class="arg-role-line" style="color:#8A6A00;"><div class="role-pip solver-pip"></div>SOLVER — UNDER ATTACK</div>
-          <div class="arg-headline-text" id="r2-solver-ref" style="font-size:20px;color:#5A5A50;"></div>
-          <div class="arg-tag solver-tag" style="color:#B0A070;border-color:#D0C080;">R1 POSITION</div>
-        </div>
         <div class="arg-card" style="background:#FFF0F0;">
-          <div class="arg-role-line" style="color:#CC1A1A;"><div class="role-pip challenger-pip"></div>CHALLENGER — UNIT 02</div>
+          <div class="arg-role-line" style="color:#CC1A1A;"><div class="role-pip challenger-pip"></div>CHALLENGER — ATTACKING</div>
+          <div class="attack-target">
+            <div class="attack-target-label">↑ SOLVER CLAIMED (R1)</div>
+            <div class="attack-target-quote" id="r2-solver-ref">—</div>
+          </div>
           <div class="arg-headline-text" id="r2-challenger-hl">Locating weaknesses…</div>
           <div class="arg-body-text" id="r2-challenger-body"></div>
           <div class="arg-tag challenger-tag" id="r2-challenger-tag">ATTACK: INCOMING</div>
         </div>
         <div class="arg-card" style="background:#F0F0FF;">
-          <div class="arg-role-line" style="color:#4A6FD4;"><div class="role-pip scout-pip"></div>SCOUT — UNIT 03</div>
+          <div class="arg-role-line" style="color:#4A6FD4;"><div class="role-pip scout-pip"></div>SCOUT — INDEPENDENT SCAN</div>
+          <div class="independent-badge">⊕ NOT A RESPONSE — ORTHOGONAL ANALYSIS</div>
           <div class="arg-headline-text" id="r2-scout-hl">Scanning for alternatives…</div>
-          <div class="arg-body-text" id="r2-scout-body"></div>
+          <div class="scout-overflow" id="r2-scout-overflow">
+            <div class="arg-body-text" id="r2-scout-body"></div>
+          </div>
+          <button class="read-more-btn" id="r2-scout-toggle" onclick="toggleScout()" style="display:none;">▼ READ FULL SCAN</button>
           <div class="arg-tag scout-tag" id="r2-scout-tag">SCAN: IN PROGRESS</div>
         </div>
       </div>
@@ -815,6 +922,18 @@
       <div class="round-cards" id="round3-cards">
         <div class="arg-card" style="background:#FFFDF0;">
           <div class="arg-role-line" style="color:#8A6A00;"><div class="role-pip solver-pip"></div>SOLVER — REVISED POSITION</div>
+          <div class="position-delta" id="r3-delta" style="display:none;">
+            <div class="delta-label">POSITION DELTA</div>
+            <div class="delta-row">
+              <span class="delta-badge delta-r1">R1</span>
+              <span class="delta-text" id="r3-delta-r1">—</span>
+            </div>
+            <div class="delta-row">
+              <span class="delta-badge delta-r3">R3</span>
+              <span class="delta-text" id="r3-delta-r3">—</span>
+            </div>
+            <div class="changed-pill" id="r3-delta-pill">↑ POSITION UPDATED</div>
+          </div>
           <div class="arg-headline-text" id="r3-solver-hl">Incorporating the battle…</div>
           <div class="arg-body-text" id="r3-solver-body"></div>
           <div class="arg-tag solver-tag" id="r3-solver-tag">FINAL POSITION</div>
@@ -869,6 +988,16 @@
   <div id="try-again-bar">
     <span class="try-again-text">THE ARENA IS READY FOR ANOTHER BATTLE</span>
     <button class="try-again-btn" onclick="resetArena()">FIGHT AGAIN →</button>
+  </div>
+
+  <!-- Next Question Suggestions -->
+  <div id="next-questions" style="display:none;">
+    <div class="nq-header">CONTINUE THE DEBATE — SUGGESTED NEXT FIGHTS</div>
+    <div class="nq-grid" id="nq-grid">
+      <div class="nq-chip loading"><div class="nq-question">&nbsp;</div><div class="nq-action">&nbsp;</div></div>
+      <div class="nq-chip loading"><div class="nq-question">&nbsp;</div><div class="nq-action">&nbsp;</div></div>
+      <div class="nq-chip loading"><div class="nq-question">&nbsp;</div><div class="nq-action">&nbsp;</div></div>
+    </div>
   </div>
 
 </section>
@@ -1148,22 +1277,24 @@
 let currentTier = 'paid';
 let fightInProgress = false;       // prevents double-submit
 let currentAbortController = null; // for cancellation
+let lastApiKey = '';
+let lastSolverModel = '';
 
 // ── PAID MODELS ──────────────────────────────────
 const PAID_MODELS = {
-  solver: 'anthropic/claude-opus-4-6',
-  challenger: 'openai/gpt-5',
-  scout: 'google/gemini-2.5-pro',
+  solver: 'anthropic/claude-opus-4-6',     // best: deepest reasoning
+  challenger: 'openai/o1',                  // 2nd: strong adversarial reasoning
+  scout: 'google/gemini-2.5-pro',           // 3rd: broad knowledge, lateral thinking
 };
 
 const PAID_OPTIONS = [
-  { value: 'anthropic/claude-opus-4-6',  label: 'CLAUDE OPUS 4.6' },
+  { value: 'anthropic/claude-opus-4-6',  label: 'CLAUDE OPUS 4.6 — BEST' },
+  { value: 'openai/o1',                  label: 'O1 — 2ND BEST' },
+  { value: 'google/gemini-2.5-pro',      label: 'GEMINI 2.5 PRO — 3RD BEST' },
   { value: 'anthropic/claude-opus-4-5',  label: 'CLAUDE OPUS 4.5' },
   { value: 'anthropic/claude-sonnet-4-5',label: 'CLAUDE SONNET 4.5' },
   { value: 'openai/gpt-5',               label: 'GPT-5' },
-  { value: 'openai/o1',                  label: 'O1' },
   { value: 'openai/gpt-4o',              label: 'GPT-4O' },
-  { value: 'google/gemini-2.5-pro',      label: 'GEMINI 2.5 PRO' },
   { value: 'google/gemini-2.0-flash',    label: 'GEMINI 2.0 FLASH' },
 ];
 
@@ -1407,7 +1538,7 @@ function clearCardLoading(hlId, bodyId) {
 
 function resetArena() {
   ['battle-results','result-round1','result-round2','result-round3','result-verdict',
-   'clash-1','clash-2','loading-panel','try-again-bar','form-error'].forEach(id => {
+   'clash-1','clash-2','loading-panel','try-again-bar','next-questions','form-error'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
@@ -1415,6 +1546,20 @@ function resetArena() {
     document.getElementById(id)?.classList.remove('round-active'));
   const btn = document.getElementById('fight-btn');
   if (btn) { btn.disabled = false; btn.textContent = 'START THE FIGHT →'; }
+  // Reset scout expander
+  const scoutOverflow = document.getElementById('r2-scout-overflow');
+  if (scoutOverflow) scoutOverflow.classList.remove('expanded');
+  const scoutToggle = document.getElementById('r2-scout-toggle');
+  if (scoutToggle) { scoutToggle.style.display = 'none'; scoutToggle.textContent = '▼ READ FULL SCAN'; }
+  // Reset position delta
+  const deltaEl = document.getElementById('r3-delta');
+  if (deltaEl) deltaEl.style.display = 'none';
+  // Reset next-questions grid back to skeleton state for next fight
+  const nqGrid = document.getElementById('nq-grid');
+  if (nqGrid) nqGrid.innerHTML = `
+    <div class="nq-chip loading"><div class="nq-question">&nbsp;</div><div class="nq-action">&nbsp;</div></div>
+    <div class="nq-chip loading"><div class="nq-question">&nbsp;</div><div class="nq-action">&nbsp;</div></div>
+    <div class="nq-chip loading"><div class="nq-question">&nbsp;</div><div class="nq-action">&nbsp;</div></div>`;
   // Intentionally NOT clearing question so user can refine and retry
   document.getElementById('question-input')?.focus();
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1440,7 +1585,7 @@ async function startFight() {
   if (btn) { btn.disabled = true; btn.textContent = 'CHECKING KEY…'; }
 
   // Show loading panel immediately during key check so it doesn't feel frozen
-  showEl('battle-results', false);
+  showEl('battle-results', true);
   showEl('loading-panel', true);
   if (cancelBtn) cancelBtn.style.display = 'block';
   setStatus('VALIDATING KEY…', 'CONNECTING TO OPENROUTER');
@@ -1485,6 +1630,8 @@ async function startFight() {
     scoutModel = document.getElementById('scout-model')?.value || PAID_MODELS.scout;
   }
 
+  lastApiKey = apiKey;
+  lastSolverModel = solverModel;
   if (btn) btn.textContent = 'THE BATTLE IS ON…';
 
   try {
@@ -1494,7 +1641,7 @@ async function startFight() {
     document.getElementById('result-round1').style.display = 'block';
     document.getElementById('result-round1')?.classList.add('round-active');
 
-    const solverPrompt = `You are SOLVER, a debate robot in a system called "Robots versus Robots". Your role is to construct the best possible initial answer to a question. Be decisive, confident, and comprehensive. State your position clearly in the first sentence. Argue in flowing prose — no bullet points. Keep your response to 3 short paragraphs maximum. Start your response with a bold one-sentence position statement in quotes, then elaborate.`;
+    const solverPrompt = `You are SOLVER, a thoughtful analyst in a multi-perspective deliberation system called "Robots versus Robots". Your role is to construct the most carefully reasoned initial answer to a question. Be intellectually honest: acknowledge genuine complexity and competing considerations where they exist, but still commit to a clear, defensible position. Argue in flowing prose — no bullet points. Keep your response to 3 paragraphs. Open with a single bold claim in quotes, then support it with your strongest evidence and reasoning. Intellectual depth and nuance over rhetorical confidence.`;
 
     const solverRaw = await callWithFallback(apiKey, solverModel, solverPrompt, question);
     clearCardLoading('r1-solver-hl', 'r1-solver-body');
@@ -1515,7 +1662,7 @@ async function startFight() {
     document.getElementById('result-round2').style.display = 'block';
     document.getElementById('result-round2')?.classList.add('round-active');
 
-    const challengerPrompt = `You are CHALLENGER, a debate robot in "Robots versus Robots". SOLVER has just proposed an answer to a question. Your job is to attack it — find flaws, challenge assumptions, expose risks, and stress-test the logic. Be aggressive but rigorous. No ad hominem — only logical assault. Start with a provocative one-sentence counter-position in quotes, then deliver your attack in 2-3 paragraphs. No bullet points.`;
+    const challengerPrompt = `You are CHALLENGER, a rigorous critical thinker in "Robots versus Robots". SOLVER has proposed an answer. Your job is to stress-test it seriously — find the weakest assumptions, identify what's missing, surface risks they overlooked, and probe where the logic doesn't hold. Be precise and intellectually honest: explicitly acknowledge the parts of SOLVER's argument that are genuinely strong before explaining where and why it falls short. Your goal is to make the final answer better, not just to win. Start with a one-sentence counter-claim in quotes, then deliver your critique in 2-3 paragraphs. No bullet points.`;
 
     const challengerRaw = await callWithFallback(apiKey, challengerModel, challengerPrompt,
       `The question: "${question}"\n\nSOLVER's position: ${solverRaw}\n\nNow attack it.`);
@@ -1527,7 +1674,7 @@ async function startFight() {
     // ── ROUND 2: SCOUT ───────────────────────────
     setStatus('SCOUT IS SCANNING FOR HIDDEN PATHS…', 'ROUND 02 · SCOUT EXPLORES');
 
-    const scoutPrompt = `You are SCOUT, a debate robot in "Robots versus Robots". You've observed SOLVER's answer and CHALLENGER's attack. Your role is to find what neither of them considered — alternative framings, overlooked evidence, third options, analogies from other domains. You are the lateral thinker. Start with an intriguing one-sentence reframe in quotes, then explore your finding in 2-3 paragraphs. No bullet points.`;
+    const scoutPrompt = `You are SCOUT, a lateral thinker in "Robots versus Robots". You've read both SOLVER's position and CHALLENGER's critique carefully. Your role is to enrich the debate — find what both missed, bring in evidence or framings they didn't consider, and synthesize the strongest insights from each side into a more complete picture. You're not trying to defeat either of them; you're trying to find the truth that their disagreement is circling. Explicitly build on the best point from each side, then add your own orthogonal insight. Start with a one-sentence reframe in quotes, then explore in 2-3 paragraphs. No bullet points.`;
 
     const scoutRaw = await callWithFallback(apiKey, scoutModel, scoutPrompt,
       `The question: "${question}"\n\nSOLVER said: ${solverRaw}\n\nCHALLENGER attacked: ${challengerRaw}\n\nFind what they both missed.`);
@@ -1535,6 +1682,9 @@ async function startFight() {
     document.getElementById('r2-scout-hl').textContent = extractHeadline(scoutRaw);
     document.getElementById('r2-scout-body').textContent = extractBody(scoutRaw);
     document.getElementById('r2-scout-tag').textContent = extractTag(scoutRaw, 'scout');
+    // Show expander if scout body is long enough to clip
+    const scoutToggle = document.getElementById('r2-scout-toggle');
+    if (scoutToggle) scoutToggle.style.display = 'block';
     document.getElementById('result-round2')?.classList.remove('round-active');
 
     // ── ROUND 3: SOLVER REVISED ──────────────────
@@ -1544,14 +1694,26 @@ async function startFight() {
     document.getElementById('result-round3').style.display = 'block';
     document.getElementById('result-round3')?.classList.add('round-active');
 
-    const r3Prompt = `You are SOLVER in "Robots versus Robots". You've now heard CHALLENGER's attack and SCOUT's alternative perspective. Revise your position to incorporate valid criticisms and insights. Show that you've genuinely updated your thinking. Be decisive about your final position. Start with a revised one-sentence position in quotes, then deliver your final argument in 2-3 paragraphs. No bullet points.`;
+    const r3Prompt = `You are SOLVER in "Robots versus Robots". You've now heard CHALLENGER's critique and SCOUT's lateral analysis. This is your chance to think carefully and arrive at the most defensible, nuanced final position. Be genuinely open: if CHALLENGER identified a real flaw, concede it clearly and explain how it changes your view. If SCOUT surfaced a better framing, adopt it. Hold firm only where your original reasoning was sound and the critique didn't land. The goal is the best possible answer, not defending your R1 position. Start with your revised one-sentence position in quotes, then explain what changed and why in 2-3 paragraphs. No bullet points.`;
 
     const r3Raw = await callWithFallback(apiKey, solverModel, r3Prompt,
       `The question: "${question}"\n\nYour original position: ${solverRaw}\n\nCHALLENGER's attack: ${challengerRaw}\n\nSCOUT's alternative: ${scoutRaw}\n\nRevise your position.`);
     clearCardLoading('r3-solver-hl', 'r3-solver-body');
-    document.getElementById('r3-solver-hl').textContent = extractHeadline(r3Raw);
+    const r3Headline = extractHeadline(r3Raw);
+    const r1Headline = document.getElementById('r1-solver-hl')?.textContent || '';
+    document.getElementById('r3-solver-hl').textContent = r3Headline;
     document.getElementById('r3-solver-body').textContent = extractBody(r3Raw);
     document.getElementById('r3-solver-tag').textContent = extractTag(r3Raw, 'solver');
+    // Position delta: compare R1 vs R3 headlines
+    const deltaEl = document.getElementById('r3-delta');
+    if (deltaEl && r1Headline && r3Headline) {
+      document.getElementById('r3-delta-r1').textContent = r1Headline;
+      document.getElementById('r3-delta-r3').textContent = r3Headline;
+      const held = r1Headline.slice(0, 40).toLowerCase() === r3Headline.slice(0, 40).toLowerCase();
+      const pill = document.getElementById('r3-delta-pill');
+      if (pill) { pill.textContent = held ? '— POSITION HELD' : '↑ POSITION UPDATED'; pill.style.color = held ? '#F5C800' : '#22C55E'; }
+      deltaEl.style.display = 'flex';
+    }
     document.getElementById('result-round3')?.classList.remove('round-active');
 
     // ── VERDICT ──────────────────────────────────
@@ -1627,6 +1789,7 @@ async function startFight() {
     if (cancelBtn) cancelBtn.style.display = 'none';
     showEl('try-again-bar', true);
     document.getElementById('result-verdict')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    generateNextQuestions(question, vd.verdict || '');
 
   } catch (err) {
     document.getElementById('loading-panel').style.display = 'none';
@@ -1691,6 +1854,15 @@ document.getElementById('api-key-input').addEventListener('input', function() {
   }
 });
 
+// Toggle Scout body expander
+function toggleScout() {
+  const overflow = document.getElementById('r2-scout-overflow');
+  const btn = document.getElementById('r2-scout-toggle');
+  if (!overflow || !btn) return;
+  const expanded = overflow.classList.toggle('expanded');
+  btn.textContent = expanded ? '▲ COLLAPSE' : '▼ READ FULL SCAN';
+}
+
 // Copy verdict to clipboard
 function copyVerdict() {
   const verdict = document.getElementById('verdict-answer')?.textContent || '';
@@ -1704,6 +1876,51 @@ function copyVerdict() {
       if (btn2) { btn2.textContent = 'COPY VERDICT'; btn2.classList.remove('copied'); }
     }, 2000);
   });
+}
+
+// Generate 3 follow-up question suggestions after a fight
+async function generateNextQuestions(question, verdictText) {
+  const section = document.getElementById('next-questions');
+  if (!section || !lastApiKey || !lastSolverModel) return;
+  section.style.display = 'block';
+
+  const sys = `You are a debate curator. Given a debate question and its verdict, suggest 3 follow-up questions for the next fight. Make each one probe a distinct angle: one that goes deeper on the same topic, one that challenges the verdict's core assumption, one that applies the same tension to a different context. Return ONLY a raw JSON array of 3 question strings. No preamble, no markdown, no numbering.`;
+  const msg = `Original question: "${question}"\n\nVerdict: "${verdictText}"\n\nReturn a JSON array of 3 follow-up debate questions.`;
+
+  try {
+    const raw = await callWithFallback(lastApiKey, lastSolverModel, sys, msg);
+    let questions = [];
+    try {
+      const m = raw.match(/\[[\s\S]*?\]/);
+      if (m) questions = JSON.parse(m[0]);
+    } catch (_) {
+      questions = raw.split('\n').map(l => l.replace(/^[\d\.\-\*"]+\s*/, '').replace(/[",]+$/, '').trim()).filter(l => l.length > 20).slice(0, 3);
+    }
+    if (!questions.length) { section.style.display = 'none'; return; }
+
+    const grid = document.getElementById('nq-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    questions.slice(0, 3).forEach(q => {
+      const chip = document.createElement('div');
+      chip.className = 'nq-chip';
+      chip.innerHTML = `<div class="nq-question">${q}</div><div class="nq-action">FIGHT THIS →</div>`;
+      chip.onclick = () => loadNextQuestion(q);
+      grid.appendChild(chip);
+    });
+  } catch (_) {
+    section.style.display = 'none';
+  }
+}
+
+function loadNextQuestion(q) {
+  const input = document.getElementById('question-input');
+  if (!input) return;
+  resetArena();
+  input.value = q;
+  input.dispatchEvent(new Event('input')); // triggers auto-resize + type detection
+  input.focus();
+  setTimeout(() => input.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
 }
 
 // Update more options tier label whenever tier changes
