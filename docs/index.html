@@ -1424,22 +1424,31 @@ async function startFight() {
     const verdictRaw = await callWithFallback(apiKey, solverModel, verdictPrompt,
       `The question: "${question}"\n\nR1 SOLVER: ${solverRaw}\n\nR2 CHALLENGER: ${challengerRaw}\n\nR2 SCOUT: ${scoutRaw}\n\nR3 SOLVER (revised): ${r3Raw}\n\nDeliver the final verdict as JSON.`);
 
+    // Extract a JSON string field value — handles unescaped quotes inside values
+    function extractField(raw, key) {
+      // Match from "key": " to the last " before the next "key": or }
+      const re = new RegExp(`"${key}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*\\})`, 'i');
+      const m = raw.match(re);
+      return m ? m[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') : null;
+    }
+
     let vd;
     try {
       // Strip markdown code fences (```json ... ```) that some models add
-      const cleaned = verdictRaw.replace(/^```(?:json)?\s*/im, '').replace(/```\s*$/m, '').trim();
+      const cleaned = verdictRaw.replace(/```(?:json)?/gi, '').trim();
       const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
       vd = JSON.parse(jsonMatch ? jsonMatch[0] : cleaned);
     } catch {
+      // JSON.parse failed (likely unescaped quotes in values) — extract fields with regex
       vd = {
-        confidence: 'MEDIUM',
-        confidence_note: 'The robots reached a reasoned conclusion.',
-        verdict: verdictRaw,
-        r1_trace: 'Solver proposed initial position.',
-        r2c_trace: 'Challenger identified key flaws.',
-        r2s_trace: 'Scout found alternative perspective.',
-        r3_trace: 'Solver revised and converged.',
-        verdict_trace: 'Final judgment delivered.',
+        confidence: extractField(verdictRaw, 'confidence') || 'MEDIUM',
+        confidence_note: extractField(verdictRaw, 'confidence_note') || 'The robots reached a reasoned conclusion.',
+        verdict: extractField(verdictRaw, 'verdict') || verdictRaw,
+        r1_trace: extractField(verdictRaw, 'r1_trace') || 'Solver proposed initial position.',
+        r2c_trace: extractField(verdictRaw, 'r2c_trace') || 'Challenger identified key flaws.',
+        r2s_trace: extractField(verdictRaw, 'r2s_trace') || 'Scout found alternative perspective.',
+        r3_trace: extractField(verdictRaw, 'r3_trace') || 'Solver revised and converged.',
+        verdict_trace: extractField(verdictRaw, 'verdict_trace') || 'Final judgment delivered.',
       };
     }
 
