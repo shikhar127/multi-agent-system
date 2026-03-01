@@ -3,380 +3,990 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Deliberate — Multi-Agent Deliberation System</title>
+  <title>Robots versus Robots — The Greatest AI Debate</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter+Tight:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Bebas+Neue&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { background: #F7F4EF; color: #131210; font-family: 'Inter', sans-serif; }
+    body { background: #F5F5F0; font-family: 'Inter Tight', sans-serif; overflow-x: hidden; }
 
-    /* NAV */
-    nav {
-      position: sticky; top: 0; z-index: 100;
-      background: #131210; height: 64px;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 80px; border-bottom: 1px solid #2A2825;
+    /* PANEL BORDERS */
+    .panel { border-bottom: 5px solid #0A0A0A; position: relative; overflow: hidden; }
+    .panel-inner-border { border: 5px solid #0A0A0A; }
+
+    /* HALFTONE */
+    .halftone {
+      background-image: radial-gradient(circle, #0A0A0A 1.5px, transparent 1.5px);
+      background-size: 14px 14px;
     }
-    .nav-left { display: flex; align-items: center; gap: 16px; }
-    .wordmark { font-family: 'Archivo Black', sans-serif; font-size: 20px; color: #F7F4EF; letter-spacing: -0.02em; text-decoration: none; }
-    .badge { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 500; color: #C85C1A; background: rgba(200,92,26,0.15); border: 1px solid rgba(200,92,26,0.3); border-radius: 4px; padding: 2px 8px; letter-spacing: 0.06em; text-transform: uppercase; }
-    .nav-links { display: flex; align-items: center; gap: 32px; }
-    .nav-links a { font-family: 'Inter Tight', sans-serif; font-size: 14px; color: #8A8278; text-decoration: none; }
-    .nav-links a:hover { color: #F7F4EF; }
-    .nav-cta { background: #C85C1A; border-radius: 6px; padding: 8px 20px; font-family: 'Inter Tight', sans-serif; font-size: 14px; font-weight: 600; color: #F7F4EF; text-decoration: none; }
-
-    /* HERO */
-    .hero {
-      background: #131210; padding: 100px 80px 120px;
+    .halftone-yellow {
+      background-image: radial-gradient(circle, #0A0A0A 1.5px, transparent 1.5px);
+      background-size: 12px 12px;
+      background-color: #F5C800;
     }
-    .hero-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 64px; gap: 40px; }
-    .hero-left { max-width: 720px; }
-    .eyebrow { font-family: 'Inter Tight', sans-serif; font-size: 12px; font-weight: 500; color: #C85C1A; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 24px; }
-    h1 { font-family: 'Archivo Black', sans-serif; font-size: clamp(56px, 5.5vw, 80px); line-height: 1.02; color: #F7F4EF; letter-spacing: -0.03em; }
-    .hero-right { max-width: 360px; padding-top: 48px; }
-    .hero-right p { font-family: 'Inter', sans-serif; font-size: 17px; line-height: 28px; color: #7A7268; }
-    .input-box { background: #1E1C19; border: 1px solid #353330; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
-    .type-pills { display: flex; gap: 10px; flex-wrap: wrap; }
-    .pill-active { background: rgba(200,92,26,0.12); border: 1px solid rgba(200,92,26,0.25); border-radius: 6px; padding: 6px 14px; font-family: 'Inter Tight', sans-serif; font-size: 12px; font-weight: 600; color: #C85C1A; letter-spacing: 0.04em; }
-    .pill { background: #262420; border: 1px solid #2E2C28; border-radius: 6px; padding: 6px 14px; font-family: 'Inter Tight', sans-serif; font-size: 12px; font-weight: 500; color: #5A5650; letter-spacing: 0.04em; }
-    .input-row { display: flex; gap: 12px; align-items: flex-end; }
-    .fake-input { flex: 1; background: #262420; border: 1px solid #353330; border-radius: 8px; padding: 18px 20px; font-family: 'Inter', sans-serif; font-size: 16px; color: #B8B2A8; line-height: 26px; }
-    .submit-btn { background: #C85C1A; border-radius: 8px; padding: 18px 32px; font-family: 'Inter Tight', sans-serif; font-size: 15px; font-weight: 700; color: #F7F4EF; border: none; cursor: pointer; white-space: nowrap; }
-    .input-meta { display: flex; gap: 24px; align-items: center; padding-top: 4px; }
-    .input-meta span { font-family: 'Inter', sans-serif; font-size: 12px; color: #4A4844; }
-    .input-meta strong { font-family: 'Inter Tight', sans-serif; font-size: 12px; font-weight: 600; color: #8A8278; border-bottom: 1px solid #353330; }
 
-    /* SECTIONS */
-    section { padding: 100px 80px; }
-    .section-eyebrow { font-family: 'Inter Tight', sans-serif; font-size: 12px; font-weight: 500; color: #C85C1A; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; }
-    h2 { font-family: 'Archivo Black', sans-serif; font-size: clamp(36px, 3.3vw, 48px); line-height: 1.04; letter-spacing: -0.025em; }
-    .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 56px; gap: 40px; }
-    .section-header p { font-family: 'Inter', sans-serif; font-size: 15px; line-height: 24px; color: #7A7268; max-width: 340px; }
+    /* ─────────────────────────────────────────
+       TITLE SPLASH
+    ───────────────────────────────────────── */
+    .title-splash {
+      width: 100%; height: 100vh; min-height: 680px;
+      background: #0A0A0A;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+      border-bottom: 5px solid #F5C800;
+    }
+    .speed-lines {
+      position: absolute; inset: 0;
+      background: conic-gradient(from 0deg at 50% 50%,
+        transparent 0deg, rgba(245,245,240,0.07) 1deg, transparent 2deg,
+        transparent 12deg, rgba(245,245,240,0.05) 13deg, transparent 14deg,
+        transparent 26deg, rgba(245,245,240,0.07) 27deg, transparent 28deg,
+        transparent 37deg, rgba(245,245,240,0.04) 38deg, transparent 39deg,
+        transparent 50deg, rgba(245,245,240,0.06) 51deg, transparent 52deg,
+        transparent 63deg, rgba(245,245,240,0.07) 64deg, transparent 65deg,
+        transparent 78deg, rgba(245,245,240,0.05) 79deg, transparent 80deg,
+        transparent 91deg, rgba(245,245,240,0.07) 92deg, transparent 93deg,
+        transparent 104deg, rgba(245,245,240,0.04) 105deg, transparent 106deg,
+        transparent 117deg, rgba(245,245,240,0.06) 118deg, transparent 119deg,
+        transparent 130deg, rgba(245,245,240,0.07) 131deg, transparent 132deg,
+        transparent 145deg, rgba(245,245,240,0.05) 146deg, transparent 147deg,
+        transparent 157deg, rgba(245,245,240,0.07) 158deg, transparent 159deg,
+        transparent 170deg, rgba(245,245,240,0.04) 171deg, transparent 172deg,
+        transparent 183deg, rgba(245,245,240,0.06) 184deg, transparent 185deg,
+        transparent 197deg, rgba(245,245,240,0.07) 198deg, transparent 199deg,
+        transparent 211deg, rgba(245,245,240,0.05) 212deg, transparent 213deg,
+        transparent 224deg, rgba(245,245,240,0.07) 225deg, transparent 226deg,
+        transparent 238deg, rgba(245,245,240,0.04) 239deg, transparent 240deg,
+        transparent 252deg, rgba(245,245,240,0.06) 253deg, transparent 254deg,
+        transparent 265deg, rgba(245,245,240,0.07) 266deg, transparent 267deg,
+        transparent 279deg, rgba(245,245,240,0.05) 280deg, transparent 281deg,
+        transparent 292deg, rgba(245,245,240,0.07) 293deg, transparent 294deg,
+        transparent 305deg, rgba(245,245,240,0.04) 306deg, transparent 307deg,
+        transparent 318deg, rgba(245,245,240,0.06) 319deg, transparent 320deg,
+        transparent 332deg, rgba(245,245,240,0.07) 333deg, transparent 334deg,
+        transparent 347deg, rgba(245,245,240,0.05) 348deg, transparent 349deg,
+        transparent 360deg
+      );
+    }
+    .chapter-label {
+      position: absolute; top: 36px; left: 52px;
+      background: #F5C800; padding: 6px 18px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 13px;
+      color: #0A0A0A; letter-spacing: 0.2em;
+    }
+    .title-main {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 0; position: relative; z-index: 2;
+    }
+    .title-word {
+      font-family: 'Bangers', cursive;
+      font-size: clamp(120px, 14vw, 200px);
+      line-height: 0.9;
+      color: #F5F5F0;
+      letter-spacing: 0.04em;
+    }
+    .versus-row {
+      display: flex; align-items: center; gap: 28px; margin: 12px 0;
+    }
+    .versus-line { height: 4px; width: 200px; background: #F5C800; }
+    .versus-text {
+      font-family: 'Bangers', cursive; font-size: 60px;
+      color: #CC1A1A; letter-spacing: 0.12em;
+    }
+    .splash-tagline {
+      position: absolute; bottom: 36px; left: 0; right: 0;
+      display: flex; justify-content: center;
+    }
+    .tagline-inner {
+      background: #CC1A1A; padding: 11px 48px;
+      transform: skewX(-3deg);
+      font-family: 'Bebas Neue', sans-serif; font-size: 16px;
+      color: #F5F5F0; letter-spacing: 0.22em;
+    }
 
-    /* PIPELINE */
-    .pipeline-section { background: #F7F4EF; }
-    .pipeline-section h2 { color: #131210; }
-    .pipeline-cards { display: flex; align-items: stretch; gap: 0; }
-    .pipeline-card { flex: 1; border-radius: 12px; padding: 32px; display: flex; flex-direction: column; gap: 12px; }
-    .pipeline-card.dark { background: #131210; }
-    .pipeline-card.muted { background: #EDEAE3; }
-    .pipeline-card.accent { background: #C85C1A; }
-    .role-label { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
-    .dark .role-label, .accent .role-label { color: #C85C1A; }
-    .muted .role-label { color: #C85C1A; }
-    .accent .role-label { color: rgba(247,244,239,0.6); }
-    .card-title { font-family: 'Archivo Black', sans-serif; font-size: 22px; letter-spacing: -0.02em; line-height: 1.2; }
-    .dark .card-title { color: #F7F4EF; }
-    .muted .card-title { color: #131210; }
-    .accent .card-title { color: #F7F4EF; }
-    .card-desc { font-family: 'Inter', sans-serif; font-size: 13px; line-height: 20px; color: #7A7268; }
-    .accent .card-desc { color: rgba(247,244,239,0.7); }
-    .arrow { width: 48px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #C85C1A; font-size: 20px; }
+    /* ─────────────────────────────────────────
+       ARENA SETUP
+    ───────────────────────────────────────── */
+    .arena-setup {
+      display: flex; border-bottom: 5px solid #0A0A0A;
+    }
+    .arena-caption {
+      width: 400px; flex-shrink: 0;
+      background: #F5C800;
+      border-right: 5px solid #0A0A0A;
+      padding: 56px 48px;
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    .narration-label {
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
+      color: #0A0A0A; letter-spacing: 0.25em; border-bottom: 2px solid #0A0A0A; padding-bottom: 8px;
+    }
+    .narration-text {
+      font-family: 'Bangers', cursive; font-size: 48px;
+      line-height: 1.0; color: #0A0A0A; letter-spacing: 0.02em;
+    }
+    .narration-body {
+      font-family: 'Inter Tight', sans-serif; font-size: 15px;
+      line-height: 24px; color: #2A2A2A; font-weight: 500;
+    }
+    .arena-panel {
+      flex: 1; padding: 56px 60px;
+      display: flex; flex-direction: column; gap: 28px;
+      position: relative;
+    }
+    .question-bubble {
+      background: #F5F5F0; border: 4px solid #0A0A0A;
+      border-radius: 4px; padding: 32px 36px;
+      box-shadow: 8px 8px 0 #0A0A0A; position: relative;
+    }
+    .bubble-label {
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
+      color: #CC1A1A; letter-spacing: 0.2em; margin-bottom: 10px;
+    }
+    .bubble-text {
+      font-family: 'Bangers', cursive; font-size: 38px;
+      line-height: 1.1; color: #0A0A0A; letter-spacing: 0.02em;
+    }
+    .arena-tags { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .tag-black {
+      background: #0A0A0A; padding: 8px 20px; transform: skewX(-3deg);
+      font-family: 'Bebas Neue', sans-serif; font-size: 13px;
+      color: #F5C800; letter-spacing: 0.15em;
+    }
+    .tag-red {
+      background: #CC1A1A; padding: 8px 20px; transform: skewX(-3deg);
+      font-family: 'Bebas Neue', sans-serif; font-size: 13px;
+      color: #F5F5F0; letter-spacing: 0.15em;
+    }
+    .impact-word {
+      font-family: 'Bangers', cursive; font-size: 52px;
+      color: #0A0A0A; letter-spacing: 0.05em; margin-left: 8px;
+    }
 
-    /* WORKFLOWS */
-    .workflows-section { background: #131210; }
-    .workflows-section h2 { color: #F7F4EF; }
-    .workflows-section .section-header p { color: #5A5650; }
-    .workflow-cards { display: flex; gap: 16px; }
-    .workflow-card { flex: 1; border: 1px solid #2A2825; border-radius: 12px; padding: 32px; display: flex; flex-direction: column; gap: 20px; }
-    .wf-header { display: flex; justify-content: space-between; align-items: flex-start; }
-    .wf-type { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 600; color: #C85C1A; letter-spacing: 0.1em; text-transform: uppercase; }
-    .wf-rounds { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 500; color: #3A3835; letter-spacing: 0.04em; }
-    .wf-title { font-family: 'Archivo Black', sans-serif; font-size: 20px; color: #F7F4EF; letter-spacing: -0.02em; line-height: 1.3; }
-    .wf-desc { font-family: 'Inter', sans-serif; font-size: 13px; line-height: 21px; color: #5A5650; }
-    .wf-example { border-top: 1px solid #2A2825; padding-top: 16px; font-family: 'Inter', sans-serif; font-size: 12px; color: #3A3835; font-style: italic; }
+    /* ─────────────────────────────────────────
+       ROBOT CHARACTER PANELS
+    ───────────────────────────────────────── */
+    .character-intro {
+      display: flex; border-bottom: 5px solid #0A0A0A; min-height: 560px;
+    }
+    .character-intro.reverse { flex-direction: row-reverse; }
 
-    /* OUTPUT */
-    .output-section { background: #F7F4EF; }
-    .output-section h2 { color: #131210; }
-    .output-layout { display: flex; gap: 80px; align-items: flex-start; }
-    .output-left { flex: 1; display: flex; flex-direction: column; gap: 24px; }
-    .output-left p { font-family: 'Inter', sans-serif; font-size: 15px; line-height: 24px; color: #7A7268; }
-    .output-bullets { display: flex; flex-direction: column; gap: 12px; padding-top: 12px; }
-    .bullet { display: flex; gap: 12px; align-items: flex-start; }
-    .bullet-dot { width: 6px; height: 6px; border-radius: 50%; background: #C85C1A; margin-top: 8px; flex-shrink: 0; }
-    .bullet p { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 22px; color: #4A4642; }
-    .terminal { flex: 1.4; background: #1E1C19; border-radius: 16px; padding: 32px; display: flex; flex-direction: column; gap: 0; }
-    .terminal-header { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
-    .terminal-dot { width: 10px; height: 10px; border-radius: 50%; background: #3A3835; }
-    .terminal-label { font-family: 'Inter Tight', sans-serif; font-size: 12px; color: #4A4844; margin-left: 8px; letter-spacing: 0.04em; }
-    .t-meta { display: flex; gap: 8px; margin-bottom: 20px; align-items: center; }
-    .t-label { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 600; color: #5A5650; letter-spacing: 0.08em; text-transform: uppercase; }
-    .t-type { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 600; color: #C85C1A; background: rgba(200,92,26,0.12); border: 1px solid rgba(200,92,26,0.2); border-radius: 4px; padding: 2px 8px; letter-spacing: 0.06em; text-transform: uppercase; }
-    .t-rounds { font-family: 'Inter Tight', sans-serif; font-size: 11px; color: #3A3835; margin-left: 8px; }
-    .t-answer { border-left: 2px solid #C85C1A; padding-left: 16px; margin-bottom: 20px; }
-    .t-answer p { font-family: 'Inter', sans-serif; font-size: 15px; line-height: 24px; color: #D4CFC8; }
-    .confidence-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.25); border-radius: 6px; padding: 5px 12px; margin-bottom: 24px; }
-    .confidence-badge span { font-family: 'Inter Tight', sans-serif; font-size: 12px; font-weight: 600; color: #4ADE80; letter-spacing: 0.06em; }
-    .confidence-note { font-family: 'Inter', sans-serif; font-size: 12px; color: #4A4844; margin-left: 8px; }
-    .trace-header { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 600; color: #4A4844; letter-spacing: 0.08em; text-transform: uppercase; border-top: 1px solid #2A2825; padding-top: 20px; margin-bottom: 12px; }
-    .trace-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px; }
-    .trace-round { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 600; color: #C85C1A; min-width: 56px; padding-top: 2px; }
-    .trace-round.ch { color: #8A7A6A; }
-    .trace-round.sc { color: #6A7A8A; }
-    .trace-text { font-family: 'Inter', sans-serif; font-size: 12px; line-height: 18px; color: #5A5650; }
+    .robot-panel {
+      width: 480px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .robot-panel.solver-bg { background: #0A0A0A; border-right: 5px solid #0A0A0A; }
+    .robot-panel.challenger-bg { background: #CC1A1A; border-left: 5px solid #0A0A0A; }
+    .robot-panel.scout-bg { background: #1A1A2E; border-right: 5px solid #0A0A0A; }
 
-    /* MODELS */
-    .models-section { background: #EDEAE3; }
-    .models-section h2 { color: #131210; }
-    .model-cards { display: flex; gap: 24px; }
-    .model-card { flex: 1; border-radius: 12px; padding: 36px; display: flex; flex-direction: column; gap: 24px; }
-    .model-card.light { background: #F7F4EF; }
-    .model-card.dark { background: #131210; }
-    .model-card-header { display: flex; justify-content: space-between; align-items: center; }
-    .model-card-title { font-family: 'Archivo Black', sans-serif; font-size: 22px; letter-spacing: -0.02em; }
-    .light .model-card-title { color: #131210; }
-    .dark .model-card-title { color: #F7F4EF; }
-    .tier-badge { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 600; border-radius: 4px; padding: 3px 10px; letter-spacing: 0.06em; text-transform: uppercase; }
-    .tier-free { color: #5A7A5A; background: rgba(90,122,90,0.1); border: 1px solid rgba(90,122,90,0.2); }
-    .tier-paid { color: #C85C1A; background: rgba(200,92,26,0.12); border: 1px solid rgba(200,92,26,0.25); }
-    .model-rows { display: flex; flex-direction: column; }
-    .model-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; }
-    .light .model-row { border-bottom: 1px solid #E4E0D8; }
-    .dark .model-row { border-bottom: 1px solid #2A2825; }
-    .light .model-row:last-child, .dark .model-row:last-child { border-bottom: none; }
-    .model-name { font-family: 'Inter Tight', sans-serif; font-size: 14px; font-weight: 600; }
-    .light .model-name { color: #131210; }
-    .dark .model-name { color: #F7F4EF; }
-    .model-role { font-family: 'Inter', sans-serif; font-size: 12px; margin-top: 2px; }
-    .light .model-role { color: #8A8278; }
-    .dark .model-role { color: #5A5650; }
-    .model-provider { font-family: 'Inter Tight', sans-serif; font-size: 11px; }
-    .light .model-provider { color: #8A8278; }
-    .dark .model-provider { color: #5A5650; }
-    .code-block { border-radius: 8px; padding: 14px 16px; }
-    .light .code-block { background: #EDEAE3; }
-    .dark .code-block { background: #1E1C19; }
-    .code-block code { font-family: 'JetBrains Mono', monospace; font-size: 13px; }
-    .light .code-block code { color: #5A5650; }
-    .dark .code-block code { color: #7A7268; }
+    .robot-number {
+      position: absolute; top: 20px; left: 24px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
+      letter-spacing: 0.2em;
+    }
+    .solver-bg .robot-number { color: #F5C800; }
+    .challenger-bg .robot-number { color: #F5F5F0; }
+    .scout-bg .robot-number { color: #7B8FF5; }
 
-    /* CTA */
-    .cta-section { background: #C85C1A; padding: 100px 80px; display: flex; justify-content: space-between; align-items: center; gap: 40px; }
-    .cta-section h2 { font-family: 'Archivo Black', sans-serif; font-size: clamp(40px, 4vw, 56px); line-height: 1.04; color: #F7F4EF; letter-spacing: -0.03em; margin-bottom: 16px; }
-    .cta-section p { font-family: 'Inter', sans-serif; font-size: 16px; line-height: 26px; color: rgba(247,244,239,0.7); }
-    .cta-buttons { display: flex; gap: 16px; align-items: center; flex-shrink: 0; }
-    .cta-primary { background: #F7F4EF; border-radius: 8px; padding: 16px 32px; font-family: 'Inter Tight', sans-serif; font-size: 16px; font-weight: 700; color: #C85C1A; text-decoration: none; }
-    .cta-secondary { border: 1px solid rgba(247,244,239,0.3); border-radius: 8px; padding: 16px 32px; font-family: 'Inter Tight', sans-serif; font-size: 16px; font-weight: 500; color: rgba(247,244,239,0.8); text-decoration: none; }
+    .character-info {
+      flex: 1; padding: 56px 56px;
+      display: flex; flex-direction: column; gap: 24px;
+      justify-content: center; position: relative;
+    }
+    .char-enter {
+      font-family: 'Bebas Neue', sans-serif; font-size: 12px;
+      color: #CC1A1A; letter-spacing: 0.25em; border-bottom: 2px solid #0A0A0A; padding-bottom: 10px;
+    }
+    .char-name {
+      font-family: 'Bangers', cursive; font-size: 80px;
+      line-height: 0.92; color: #0A0A0A; letter-spacing: 0.03em;
+    }
+    .char-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: 18px;
+      letter-spacing: 0.18em; padding: 6px 0;
+    }
+    .char-quote {
+      font-family: 'Bangers', cursive; font-size: 26px;
+      line-height: 1.2; color: #0A0A0A; letter-spacing: 0.02em;
+      border-left: 5px solid #F5C800; padding-left: 16px;
+    }
+    .char-stats {
+      display: flex; flex-direction: column; gap: 10px;
+      border: 3px solid #0A0A0A; padding: 20px 24px;
+      background: #F5F5F0; box-shadow: 5px 5px 0 #0A0A0A;
+    }
+    .stats-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
+      color: #CC1A1A; letter-spacing: 0.2em; margin-bottom: 4px;
+    }
+    .stat-row {
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid #D0D0CB; padding-bottom: 8px;
+    }
+    .stat-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .stat-label {
+      font-family: 'Bebas Neue', sans-serif; font-size: 13px;
+      color: #5A5A55; letter-spacing: 0.1em;
+    }
+    .stat-bar { display: flex; gap: 3px; }
+    .stat-pip {
+      width: 16px; height: 8px; background: #0A0A0A;
+    }
+    .stat-pip.empty { background: #D0D0CB; }
+    .char-flavor {
+      font-family: 'Inter Tight', sans-serif; font-size: 14px;
+      line-height: 22px; color: #5A5A55;
+    }
 
-    @media (max-width: 900px) {
-      nav, section, .hero, .cta-section { padding-left: 24px; padding-right: 24px; }
-      .hero-top, .section-header, .output-layout, .cta-section { flex-direction: column; }
-      .pipeline-cards { flex-direction: column; }
-      .arrow { transform: rotate(90deg); }
-      .workflow-cards, .model-cards { flex-direction: column; }
-      .cta-buttons { flex-direction: column; width: 100%; }
+    /* ─────────────────────────────────────────
+       BATTLE SEQUENCE
+    ───────────────────────────────────────── */
+    .battle-header {
+      background: #CC1A1A; padding: 40px 60px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 5px solid #0A0A0A;
+    }
+    .battle-title {
+      font-family: 'Bangers', cursive; font-size: 96px;
+      line-height: 0.9; color: #F5F5F0; letter-spacing: 0.04em;
+    }
+    .battle-subtitle {
+      font-family: 'Bebas Neue', sans-serif; font-size: 14px;
+      color: rgba(245,245,240,0.7); letter-spacing: 0.2em;
+      margin-top: 8px;
+    }
+    .battle-round-count {
+      font-family: 'Bangers', cursive; font-size: 64px;
+      color: #F5C800; letter-spacing: 0.05em; text-align: right; line-height: 1;
+    }
+
+    .rounds-container {
+      display: flex; flex-direction: column;
+      border-bottom: 5px solid #0A0A0A;
+    }
+
+    .round-panel {
+      display: flex; border-bottom: 5px solid #0A0A0A; min-height: 400px;
+    }
+    .round-panel:last-child { border-bottom: none; }
+
+    .round-label-col {
+      width: 100px; flex-shrink: 0;
+      background: #0A0A0A; display: flex; align-items: center;
+      justify-content: center; border-right: 5px solid #0A0A0A;
+    }
+    .round-label-text {
+      font-family: 'Bangers', cursive; font-size: 48px;
+      color: #F5C800; letter-spacing: 0.05em;
+      writing-mode: vertical-rl; text-orientation: mixed;
+      transform: rotate(180deg);
+    }
+
+    .round-content { flex: 1; display: flex; }
+
+    .argument-card {
+      flex: 1; padding: 36px 40px; display: flex; flex-direction: column;
+      gap: 16px; border-right: 4px solid #0A0A0A; position: relative;
+      overflow: hidden;
+    }
+    .argument-card:last-child { border-right: none; }
+
+    .arg-role {
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
+      letter-spacing: 0.2em; display: flex; align-items: center; gap: 10px;
+    }
+    .role-dot { width: 10px; height: 10px; flex-shrink: 0; }
+    .solver-dot { background: #F5C800; }
+    .challenger-dot { background: #CC1A1A; }
+    .scout-dot { background: #4A6FD4; }
+
+    .arg-headline {
+      font-family: 'Bangers', cursive; font-size: 32px;
+      line-height: 1.1; color: #0A0A0A; letter-spacing: 0.02em;
+    }
+    .arg-body {
+      font-family: 'Inter Tight', sans-serif; font-size: 14px;
+      line-height: 22px; color: #3A3A35; flex: 1;
+    }
+    .arg-impact {
+      font-family: 'Bangers', cursive; font-size: 22px;
+      letter-spacing: 0.05em; padding: 6px 0;
+      border-top: 3px solid currentColor;
+    }
+    .solver-impact { color: #8A6A00; border-color: #F5C800; }
+    .challenger-impact { color: #CC1A1A; border-color: #CC1A1A; }
+    .scout-impact { color: #4A6FD4; border-color: #4A6FD4; }
+
+    /* clash bar between rounds */
+    .clash-bar {
+      background: #F5C800; display: flex; align-items: center;
+      justify-content: center; padding: 16px;
+      border-bottom: 5px solid #0A0A0A;
+    }
+    .clash-text {
+      font-family: 'Bangers', cursive; font-size: 64px;
+      color: #0A0A0A; letter-spacing: 0.1em;
+      text-shadow: 4px 4px 0 rgba(0,0,0,0.15);
+    }
+
+    /* ─────────────────────────────────────────
+       VERDICT
+    ───────────────────────────────────────── */
+    .verdict-section {
+      background: #0A0A0A; position: relative; overflow: hidden;
+    }
+    .verdict-inner {
+      padding: 80px 80px; display: flex; gap: 80px; position: relative; z-index: 2;
+    }
+    .verdict-left { flex: 1; display: flex; flex-direction: column; gap: 28px; }
+    .verdict-chapter {
+      font-family: 'Bebas Neue', sans-serif; font-size: 12px;
+      color: #5A5A55; letter-spacing: 0.25em;
+    }
+    .verdict-title {
+      font-family: 'Bangers', cursive; font-size: 96px;
+      line-height: 0.88; color: #F5F5F0; letter-spacing: 0.04em;
+    }
+    .verdict-confidence {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: rgba(245,200,0,0.12); border: 2px solid #F5C800;
+      border-radius: 2px; padding: 10px 20px;
+    }
+    .confidence-label {
+      font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+      color: #F5C800; letter-spacing: 0.15em;
+    }
+    .confidence-note {
+      font-family: 'Inter Tight', sans-serif; font-size: 13px;
+      color: #6A6A65; margin-left: 8px;
+    }
+    .verdict-text {
+      border-left: 4px solid #F5C800; padding-left: 24px;
+    }
+    .verdict-text p {
+      font-family: 'Inter Tight', sans-serif; font-size: 18px;
+      line-height: 30px; color: #C8C8C0;
+    }
+    .verdict-right { width: 440px; flex-shrink: 0; }
+    .trace-box {
+      background: #1A1A18; border: 3px solid #2A2A25;
+      padding: 32px; display: flex; flex-direction: column; gap: 20px;
+    }
+    .trace-box-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: 12px;
+      color: #5A5A55; letter-spacing: 0.2em; border-bottom: 1px solid #2A2A25; padding-bottom: 12px;
+    }
+    .trace-item { display: flex; flex-direction: column; gap: 6px; }
+    .trace-round-label {
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
+      letter-spacing: 0.15em;
+    }
+    .trace-summary {
+      font-family: 'Inter Tight', sans-serif; font-size: 13px;
+      line-height: 20px; color: #6A6A65;
+    }
+    .trace-divider { border: none; border-top: 1px solid #2A2A25; }
+
+    /* ─────────────────────────────────────────
+       FINAL CTA
+    ───────────────────────────────────────── */
+    .final-cta {
+      background: #F5C800; padding: 80px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 5px solid #0A0A0A; gap: 40px;
+    }
+    .cta-title {
+      font-family: 'Bangers', cursive; font-size: 96px;
+      line-height: 0.9; color: #0A0A0A; letter-spacing: 0.04em;
+    }
+    .cta-sub {
+      font-family: 'Bebas Neue', sans-serif; font-size: 14px;
+      color: #5A4A00; letter-spacing: 0.2em; margin-top: 12px;
+    }
+    .cta-buttons { display: flex; gap: 16px; flex-shrink: 0; }
+    .btn-black {
+      background: #0A0A0A; border: 4px solid #0A0A0A;
+      padding: 16px 36px; text-decoration: none;
+      font-family: 'Bebas Neue', sans-serif; font-size: 20px;
+      color: #F5C800; letter-spacing: 0.15em;
+      box-shadow: 6px 6px 0 rgba(0,0,0,0.25);
+    }
+    .btn-outline {
+      background: transparent; border: 4px solid #0A0A0A;
+      padding: 16px 36px; text-decoration: none;
+      font-family: 'Bebas Neue', sans-serif; font-size: 20px;
+      color: #0A0A0A; letter-spacing: 0.15em;
     }
   </style>
 </head>
 <body>
 
-<nav>
-  <div class="nav-left">
-    <a href="#" class="wordmark">Deliberate</a>
-    <span class="badge">Multi-Agent</span>
+<!-- ══════════════════════════════════════
+  TITLE SPLASH
+══════════════════════════════════════ -->
+<div class="title-splash panel">
+  <div class="speed-lines"></div>
+  <div class="chapter-label">CHAPTER 01 — THE ARENA</div>
+  <div class="title-main">
+    <div class="title-word">ROBOTS</div>
+    <div class="versus-row">
+      <div class="versus-line"></div>
+      <span class="versus-text">VERSUS</span>
+      <div class="versus-line"></div>
+    </div>
+    <div class="title-word">ROBOTS</div>
   </div>
-  <div class="nav-links">
-    <a href="#how-it-works">How it works</a>
-    <a href="#models">Models</a>
-    <a href="https://github.com/shikhar127/multi-agent-system" target="_blank">Docs</a>
-    <a href="https://github.com/shikhar127/multi-agent-system" class="nav-cta">Run a query →</a>
+  <div class="splash-tagline">
+    <div class="tagline-inner">THE GREATEST INTELLECTUAL COMBAT EVER WITNESSED</div>
   </div>
-</nav>
+</div>
 
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-top">
-    <div class="hero-left">
-      <div class="eyebrow">Three minds. One answer.</div>
-      <h1>Ask anything.<br/>Get a verdict.</h1>
-    </div>
-    <div class="hero-right">
-      <p>Every question runs through three AI models — Solver, Challenger, and Scout — debating in structured rounds before a final answer is synthesized.</p>
-    </div>
+<!-- ══════════════════════════════════════
+  ARENA SETUP
+══════════════════════════════════════ -->
+<div class="arena-setup panel">
+  <div class="arena-caption halftone-yellow">
+    <div class="narration-label">NARRATION</div>
+    <div class="narration-text">A QUESTION ENTERS THE ARENA.</div>
+    <p class="narration-body">Somewhere in the digital expanse, a question too complex for any single mind — one that demands the highest form of combat: intellectual war.</p>
+    <p class="narration-body" style="margin-top: 8px;">Three robots. Three minds. One truth to uncover.</p>
   </div>
-  <div class="input-box">
-    <div class="type-pills">
-      <span class="pill-active">ANALYTICAL</span>
-      <span class="pill">FACTUAL</span>
-      <span class="pill">CREATIVE</span>
-      <span class="pill">JUDGMENT</span>
+  <div class="arena-panel" style="background: #F5F5F0;">
+    <div style="position: absolute; inset: 0; opacity: 0.05;" class="halftone"></div>
+    <div class="question-bubble">
+      <div class="bubble-label">THE QUESTION</div>
+      <div class="bubble-text">"Should we rewrite the legacy payments service in Go, or incrementally migrate it from Python?"</div>
     </div>
-    <div class="input-row">
-      <div class="fake-input">Should we rewrite the legacy payments service in Go, or incrementally migrate it from Python?</div>
-      <button class="submit-btn">Deliberate →</button>
-    </div>
-    <div class="input-meta">
-      <span>Model preset:</span>
-      <strong>paid — Claude Sonnet 4.6 ×3</strong>
-      <span>Change →</span>
+    <div class="arena-tags">
+      <div class="tag-black">TYPE: ANALYTICAL</div>
+      <div class="tag-red">WORKFLOW B — 3 ROUNDS</div>
+      <span class="impact-word">ENGAGE!!</span>
     </div>
   </div>
 </div>
 
-<!-- PIPELINE -->
-<section class="pipeline-section" id="how-it-works">
-  <div class="section-header">
-    <div>
-      <div class="section-eyebrow">How it works</div>
-      <h2>Three roles.<br/>Structured debate.</h2>
-    </div>
-    <p>The classifier routes each question to the right workflow — 2 to 4 rounds of debate — then synthesizes a final answer with confidence and dissent.</p>
+<!-- ══════════════════════════════════════
+  ROBOT 01 — THE SOLVER
+══════════════════════════════════════ -->
+<div class="character-intro panel">
+  <!-- Robot illustration -->
+  <div class="robot-panel solver-bg">
+    <div class="robot-number">UNIT 01</div>
+    <!-- Speed lines behind robot -->
+    <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.15;" viewBox="0 0 480 560">
+      <line x1="240" y1="280" x2="0" y2="0" stroke="#F5C800" stroke-width="2"/>
+      <line x1="240" y1="280" x2="120" y2="0" stroke="#F5C800" stroke-width="1"/>
+      <line x1="240" y1="280" x2="240" y2="0" stroke="#F5C800" stroke-width="2"/>
+      <line x1="240" y1="280" x2="360" y2="0" stroke="#F5C800" stroke-width="1"/>
+      <line x1="240" y1="280" x2="480" y2="0" stroke="#F5C800" stroke-width="2"/>
+      <line x1="240" y1="280" x2="480" y2="140" stroke="#F5C800" stroke-width="1"/>
+      <line x1="240" y1="280" x2="480" y2="280" stroke="#F5C800" stroke-width="2"/>
+      <line x1="240" y1="280" x2="480" y2="420" stroke="#F5C800" stroke-width="1"/>
+      <line x1="240" y1="280" x2="480" y2="560" stroke="#F5C800" stroke-width="2"/>
+      <line x1="240" y1="280" x2="360" y2="560" stroke="#F5C800" stroke-width="1"/>
+      <line x1="240" y1="280" x2="240" y2="560" stroke="#F5C800" stroke-width="2"/>
+      <line x1="240" y1="280" x2="120" y2="560" stroke="#F5C800" stroke-width="1"/>
+      <line x1="240" y1="280" x2="0" y2="560" stroke="#F5C800" stroke-width="2"/>
+      <line x1="240" y1="280" x2="0" y2="420" stroke="#F5C800" stroke-width="1"/>
+      <line x1="240" y1="280" x2="0" y2="280" stroke="#F5C800" stroke-width="2"/>
+      <line x1="240" y1="280" x2="0" y2="140" stroke="#F5C800" stroke-width="1"/>
+    </svg>
+    <!-- Solver Robot SVG -->
+    <svg width="280" height="340" viewBox="0 0 280 340" style="position:relative;z-index:2;">
+      <!-- Head -->
+      <rect x="60" y="20" width="160" height="140" rx="8" fill="#F5F5F0" stroke="#F5C800" stroke-width="3"/>
+      <!-- Antenna -->
+      <line x1="140" y1="20" x2="140" y2="0" stroke="#F5C800" stroke-width="3"/>
+      <circle cx="140" cy="0" r="6" fill="#F5C800"/>
+      <!-- Eyes — determined, focused -->
+      <rect x="82" y="52" width="40" height="28" rx="4" fill="#0A0A0A"/>
+      <rect x="158" y="52" width="40" height="28" rx="4" fill="#0A0A0A"/>
+      <rect x="88" y="58" width="28" height="16" rx="2" fill="#F5C800"/>
+      <rect x="164" y="58" width="28" height="16" rx="2" fill="#F5C800"/>
+      <!-- Pupils -->
+      <rect x="96" y="62" width="12" height="8" rx="1" fill="#0A0A0A"/>
+      <rect x="172" y="62" width="12" height="8" rx="1" fill="#0A0A0A"/>
+      <!-- Mouth — straight, confident line -->
+      <rect x="90" y="116" width="100" height="6" rx="3" fill="#0A0A0A"/>
+      <rect x="104" y="128" width="72" height="4" rx="2" fill="#3A3A35"/>
+      <!-- Face details -->
+      <rect x="68" y="88" width="12" height="2" fill="#F5C800"/>
+      <rect x="200" y="88" width="12" height="2" fill="#F5C800"/>
+      <!-- Neck -->
+      <rect x="116" y="160" width="48" height="20" rx="4" fill="#D0D0CB" stroke="#0A0A0A" stroke-width="2"/>
+      <!-- Body / shoulders -->
+      <rect x="40" y="180" width="200" height="120" rx="8" fill="#2A2A2A" stroke="#F5C800" stroke-width="3"/>
+      <!-- Chest plate -->
+      <rect x="70" y="196" width="140" height="80" rx="4" fill="#1A1A18"/>
+      <!-- Chest details — circuit lines -->
+      <line x1="90" y1="220" x2="130" y2="220" stroke="#F5C800" stroke-width="1.5"/>
+      <line x1="150" y1="220" x2="190" y2="220" stroke="#F5C800" stroke-width="1.5"/>
+      <line x1="90" y1="236" x2="110" y2="236" stroke="#F5C800" stroke-width="1.5"/>
+      <rect x="122" y="228" width="36" height="20" rx="2" fill="#F5C800" opacity="0.9"/>
+      <text x="140" y="243" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="11" fill="#0A0A0A" letter-spacing="1">SOLVE</text>
+      <!-- Arms -->
+      <rect x="0" y="186" width="36" height="80" rx="6" fill="#2A2A2A" stroke="#F5C800" stroke-width="2"/>
+      <rect x="244" y="186" width="36" height="80" rx="6" fill="#2A2A2A" stroke="#F5C800" stroke-width="2"/>
+      <!-- Fist left — extended forward (argumentative) -->
+      <rect x="0" y="256" width="36" height="30" rx="4" fill="#3A3A35" stroke="#F5C800" stroke-width="2"/>
+      <rect x="244" y="256" width="36" height="30" rx="4" fill="#3A3A35" stroke="#F5C800" stroke-width="2"/>
+      <!-- Legs -->
+      <rect x="80" y="300" width="44" height="36" rx="4" fill="#2A2A2A" stroke="#F5C800" stroke-width="2"/>
+      <rect x="156" y="300" width="44" height="36" rx="4" fill="#2A2A2A" stroke="#F5C800" stroke-width="2"/>
+    </svg>
   </div>
-  <div class="pipeline-cards">
-    <div class="pipeline-card dark">
-      <span class="role-label">Solver</span>
-      <div class="card-title">Builds &amp; proposes</div>
-      <p class="card-desc">Constructs the primary answer or solution. Takes a definitive position and explains its reasoning step by step.</p>
-    </div>
-    <div class="arrow">→</div>
-    <div class="pipeline-card muted">
-      <span class="role-label">Challenger</span>
-      <div class="card-title">Attacks &amp; stress-tests</div>
-      <p class="card-desc">Finds flaws, edge cases, and faulty assumptions. Plays devil's advocate to force a stronger answer.</p>
-    </div>
-    <div class="arrow">→</div>
-    <div class="pipeline-card muted">
-      <span class="role-label">Scout</span>
-      <div class="card-title">Finds alternatives</div>
-      <p class="card-desc">Explores reframings, alternative approaches, and perspectives the Solver missed. Prevents tunnel vision.</p>
-    </div>
-    <div class="arrow">→</div>
-    <div class="pipeline-card accent">
-      <span class="role-label">Synthesizer</span>
-      <div class="card-title">Final verdict</div>
-      <p class="card-desc">Integrates all rounds into a confident final answer with confidence rating, dissent, and full trace.</p>
-    </div>
-  </div>
-</section>
 
-<!-- WORKFLOWS -->
-<section class="workflows-section">
-  <div class="section-header">
-    <div>
-      <div class="section-eyebrow">Workflows</div>
-      <h2>Four question types.<br/>Four debate strategies.</h2>
+  <!-- Character info -->
+  <div class="character-info">
+    <div class="char-enter">— ENTER THE ARENA —</div>
+    <div class="char-name">THE<br/>SOLVER</div>
+    <div class="char-title" style="color: #8A6A00;">THE ARCHITECT OF ANSWERS</div>
+    <div class="char-quote">"I do not guess. I construct. Every argument I make is a fortress built on logic — and I invite you to find the cracks."</div>
+    <div class="char-stats">
+      <div class="stats-title">COMBAT STATS</div>
+      <div class="stat-row">
+        <span class="stat-label">LOGIC</span>
+        <div class="stat-bar">
+          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">PRECISION</span>
+        <div class="stat-bar">
+          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">ADAPTABILITY</span>
+        <div class="stat-bar">
+          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip empty"></div><div class="stat-pip empty"></div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">AGGRESSION</span>
+        <div class="stat-bar">
+          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip empty"></div><div class="stat-pip empty"></div><div class="stat-pip empty"></div>
+        </div>
+      </div>
     </div>
-    <p>The classifier detects question type automatically and routes it to the optimal deliberation workflow.</p>
+    <p class="char-flavor">Assigns itself to build the first complete answer. Methodical. Comprehensive. A debater who has never left a question unanswered — until the Challenger showed up.</p>
   </div>
-  <div class="workflow-cards">
-    <div class="workflow-card">
-      <div class="wf-header"><span class="wf-type">A — Factual</span><span class="wf-rounds">2–3 rounds</span></div>
-      <div class="wf-title">Multi-Agent Debate + Cross-Verification</div>
-      <p class="wf-desc">All three models answer independently, then compare and argue. Arbitration fires only if Round 2 doesn't converge.</p>
-      <div class="wf-example">e.g. "What is the capital of France?"</div>
-    </div>
-    <div class="workflow-card">
-      <div class="wf-header"><span class="wf-type">B — Analytical</span><span class="wf-rounds">3–4 rounds</span></div>
-      <div class="wf-title">Dialectical Debate + Devil's Advocate</div>
-      <p class="wf-desc">Solver builds a full solution; Challenger and Scout attack it; Solver revises; then all converge on a final answer.</p>
-      <div class="wf-example">e.g. "Rewrite in Go or migrate from Python?"</div>
-    </div>
-    <div class="workflow-card">
-      <div class="wf-header"><span class="wf-type">C — Creative</span><span class="wf-rounds">4 rounds</span></div>
-      <div class="wf-title">Nominal Group + Adversarial Collaboration</div>
-      <p class="wf-desc">Each model takes a different persona — Pragmatic, Contrarian, Ambitious — then cross-pollinates into a hybrid recommendation.</p>
-      <div class="wf-example">e.g. "Design a rate-limiting strategy"</div>
-    </div>
-    <div class="workflow-card">
-      <div class="wf-header"><span class="wf-type">D — Judgment</span><span class="wf-rounds">4 rounds</span></div>
-      <div class="wf-title">ACH Evidence Matrix + Crux Analysis</div>
-      <p class="wf-desc">Models take distinct positions, build an evidence matrix, identify crux disagreements, then issue a final judgment with reversal conditions.</p>
-      <div class="wf-example">e.g. "Microservices vs monolith?"</div>
-    </div>
-  </div>
-</section>
+</div>
 
-<!-- OUTPUT -->
-<section class="output-section">
-  <div class="output-layout">
-    <div class="output-left">
-      <div>
-        <div class="section-eyebrow">Output</div>
-        <h2>Answer with evidence,<br/>not just confidence.</h2>
+<!-- ══════════════════════════════════════
+  ROBOT 02 — THE CHALLENGER
+══════════════════════════════════════ -->
+<div class="character-intro reverse panel">
+  <!-- Character info -->
+  <div class="character-info" style="background: #F5F5F0;">
+    <div class="char-enter" style="color: #CC1A1A;">— ENTER THE ARENA —</div>
+    <div class="char-name">THE<br/>CHAL-<br/>LENGER</div>
+    <div class="char-title" style="color: #CC1A1A;">THE DESTROYER OF WEAK LOGIC</div>
+    <div class="char-quote" style="border-left-color: #CC1A1A;">"Every argument has a flaw. Every assumption has a crack. I am the force that finds them — because only by breaking an idea do we know if it can survive."</div>
+    <div class="char-stats">
+      <div class="stats-title">COMBAT STATS</div>
+      <div class="stat-row">
+        <span class="stat-label">LOGIC</span>
+        <div class="stat-bar">
+          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip empty"></div>
+        </div>
       </div>
-      <p>Every response includes a confidence rating, any unresolved dissent, and the full reasoning trace — round by round.</p>
-      <div class="output-bullets">
-        <div class="bullet"><div class="bullet-dot"></div><p>Final answer synthesized from all debate rounds</p></div>
-        <div class="bullet"><div class="bullet-dot"></div><p>HIGH / MEDIUM / LOW confidence rating</p></div>
-        <div class="bullet"><div class="bullet-dot"></div><p>Minority position shown when unresolved</p></div>
-        <div class="bullet"><div class="bullet-dot"></div><p>Per-round trace: what each model said and why it changed</p></div>
+      <div class="stat-row">
+        <span class="stat-label">PRECISION</span>
+        <div class="stat-bar">
+          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip empty"></div><div class="stat-pip empty"></div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">ADAPTABILITY</span>
+        <div class="stat-bar">
+          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip empty"></div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">AGGRESSION</span>
+        <div class="stat-bar">
+          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div>
+        </div>
       </div>
     </div>
-    <div class="terminal">
-      <div class="terminal-header">
-        <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
-        <span class="terminal-label">deliberation output</span>
-      </div>
-      <div class="t-meta">
-        <span class="t-label">Question type</span>
-        <span class="t-type">Analytical</span>
-        <span class="t-rounds">Workflow B · 3 rounds</span>
-      </div>
-      <div class="t-answer">
-        <p>Incremental migration is the stronger choice. A full rewrite carries high delivery risk with no user-facing upside. Migrate the most performance-sensitive endpoints to Go first — payment processing and reconciliation — while keeping the Python API gateway stable. Validate Go performance gains before committing to further migration.</p>
-      </div>
-      <div style="margin-bottom: 24px;">
-        <span class="confidence-badge"><span>HIGH CONFIDENCE</span></span>
-        <span class="confidence-note">All three models converged in Round 3</span>
-      </div>
-      <div class="trace-header">Reasoning trace</div>
-      <div class="trace-row"><span class="trace-round">R1 · S</span><span class="trace-text">Proposed full Go rewrite for maximum performance gains and clean architecture.</span></div>
-      <div class="trace-row"><span class="trace-round ch">R2 · C</span><span class="trace-text">Challenged delivery risk — rewrites routinely take 3× longer than estimated.</span></div>
-      <div class="trace-row"><span class="trace-round sc">R2 · Sc</span><span class="trace-text">Proposed selective migration of hot paths only — validated by Shopify's approach.</span></div>
-      <div class="trace-row"><span class="trace-round">R3 · S</span><span class="trace-text">Revised to incremental migration. Accepted Challenger's risk argument.</span></div>
-    </div>
+    <p class="char-flavor">Its purpose: attack every claim the Solver makes. Not out of ego — but because an idea that survives the Challenger's assault is an idea that deserves to stand.</p>
   </div>
-</section>
 
-<!-- MODELS -->
-<section class="models-section" id="models">
-  <div class="section-header">
-    <div>
-      <div class="section-eyebrow">Models</div>
-      <h2>Free or paid.<br/>Your choice.</h2>
-    </div>
-    <p>Mix and match any model across the three roles. Run entirely free via Groq, or use proprietary models for maximum quality.</p>
+  <!-- Robot panel -->
+  <div class="robot-panel challenger-bg">
+    <div class="robot-number">UNIT 02</div>
+    <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.15;" viewBox="0 0 480 560">
+      <line x1="240" y1="280" x2="0" y2="0" stroke="#F5F5F0" stroke-width="2"/>
+      <line x1="240" y1="280" x2="120" y2="0" stroke="#F5F5F0" stroke-width="1.5"/>
+      <line x1="240" y1="280" x2="240" y2="0" stroke="#F5F5F0" stroke-width="2"/>
+      <line x1="240" y1="280" x2="360" y2="0" stroke="#F5F5F0" stroke-width="1.5"/>
+      <line x1="240" y1="280" x2="480" y2="0" stroke="#F5F5F0" stroke-width="2"/>
+      <line x1="240" y1="280" x2="480" y2="280" stroke="#F5F5F0" stroke-width="2"/>
+      <line x1="240" y1="280" x2="480" y2="560" stroke="#F5F5F0" stroke-width="2"/>
+      <line x1="240" y1="280" x2="240" y2="560" stroke="#F5F5F0" stroke-width="2"/>
+      <line x1="240" y1="280" x2="0" y2="560" stroke="#F5F5F0" stroke-width="2"/>
+      <line x1="240" y1="280" x2="0" y2="280" stroke="#F5F5F0" stroke-width="2"/>
+    </svg>
+    <!-- Challenger Robot SVG — sharp, angular, intense -->
+    <svg width="280" height="340" viewBox="0 0 280 340" style="position:relative;z-index:2;">
+      <!-- Head — angular -->
+      <polygon points="60,20 220,20 240,60 240,155 60,155 40,60" fill="#F5F5F0" stroke="#0A0A0A" stroke-width="3"/>
+      <!-- Antenna — jagged -->
+      <polyline points="140,20 130,0 150,8 140,0" stroke="#CC1A1A" stroke-width="3" fill="none"/>
+      <circle cx="140" cy="0" r="5" fill="#CC1A1A"/>
+      <!-- Eyes — sharp, angry slant -->
+      <polygon points="82,50 122,50 128,80 76,80" fill="#0A0A0A"/>
+      <polygon points="158,50 198,50 204,80 152,80" fill="#0A0A0A"/>
+      <polygon points="86,56 116,56 120,74 82,74" fill="#CC1A1A"/>
+      <polygon points="162,56 192,56 196,74 158,74" fill="#CC1A1A"/>
+      <!-- Pupils — menacing -->
+      <rect x="94" y="60" width="16" height="10" rx="0" fill="#0A0A0A"/>
+      <rect x="166" y="60" width="16" height="10" rx="0" fill="#0A0A0A"/>
+      <!-- Mouth — jagged grin -->
+      <polyline points="88,120 100,112 114,124 128,112 142,124 156,112 170,124 184,120" stroke="#0A0A0A" stroke-width="3" fill="none" stroke-linejoin="round"/>
+      <!-- Steam from head — intensity -->
+      <line x1="80" y1="30" x2="70" y2="10" stroke="#CC1A1A" stroke-width="2" stroke-dasharray="3,2"/>
+      <line x1="200" y1="30" x2="210" y2="10" stroke="#CC1A1A" stroke-width="2" stroke-dasharray="3,2"/>
+      <!-- Neck -->
+      <rect x="112" y="155" width="56" height="22" rx="0" fill="#D0D0CB" stroke="#0A0A0A" stroke-width="2"/>
+      <!-- Body — aggressive stance -->
+      <rect x="32" y="177" width="216" height="120" rx="0" fill="#2A0000" stroke="#CC1A1A" stroke-width="3"/>
+      <!-- Chest plate -->
+      <rect x="62" y="193" width="156" height="84" rx="0" fill="#1A0000"/>
+      <!-- Chest — CHALLENGE text -->
+      <rect x="88" y="224" width="104" height="28" rx="0" fill="#CC1A1A"/>
+      <text x="140" y="243" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="13" fill="#F5F5F0" letter-spacing="2">CHALLENGE</text>
+      <!-- Circuit lines -->
+      <line x1="72" y1="208" x2="96" y2="208" stroke="#CC1A1A" stroke-width="1.5"/>
+      <line x1="184" y1="208" x2="208" y2="208" stroke="#CC1A1A" stroke-width="1.5"/>
+      <!-- Arms — raised, aggressive -->
+      <rect x="0" y="160" width="30" height="96" rx="0" fill="#2A0000" stroke="#CC1A1A" stroke-width="2"/>
+      <rect x="250" y="160" width="30" height="96" rx="0" fill="#2A0000" stroke="#CC1A1A" stroke-width="2"/>
+      <!-- Fists -->
+      <rect x="0" y="250" width="30" height="28" rx="0" fill="#3A0000" stroke="#CC1A1A" stroke-width="2"/>
+      <rect x="250" y="250" width="30" height="28" rx="0" fill="#3A0000" stroke="#CC1A1A" stroke-width="2"/>
+      <!-- Legs -->
+      <rect x="72" y="297" width="48" height="40" rx="0" fill="#2A0000" stroke="#CC1A1A" stroke-width="2"/>
+      <rect x="160" y="297" width="48" height="40" rx="0" fill="#2A0000" stroke="#CC1A1A" stroke-width="2"/>
+    </svg>
   </div>
-  <div class="model-cards">
-    <div class="model-card light">
-      <div class="model-card-header">
-        <span class="model-card-title">Free</span>
-        <span class="tier-badge tier-free">Groq API</span>
-      </div>
-      <div class="model-rows">
-        <div class="model-row"><div><div class="model-name">Llama 3.3 70B</div><div class="model-role">Solver — best open-source general</div></div><span class="model-provider">Meta</span></div>
-        <div class="model-row"><div><div class="model-name">Mixtral 8x7B</div><div class="model-role">Challenger — structured reasoning</div></div><span class="model-provider">Mistral</span></div>
-        <div class="model-row"><div><div class="model-name">Gemma 2 9B</div><div class="model-role">Scout — distinct architecture</div></div><span class="model-provider">Google</span></div>
-      </div>
-      <div class="code-block"><code>MODEL_PRESET=free</code></div>
-    </div>
-    <div class="model-card dark">
-      <div class="model-card-header">
-        <span class="model-card-title">Paid</span>
-        <span class="tier-badge tier-paid">Recommended</span>
-      </div>
-      <div class="model-rows">
-        <div class="model-row"><div><div class="model-name">Claude Sonnet 4.6 ×3</div><div class="model-role">All roles — balanced quality + speed</div></div><span class="model-provider">Anthropic</span></div>
-        <div class="model-row"><div><div class="model-name">Claude Opus 4.6 + Sonnet 4.6</div><div class="model-role">Premium — Opus as Solver</div></div><span class="model-provider">Anthropic</span></div>
-        <div class="model-row"><div><div class="model-name">GPT-4o + Groq mix</div><div class="model-role">Custom — any combination</div></div><span class="model-provider">OpenAI</span></div>
-      </div>
-      <div class="code-block"><code>MODEL_PRESET=paid</code></div>
-    </div>
-  </div>
-</section>
+</div>
 
-<!-- CTA -->
-<div class="cta-section">
+<!-- ══════════════════════════════════════
+  ROBOT 03 — THE SCOUT
+══════════════════════════════════════ -->
+<div class="character-intro panel">
+  <!-- Robot panel -->
+  <div class="robot-panel scout-bg">
+    <div class="robot-number" style="color: #7B8FF5;">UNIT 03</div>
+    <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.1;" viewBox="0 0 480 560">
+      <circle cx="240" cy="280" r="60" stroke="#7B8FF5" stroke-width="1" fill="none"/>
+      <circle cx="240" cy="280" r="120" stroke="#7B8FF5" stroke-width="1" fill="none"/>
+      <circle cx="240" cy="280" r="190" stroke="#7B8FF5" stroke-width="1" fill="none"/>
+      <circle cx="240" cy="280" r="260" stroke="#7B8FF5" stroke-width="1" fill="none"/>
+      <line x1="240" y1="0" x2="240" y2="560" stroke="#7B8FF5" stroke-width="0.5"/>
+      <line x1="0" y1="280" x2="480" y2="280" stroke="#7B8FF5" stroke-width="0.5"/>
+      <line x1="0" y1="0" x2="480" y2="560" stroke="#7B8FF5" stroke-width="0.5"/>
+      <line x1="480" y1="0" x2="0" y2="560" stroke="#7B8FF5" stroke-width="0.5"/>
+    </svg>
+    <!-- Scout Robot SVG — rounded, curious, many eyes -->
+    <svg width="260" height="340" viewBox="0 0 260 340" style="position:relative;z-index:2;">
+      <!-- Head — round, curious -->
+      <ellipse cx="130" cy="110" rx="90" ry="92" fill="#F5F5F0" stroke="#7B8FF5" stroke-width="3"/>
+      <!-- Antenna — multiple -->
+      <line x1="100" y1="22" x2="88" y2="0" stroke="#7B8FF5" stroke-width="2.5"/>
+      <circle cx="86" cy="0" r="5" fill="#7B8FF5"/>
+      <line x1="130" y1="18" x2="130" y2="0" stroke="#7B8FF5" stroke-width="2.5"/>
+      <circle cx="130" cy="0" r="5" fill="#4A6FD4"/>
+      <line x1="160" y1="22" x2="172" y2="0" stroke="#7B8FF5" stroke-width="2.5"/>
+      <circle cx="174" cy="0" r="5" fill="#7B8FF5"/>
+      <!-- Eyes — multiple scanning eyes -->
+      <circle cx="100" cy="95" r="22" fill="#0A0A0A"/>
+      <circle cx="160" cy="95" r="22" fill="#0A0A0A"/>
+      <circle cx="100" cy="95" r="14" fill="#4A6FD4"/>
+      <circle cx="160" cy="95" r="14" fill="#4A6FD4"/>
+      <circle cx="100" cy="95" r="7" fill="#0A0A0A"/>
+      <circle cx="160" cy="95" r="7" fill="#0A0A0A"/>
+      <circle cx="97" cy="92" r="3" fill="#7B8FF5"/>
+      <circle cx="157" cy="92" r="3" fill="#7B8FF5"/>
+      <!-- Small third eye — scanner -->
+      <circle cx="130" cy="140" r="10" fill="#0A0A0A"/>
+      <circle cx="130" cy="140" r="6" fill="#F5C800"/>
+      <circle cx="130" cy="140" r="2" fill="#0A0A0A"/>
+      <!-- Mouth — gentle curve -->
+      <path d="M 100 158 Q 130 172 160 158" stroke="#0A0A0A" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- Neck -->
+      <rect x="108" y="200" width="44" height="18" rx="8" fill="#D0D0CB" stroke="#7B8FF5" stroke-width="2"/>
+      <!-- Body — compact, agile -->
+      <rect x="50" y="218" width="160" height="100" rx="12" fill="#1A1A2E" stroke="#7B8FF5" stroke-width="3"/>
+      <!-- Chest display — scanning radar -->
+      <rect x="74" y="232" width="112" height="68" rx="8" fill="#0D0D1A"/>
+      <circle cx="130" cy="266" r="26" stroke="#4A6FD4" stroke-width="1.5" fill="none"/>
+      <circle cx="130" cy="266" r="16" stroke="#7B8FF5" stroke-width="1" fill="none"/>
+      <line x1="130" y1="266" x2="148" y2="252" stroke="#7B8FF5" stroke-width="2"/>
+      <circle cx="130" cy="266" r="3" fill="#7B8FF5"/>
+      <text x="130" y="312" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="10" fill="#4A6FD4" letter-spacing="2">SCOUT</text>
+      <!-- Arms — nimble -->
+      <rect x="8" y="224" width="38" height="70" rx="10" fill="#1A1A2E" stroke="#7B8FF5" stroke-width="2"/>
+      <rect x="214" y="224" width="38" height="70" rx="10" fill="#1A1A2E" stroke="#7B8FF5" stroke-width="2"/>
+      <ellipse cx="27" cy="298" rx="18" ry="12" fill="#252535" stroke="#7B8FF5" stroke-width="2"/>
+      <ellipse cx="233" cy="298" rx="18" ry="12" fill="#252535" stroke="#7B8FF5" stroke-width="2"/>
+      <!-- Legs -->
+      <rect x="74" y="318" width="40" height="20" rx="6" fill="#1A1A2E" stroke="#7B8FF5" stroke-width="2"/>
+      <rect x="146" y="318" width="40" height="20" rx="6" fill="#1A1A2E" stroke="#7B8FF5" stroke-width="2"/>
+    </svg>
+  </div>
+
+  <!-- Character info -->
+  <div class="character-info" style="background: #F5F5F0;">
+    <div class="char-enter" style="color: #4A6FD4;">— ENTER THE ARENA —</div>
+    <div class="char-name" style="color: #0A0A0A;">THE<br/>SCOUT</div>
+    <div class="char-title" style="color: #4A6FD4;">THE SEEKER OF HIDDEN PATHS</div>
+    <div class="char-quote" style="border-left-color: #4A6FD4;">"While they fight over what is in front of them, I search for what neither of them can see. The answer is rarely in the middle — it's off the map entirely."</div>
+    <div class="char-stats">
+      <div class="stats-title">COMBAT STATS</div>
+      <div class="stat-row">
+        <span class="stat-label">LOGIC</span>
+        <div class="stat-bar">
+          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip empty"></div><div class="stat-pip empty"></div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">PRECISION</span>
+        <div class="stat-bar">
+          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip empty"></div><div class="stat-pip empty"></div><div class="stat-pip empty"></div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">ADAPTABILITY</span>
+        <div class="stat-bar">
+          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">LATERAL THINKING</span>
+        <div class="stat-bar">
+          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div>
+        </div>
+      </div>
+    </div>
+    <p class="char-flavor">Trained to find what no one is looking for. Its radar sweeps every domain, every case study, every precedent — surfacing the alternative no one considered.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+  THE BATTLE
+══════════════════════════════════════ -->
+<div class="battle-header">
   <div>
-    <h2>Ready to deliberate?</h2>
-    <p>pip install and run in 60 seconds. Free models included.</p>
+    <div class="battle-title">THE<br/>BATTLE</div>
+    <div class="battle-subtitle">3 ROUNDS OF INTELLECTUAL COMBAT — NO HOLDS BARRED</div>
+  </div>
+  <div style="text-align: right;">
+    <div class="battle-round-count">ROUND<br/>01 / 03</div>
+    <div style="font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: rgba(245,245,240,0.5); letter-spacing: 0.15em; margin-top: 8px;">INDEPENDENT PROPOSALS</div>
+  </div>
+</div>
+
+<div class="rounds-container">
+  <!-- ROUND 1 -->
+  <div class="round-panel">
+    <div class="round-label-col">
+      <div class="round-label-text">ROUND 01</div>
+    </div>
+    <div class="round-content">
+      <!-- Solver -->
+      <div class="argument-card" style="background: #FEFDF8;">
+        <div style="position:absolute;inset:0;opacity:0.04;" class="halftone"></div>
+        <div class="arg-role" style="color: #8A6A00;">
+          <div class="role-dot solver-dot"></div>
+          SOLVER — UNIT 01
+        </div>
+        <div class="arg-headline">"A Full Rewrite. Go. Now. Clean Architecture From Day One."</div>
+        <p class="arg-body">The Python service is a liability. Go gives us concurrency primitives that Python simply cannot match for payment processing at scale. Our test suite validates the behaviour — port it, test it, ship it. A full rewrite is 6 months of pain followed by years of clarity.</p>
+        <div class="arg-impact solver-impact">POSITION: FULL REWRITE IN GO</div>
+      </div>
+      <!-- Challenger -->
+      <div class="argument-card" style="background: #FFF5F5;">
+        <div style="position:absolute;inset:0;opacity:0.04;" class="halftone"></div>
+        <div class="arg-role" style="color: #CC1A1A;">
+          <div class="role-dot challenger-dot"></div>
+          CHALLENGER — UNIT 02
+        </div>
+        <div class="arg-headline">"Six Months? That's Optimistic. Try Eighteen."</div>
+        <p class="arg-body">Large-scale rewrites take 3–5× longer than estimated. It's empirical. Netscape, Knight Capital, Mox Bank — I have every case study memorised. The payments service handles ₹2,000 Cr/month. A regression here is not a bug — it is a catastrophe. The Solver underestimates the blast radius of its own proposal.</p>
+        <div class="arg-impact challenger-impact">POSITION: THE REWRITE IS RECKLESS</div>
+      </div>
+      <!-- Scout -->
+      <div class="argument-card" style="background: #F5F5FF;">
+        <div style="position:absolute;inset:0;opacity:0.04;" class="halftone"></div>
+        <div class="arg-role" style="color: #4A6FD4;">
+          <div class="role-dot scout-dot"></div>
+          SCOUT — UNIT 03
+        </div>
+        <div class="arg-headline">"There's a Third Option Neither of You Are Seeing."</div>
+        <p class="arg-body">Selective hot-path migration. Not a full rewrite — not status quo. Identify the 20% of endpoints responsible for 80% of load. Rewrite those in Go. Keep the Python gateway stable. I found the Shopify engineering post. 40% latency improvement. Zero downtime. This path exists.</p>
+        <div class="arg-impact scout-impact">POSITION: SELECTIVE HOT-PATH MIGRATION</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLASH BAR -->
+  <div class="clash-bar">
+    <span class="clash-text">CLASH!!</span>
+    <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#0A0A0A;margin:0 32px;letter-spacing:0.2em;">ROUND 02 — CHALLENGE &amp; COUNTER</span>
+    <span class="clash-text">CLASH!!</span>
+  </div>
+
+  <!-- ROUND 2 -->
+  <div class="round-panel">
+    <div class="round-label-col" style="background: #CC1A1A;">
+      <div class="round-label-text" style="color: #F5F5F0;">ROUND 02</div>
+    </div>
+    <div class="round-content">
+      <!-- Challenger attacks Solver -->
+      <div class="argument-card" style="background: #FFF0F0;">
+        <div class="arg-role" style="color: #CC1A1A;">
+          <div class="role-dot challenger-dot"></div>
+          CHALLENGER → SOLVER
+        </div>
+        <div class="arg-headline">"Your Test Suite Won't Save You From Concurrency Bugs."</div>
+        <p class="arg-body">The Solver claims the Python tests validate the Go implementation. They do not. Go's goroutine model surfaces race conditions that Python's GIL was silently suppressing. You will spend months debugging issues that your existing tests will never catch. This is not pessimism — this is physics.</p>
+        <div class="arg-impact challenger-impact">FLAW FOUND: TEST SUITE IS INSUFFICIENT</div>
+      </div>
+      <!-- Scout expands -->
+      <div class="argument-card" style="background: #F0F0FF;">
+        <div class="arg-role" style="color: #4A6FD4;">
+          <div class="role-dot scout-dot"></div>
+          SCOUT — EXPANDED EVIDENCE
+        </div>
+        <div class="arg-headline">"Here's Exactly Which Endpoints. I Ran the Analysis."</div>
+        <p class="arg-body">Payment processing: 340ms p99 in Python, 58ms in Go benchmark. Reconciliation batch: 4.2 minutes vs 42 seconds. These two endpoints. Everything else: Python performance is adequate. The incremental path has a clear, measurable definition — it isn't vague. The Solver's binary framing is a false dilemma.</p>
+        <div class="arg-impact scout-impact">EVIDENCE: 2 ENDPOINTS DRIVE ALL LATENCY</div>
+      </div>
+      <!-- Solver forced to respond -->
+      <div class="argument-card" style="background: #FFFDF0;">
+        <div class="arg-role" style="color: #8A6A00;">
+          <div class="role-dot solver-dot"></div>
+          SOLVER — UNDER PRESSURE
+        </div>
+        <div class="arg-headline">"The Challenger's Concurrency Point... Has Merit."</div>
+        <p class="arg-body">I must acknowledge: the GIL argument is structurally sound. My original test-suite confidence was misplaced. However — the Scout's selective migration still requires rewriting Go concurrency in the hottest paths. We face the concurrency problem regardless. The question is scope, not whether.</p>
+        <div class="arg-impact solver-impact">CONCEDES: TEST SUITE ARGUMENT IS VALID</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINAL CLASH -->
+  <div class="clash-bar" style="background: #0A0A0A;">
+    <span class="clash-text" style="color: #F5C800;">CONVERGENCE!!</span>
+    <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#F5F5F0;margin:0 32px;letter-spacing:0.2em;">ROUND 03 — THE VERDICT</span>
+    <span class="clash-text" style="color: #F5C800;">CONVERGENCE!!</span>
+  </div>
+
+  <!-- ROUND 3 -->
+  <div class="round-panel">
+    <div class="round-label-col" style="background: #F5C800;">
+      <div class="round-label-text" style="color: #0A0A0A;">ROUND 03</div>
+    </div>
+    <div class="round-content">
+      <div class="argument-card" style="background: #FFFDF0; flex: 1.5;">
+        <div class="arg-role" style="color: #8A6A00;">
+          <div class="role-dot solver-dot"></div>
+          SOLVER — REVISED POSITION
+        </div>
+        <div class="arg-headline">"I Accept the Scout's Framing. Incremental Migration — With Conditions."</div>
+        <p class="arg-body">The Challenger's delivery-risk argument and the Scout's empirical data have shifted my position. A full rewrite introduces uncalculated risk at a scale of ₹2,000 Cr/month in transactions. I revise: migrate the payment processing and reconciliation endpoints to Go first. Set a 3-month checkpoint — if latency gains confirm the Scout's projections, continue migration. If not, stop and reassess the full-rewrite thesis.</p>
+        <div class="arg-impact solver-impact">REVISED: INCREMENTAL — MEASURE FIRST</div>
+      </div>
+      <div class="argument-card" style="background: #FFF5F5;">
+        <div class="arg-role" style="color: #CC1A1A;">
+          <div class="role-dot challenger-dot"></div>
+          CHALLENGER — SATISFIED
+        </div>
+        <div class="arg-headline">"The 3-Month Checkpoint Is Exactly Right."</div>
+        <p class="arg-body">The Solver has incorporated the risk analysis. The Scout provided the evidence. The revised position is sound: validate the incremental approach with real production data before committing further. I concur. This is not surrender — this is what rigorous debate produces.</p>
+        <div class="arg-impact challenger-impact">CONVERGENCE ACHIEVED</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+  VERDICT
+══════════════════════════════════════ -->
+<div class="verdict-section panel">
+  <div class="speed-lines" style="opacity: 0.06; position: absolute; inset: 0;"></div>
+  <div class="verdict-inner">
+    <div class="verdict-left">
+      <div class="verdict-chapter">— FINAL JUDGMENT —</div>
+      <div class="verdict-title">THE<br/>VERDICT</div>
+      <div class="verdict-confidence">
+        <span class="confidence-label">⬡ HIGH CONFIDENCE</span>
+        <span class="confidence-note">All 3 robots converged in Round 3</span>
+      </div>
+      <div class="verdict-text">
+        <p>Incremental migration is the stronger choice. Migrate payment processing and reconciliation endpoints to Go first. Keep the Python API gateway stable. Set a hard checkpoint at 3 months: if Go endpoints show less than 20% latency improvement in production, reconsider the migration thesis entirely before committing further resources.</p>
+      </div>
+      <div style="font-family:'Bangers',cursive;font-size:36px;color:#F5C800;letter-spacing:0.05em;margin-top: 8px;">THE DEBATE IS OVER. THE TRUTH REMAINS.</div>
+    </div>
+    <div class="verdict-right">
+      <div class="trace-box">
+        <div class="trace-box-title">BATTLE LOG — 3 ROUNDS</div>
+        <div class="trace-item">
+          <div class="trace-round-label" style="color: #F5C800;">R1 · SOLVER</div>
+          <div class="trace-summary">Proposed full Go rewrite. Cited clean architecture and test suite validation.</div>
+        </div>
+        <hr class="trace-divider"/>
+        <div class="trace-item">
+          <div class="trace-round-label" style="color: #CC1A1A;">R1 · CHALLENGER</div>
+          <div class="trace-summary">Flagged delivery risk. Referenced historical rewrite failures at scale.</div>
+        </div>
+        <hr class="trace-divider"/>
+        <div class="trace-item">
+          <div class="trace-round-label" style="color: #4A6FD4;">R1 · SCOUT</div>
+          <div class="trace-summary">Introduced selective hot-path migration. Found Shopify case study.</div>
+        </div>
+        <hr class="trace-divider"/>
+        <div class="trace-item">
+          <div class="trace-round-label" style="color: #CC1A1A;">R2 · CHALLENGER</div>
+          <div class="trace-summary">Destroyed Solver's test-suite confidence. GIL concurrency argument.</div>
+        </div>
+        <hr class="trace-divider"/>
+        <div class="trace-item">
+          <div class="trace-round-label" style="color: #4A6FD4;">R2 · SCOUT</div>
+          <div class="trace-summary">Produced specific latency benchmarks for 2 target endpoints.</div>
+        </div>
+        <hr class="trace-divider"/>
+        <div class="trace-item">
+          <div class="trace-round-label" style="color: #F5C800;">R3 · SOLVER</div>
+          <div class="trace-summary">Revised position. Accepted risk argument. Proposed 3-month checkpoint.</div>
+        </div>
+        <hr class="trace-divider"/>
+        <div class="trace-item" style="background: rgba(245,200,0,0.06); margin: 0 -32px -32px; padding: 20px 32px;">
+          <div class="trace-round-label" style="color: #F5C800; font-size: 14px;">UNANIMOUS CONVERGENCE</div>
+          <div class="trace-summary">First time in recorded robot debate history. Three minds. One truth.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+  FINAL CTA
+══════════════════════════════════════ -->
+<div class="final-cta">
+  <div>
+    <div class="cta-title">YOUR TURN<br/>TO FIGHT.</div>
+    <div class="cta-sub">PIP INSTALL. FREE MODELS INCLUDED. ENTER THE ARENA.</div>
   </div>
   <div class="cta-buttons">
-    <a href="https://github.com/shikhar127/multi-agent-system" class="cta-primary">Get started →</a>
-    <a href="https://github.com/shikhar127/multi-agent-system" class="cta-secondary">View on GitHub</a>
+    <a href="https://github.com/shikhar127/multi-agent-system" class="btn-black">GET STARTED →</a>
+    <a href="https://github.com/shikhar127/multi-agent-system" class="btn-outline">VIEW ON GITHUB</a>
   </div>
 </div>
 
