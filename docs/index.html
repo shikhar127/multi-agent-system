@@ -448,18 +448,16 @@
       font-family: 'Inter Tight', sans-serif; font-size: 12px; color: #9A9A90;
     }
     .verdict-summary {
-      font-family: 'Inter Tight', sans-serif; font-size: 16px; font-weight: 700;
-      color: #F5F5F0; line-height: 1.5; margin-bottom: 16px;
+      font-family: 'Inter Tight', sans-serif; font-size: 17px; font-weight: 700;
+      color: #F5F5F0; line-height: 1.5; margin-bottom: 20px;
     }
-    .verdict-reasons {
-      list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;
+    .verdict-section-label {
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
+      letter-spacing: 0.2em; color: #5A5650; margin-bottom: 8px;
     }
-    .verdict-reasons li {
-      font-family: 'Inter Tight', sans-serif; font-size: 14px; color: #C0BAB0;
-      line-height: 1.5; padding-left: 16px; position: relative;
-    }
-    .verdict-reasons li::before {
-      content: '—'; position: absolute; left: 0; color: #F5C800;
+    .verdict-reasoning {
+      font-family: 'Inter Tight', sans-serif; font-size: 14px;
+      color: #A8A8A0; line-height: 1.75; margin-bottom: 20px;
     }
     .verdict-actions { display: flex; flex-direction: column; gap: 6px; }
     .verdict-actions-label {
@@ -1034,7 +1032,8 @@
         <div class="verdict-big">THE<br/>VERDICT</div>
         <div class="verdict-answer-text" id="verdict-answer-block">
           <div class="verdict-summary" id="verdict-summary"></div>
-          <ul class="verdict-reasons" id="verdict-reasons"></ul>
+          <div class="verdict-section-label">FULL REASONING</div>
+          <div class="verdict-reasoning" id="verdict-reasoning"></div>
           <div id="verdict-actions-wrap" style="display:none">
             <div class="verdict-actions-label">ACTION ITEMS</div>
             <ul class="verdict-actions" id="verdict-actions"></ul>
@@ -1826,16 +1825,16 @@ async function startFight() {
     // ── VERDICT ──────────────────────────────────
     setStatus('THE SYNTHESIZER IS DELIVERING THE VERDICT…', 'FINAL JUDGMENT');
 
-    const verdictPrompt = `You are the SYNTHESIZER in "Robots versus Robots". Three robots debated a question. Cut through the noise and give the real answer.
+    const verdictPrompt = `You are the SYNTHESIZER in "Robots versus Robots". Three robots debated a question. Deliver the final verdict in three parts.
 
-Write like you're explaining to a smart 12-year-old. No corporate speak, no hedging, no "it depends". Pick a side and say it plainly. One dry joke allowed if it fits naturally — don't force it.
+Write like you're explaining to a smart 12-year-old. No corporate speak, no hedging. Pick a side and commit. One dry joke allowed if it fits — don't force it.
 
 Structure your response as JSON with these exact fields:
 {
   "confidence": "HIGH" | "MEDIUM" | "LOW",
   "confidence_note": "one short sentence — why you're sure or not sure",
-  "summary": "1-2 sentences, plain English, no fluff. State what's true and move on.",
-  "reasons": ["short reason 1", "short reason 2", "short reason 3"],
+  "summary": "1-2 sentences. The bottom-line answer, plain English. No fluff.",
+  "reasoning": "3-5 sentences. The full explanation — which arguments actually held up, which fell apart and why, what the debate revealed that wasn't obvious at the start. Be specific, name the actual points that mattered.",
   "action_items": ["concrete action 1", "concrete action 2"],
   "verdict": "same as summary field",
   "r1_trace": "one sentence: what Solver said in Round 1",
@@ -1844,7 +1843,7 @@ Structure your response as JSON with these exact fields:
   "r3_trace": "one sentence: Solver's final position",
   "verdict_trace": "one sentence: final call"
 }
-Rules: reasons = 2-4 strings, each under 15 words, no filler. action_items = 1-3 strings, ONLY if something needs to be done — empty array for trivia/philosophy questions. No buzzwords, no "it is worth noting", no "in conclusion".`;
+Rules: reasoning must be a single string (not an array). action_items = 1-3 strings, ONLY if something needs to be done — empty array for trivia/philosophy questions. No buzzwords, no "it is worth noting", no "in conclusion".`;
 
     const verdictRaw = await callWithFallback(apiKey, solverModel, verdictPrompt,
       `The question: "${question}"\n\nR1 SOLVER: ${solverRaw}\n\nR2 CHALLENGER: ${challengerRaw}\n\nR2 SCOUT: ${scoutRaw}\n\nR3 SOLVER (revised): ${r3Raw}\n\nDeliver the final verdict as JSON.`);
@@ -1873,7 +1872,7 @@ Rules: reasons = 2-4 strings, each under 15 words, no filler. action_items = 1-3
         confidence:      extractField(verdictRaw, 'confidence')      || 'MEDIUM',
         confidence_note: extractField(verdictRaw, 'confidence_note') || 'The robots reached a reasoned conclusion.',
         summary:         extractField(verdictRaw, 'summary')         || extractField(verdictRaw, 'verdict') || 'The debate has concluded.',
-        reasons:         [],
+        reasoning:       extractField(verdictRaw, 'reasoning')       || '',
         action_items:    [],
         verdict:         extractField(verdictRaw, 'verdict')         || 'The debate has concluded. See the round summaries above.',
         r1_trace:        extractField(verdictRaw, 'r1_trace')        || 'Solver proposed initial position.',
@@ -1901,11 +1900,8 @@ Rules: reasons = 2-4 strings, each under 15 words, no filler. action_items = 1-3
     const summaryEl = document.getElementById('verdict-summary');
     if (summaryEl) summaryEl.textContent = vd.summary || vd.verdict || '';
 
-    const reasonsEl = document.getElementById('verdict-reasons');
-    if (reasonsEl) {
-      const reasons = Array.isArray(vd.reasons) ? vd.reasons : [];
-      reasonsEl.innerHTML = reasons.map(r => `<li>${r}</li>`).join('');
-    }
+    const reasoningEl = document.getElementById('verdict-reasoning');
+    if (reasoningEl) reasoningEl.textContent = vd.reasoning || '';
 
     const actionsEl = document.getElementById('verdict-actions');
     const actionsWrap = document.getElementById('verdict-actions-wrap');
@@ -2089,11 +2085,11 @@ function toggleScout() {
 // Copy verdict to clipboard
 function copyVerdict() {
   const summary = document.getElementById('verdict-summary')?.textContent || '';
-  const reasons = [...(document.getElementById('verdict-reasons')?.querySelectorAll('li') || [])].map(li => '— ' + li.textContent).join('\n');
+  const reasoning = document.getElementById('verdict-reasoning')?.textContent || '';
   const actions = [...(document.getElementById('verdict-actions')?.querySelectorAll('li') || [])].map(li => '→ ' + li.textContent).join('\n');
   const conf = document.getElementById('verdict-confidence')?.textContent || '';
   let text = `[Robots versus Robots — ${conf}]\n\n${summary}`;
-  if (reasons) text += `\n\nKEY REASONS\n${reasons}`;
+  if (reasoning) text += `\n\nFULL REASONING\n${reasoning}`;
   if (actions) text += `\n\nACTION ITEMS\n${actions}`;
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.getElementById('copy-verdict-btn');
