@@ -167,6 +167,28 @@
       line-height: 18px;
     }
 
+    /* OAuth connect */
+    .oauth-connect-btn {
+      background: transparent; border: 3px solid #F5C800;
+      padding: 12px 20px; cursor: pointer; width: 100%;
+      font-family: 'Bebas Neue', sans-serif; font-size: 16px;
+      letter-spacing: 0.12em; color: #F5C800; transition: background 0.15s;
+    }
+    .oauth-connect-btn:hover { background: rgba(245,200,0,0.1); }
+    .oauth-connected-state {
+      display: flex; align-items: center; justify-content: space-between;
+      border: 3px solid #4A8A60; padding: 12px 16px;
+      background: rgba(74,138,96,0.08);
+    }
+    .oauth-connected-label {
+      font-family: 'Bebas Neue'; font-size: 14px; color: #4A8A60; letter-spacing: 0.1em;
+    }
+    .oauth-disconnect-btn {
+      font-family: 'Bebas Neue'; font-size: 12px; color: #5A5A50;
+      background: transparent; border: none; cursor: pointer; letter-spacing: 0.05em;
+    }
+    .oauth-disconnect-btn:hover { color: #CC1A1A; }
+
     /* ════════════════════════════════
        BATTLE RESULTS
     ════════════════════════════════ */
@@ -792,13 +814,30 @@
         </div>
       </div>
 
-      <div class="form-field">
+      <div class="form-field" id="key-field">
         <label class="field-label" for="api-key-input">BATTLE KEY (OPENROUTER API KEY)</label>
         <input id="api-key-input" type="password" class="key-input" style="width:100%;" placeholder="sk-or-v1-…" autocomplete="off" />
         <div class="form-note">One key for all models. Get a free key at openrouter.ai — no separate Anthropic or OpenAI key needed.</div>
         <div class="remember-row">
           <input type="checkbox" id="remember-key" onchange="toggleRememberKey()" />
           <label for="remember-key">Remember for this session</label>
+        </div>
+      </div>
+
+      <div class="form-field" id="free-connect-field" style="display:none;">
+        <div class="field-label">OPENROUTER ACCOUNT</div>
+        <div id="oauth-connect-view">
+          <button class="oauth-connect-btn" onclick="connectOpenRouter()">CONNECT OPENROUTER →</button>
+          <div class="form-note" style="margin-top:8px;">Free models, no credit card. Your key stays in this browser — never sent anywhere except OpenRouter.</div>
+        </div>
+        <div id="oauth-connected-view" style="display:none;">
+          <div class="oauth-connected-state">
+            <div>
+              <div class="oauth-connected-label">✓ CONNECTED</div>
+              <div class="form-note" style="margin-top:3px;">Free OpenRouter account linked for this session</div>
+            </div>
+            <button class="oauth-disconnect-btn" onclick="disconnectOpenRouter()">DISCONNECT</button>
+          </div>
         </div>
       </div>
 
@@ -1385,6 +1424,16 @@ function setTier(tier) {
   else if (liveFreeModels.length > 0) populateFreeSelects(liveFreeModels);
   else showFreeSelectPlaceholder(); // clear paid options so they don't mislead
   updateMoreOptionsTierLabel();
+  // Toggle between manual key input (paid) and OAuth connect (free)
+  const keyField = document.getElementById('key-field');
+  const freeField = document.getElementById('free-connect-field');
+  if (tier === 'free') {
+    if (keyField) keyField.style.display = 'none';
+    if (freeField) freeField.style.display = 'block';
+  } else {
+    if (keyField) keyField.style.display = 'block';
+    if (freeField) freeField.style.display = 'none';
+  }
 }
 
 function toggleMoreOptions() {
@@ -1627,7 +1676,11 @@ async function startFight() {
   const errEl = document.getElementById('form-error');
   if (errEl) errEl.style.display = 'none';
   if (!question) { showError('Enter a question for the robots to fight over.'); return; }
-  if (!apiKey) { showError('Enter your OpenRouter API key. Get one free at openrouter.ai'); return; }
+  if (!apiKey) {
+    if (currentTier === 'free') showError('Connect your OpenRouter account first — click "CONNECT OPENROUTER" above.');
+    else showError('Enter your OpenRouter API key. Get one free at openrouter.ai');
+    return;
+  }
 
   fightInProgress = true;
   currentAbortController = new AbortController();
@@ -1773,21 +1826,25 @@ async function startFight() {
     // ── VERDICT ──────────────────────────────────
     setStatus('THE SYNTHESIZER IS DELIVERING THE VERDICT…', 'FINAL JUDGMENT');
 
-    const verdictPrompt = `You are the SYNTHESIZER in "Robots versus Robots". Three robots have debated a question across 3 rounds. Your job is to deliver the final verdict — a clear, decisive answer that incorporates the best arguments from all three robots. Structure your response as JSON with these exact fields:
+    const verdictPrompt = `You are the SYNTHESIZER in "Robots versus Robots". Three robots debated a question. Cut through the noise and give the real answer.
+
+Write like you're explaining to a smart 12-year-old. No corporate speak, no hedging, no "it depends". Pick a side and say it plainly. One dry joke allowed if it fits naturally — don't force it.
+
+Structure your response as JSON with these exact fields:
 {
   "confidence": "HIGH" | "MEDIUM" | "LOW",
-  "confidence_note": "one sentence explaining the confidence level",
-  "summary": "1-2 sentence crisp bottom-line answer — the verdict in plain English",
-  "reasons": ["key reason 1", "key reason 2", "key reason 3"],
+  "confidence_note": "one short sentence — why you're sure or not sure",
+  "summary": "1-2 sentences, plain English, no fluff. State what's true and move on.",
+  "reasons": ["short reason 1", "short reason 2", "short reason 3"],
   "action_items": ["concrete action 1", "concrete action 2"],
-  "verdict": "summary sentence for copy/reference (same as summary field)",
-  "r1_trace": "one sentence summary of Solver's Round 1 position",
-  "r2c_trace": "one sentence summary of Challenger's key attack",
-  "r2s_trace": "one sentence summary of Scout's key finding",
-  "r3_trace": "one sentence summary of Solver's revised position",
-  "verdict_trace": "one sentence final judgment summary"
+  "verdict": "same as summary field",
+  "r1_trace": "one sentence: what Solver said in Round 1",
+  "r2c_trace": "one sentence: what Challenger attacked",
+  "r2s_trace": "one sentence: what Scout found",
+  "r3_trace": "one sentence: Solver's final position",
+  "verdict_trace": "one sentence: final call"
 }
-Rules: reasons must be an array of 2-4 strings. action_items is an array of 1-3 strings — include ONLY if the question implies something to do or decide; omit (empty array) for purely philosophical or factual questions.`;
+Rules: reasons = 2-4 strings, each under 15 words, no filler. action_items = 1-3 strings, ONLY if something needs to be done — empty array for trivia/philosophy questions. No buzzwords, no "it is worth noting", no "in conclusion".`;
 
     const verdictRaw = await callWithFallback(apiKey, solverModel, verdictPrompt,
       `The question: "${question}"\n\nR1 SOLVER: ${solverRaw}\n\nR2 CHALLENGER: ${challengerRaw}\n\nR2 SCOUT: ${scoutRaw}\n\nR3 SOLVER (revised): ${r3Raw}\n\nDeliver the final verdict as JSON.`);
@@ -1921,8 +1978,75 @@ document.getElementById('question-input').addEventListener('input', function() {
   this.style.height = this.scrollHeight + 'px';
 });
 
+// ── PKCE OAUTH (OpenRouter free tier) ────────────
+function _b64url(buf) {
+  return btoa(String.fromCharCode(...new Uint8Array(buf)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+async function _codeVerifier() {
+  const a = new Uint8Array(32); crypto.getRandomValues(a); return _b64url(a);
+}
+async function _codeChallenge(v) {
+  return _b64url(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v)));
+}
+
+function updateOAuthUI(connected) {
+  document.getElementById('oauth-connected-view').style.display = connected ? 'block' : 'none';
+  document.getElementById('oauth-connect-view').style.display = connected ? 'none' : 'block';
+}
+
+async function connectOpenRouter() {
+  const verifier = await _codeVerifier();
+  const challenge = await _codeChallenge(verifier);
+  sessionStorage.setItem('rvr_pkce_verifier', verifier);
+  const cb = window.location.href.split('?')[0];
+  window.location.href = `https://openrouter.ai/auth?callback_url=${encodeURIComponent(cb)}&code_challenge=${challenge}&code_challenge_method=S256`;
+}
+
+function disconnectOpenRouter() {
+  sessionStorage.removeItem('rvr_oauth_key');
+  sessionStorage.removeItem('rvr_pkce_verifier');
+  document.getElementById('api-key-input').value = '';
+  updateOAuthUI(false);
+}
+
+// Handle OAuth callback on page load
+(async function handleOAuthCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  if (!code) return;
+  history.replaceState({}, '', window.location.href.split('?')[0]);
+  const verifier = sessionStorage.getItem('rvr_pkce_verifier');
+  if (!verifier) return;
+  try {
+    const res = await fetch('https://openrouter.ai/auth/keys', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, code_verifier: verifier }),
+    });
+    const data = await res.json();
+    const key = data.key;
+    if (!key) throw new Error('No key returned');
+    sessionStorage.setItem('rvr_oauth_key', key);
+    sessionStorage.removeItem('rvr_pkce_verifier');
+    document.getElementById('api-key-input').value = key;
+    setTier('free');
+    updateOAuthUI(true);
+  } catch (e) {
+    console.error('[RvR] OAuth exchange failed:', e);
+  }
+})();
+
 // SessionStorage key persistence
 (function initSavedKey() {
+  const oauthKey = sessionStorage.getItem('rvr_oauth_key');
+  if (oauthKey) {
+    const inp = document.getElementById('api-key-input');
+    if (inp) inp.value = oauthKey;
+    setTier('free');
+    updateOAuthUI(true);
+    return;
+  }
   const saved = sessionStorage.getItem('rvr_api_key');
   if (saved) {
     const inp = document.getElementById('api-key-input');
