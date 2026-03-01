@@ -1042,7 +1042,10 @@
         <div class="arg-card" style="background:#FEFDF8;">
           <div class="arg-role-line" style="color:#8A6A00;"><div class="role-pip solver-pip"></div>SOLVER — UNIT 01</div>
           <div class="arg-headline-text" id="r1-solver-hl">Building the case…</div>
-          <div class="arg-body-text" id="r1-solver-body"></div>
+          <div class="scout-overflow" id="r1-solver-overflow">
+            <div class="arg-body-text" id="r1-solver-body"></div>
+          </div>
+          <button class="read-more-btn" id="r1-solver-toggle" onclick="toggleExpander('r1-solver-overflow','r1-solver-toggle','READ FULL ARGUMENT')" style="display:none;color:#8A6A00;">▼ READ FULL ARGUMENT</button>
           <div class="arg-tag solver-tag" id="r1-solver-tag">POSITION: FORMING</div>
         </div>
       </div>
@@ -1080,7 +1083,7 @@
           <div class="scout-overflow" id="r2-scout-overflow">
             <div class="arg-body-text" id="r2-scout-body"></div>
           </div>
-          <button class="read-more-btn" id="r2-scout-toggle" onclick="toggleScout()" style="display:none;">▼ READ FULL SCAN</button>
+          <button class="read-more-btn" id="r2-scout-toggle" onclick="toggleExpander('r2-scout-overflow','r2-scout-toggle','READ FULL SCAN')" style="display:none;">▼ READ FULL SCAN</button>
           <div class="arg-tag scout-tag" id="r2-scout-tag">SCAN: IN PROGRESS</div>
         </div>
       </div>
@@ -1116,7 +1119,10 @@
             <div class="changed-pill" id="r3-delta-pill">↑ POSITION UPDATED</div>
           </div>
           <div class="arg-headline-text" id="r3-solver-hl">Incorporating the battle…</div>
-          <div class="arg-body-text" id="r3-solver-body"></div>
+          <div class="scout-overflow" id="r3-solver-overflow">
+            <div class="arg-body-text" id="r3-solver-body"></div>
+          </div>
+          <button class="read-more-btn" id="r3-solver-toggle" onclick="toggleExpander('r3-solver-overflow','r3-solver-toggle','READ REVISED POSITION')" style="display:none;color:#8A6A00;">▼ READ REVISED POSITION</button>
           <div class="arg-tag solver-tag" id="r3-solver-tag">FINAL POSITION</div>
         </div>
       </div>
@@ -1745,11 +1751,17 @@ function resetArena() {
   if (btn) { btn.disabled = false; btn.textContent = 'START THE FIGHT →'; btn.onclick = startFight; }
   const cancelBtnForm = document.getElementById('cancel-btn-form');
   if (cancelBtnForm) cancelBtnForm.style.display = 'none';
-  // Reset scout expander
-  const scoutOverflow = document.getElementById('r2-scout-overflow');
-  if (scoutOverflow) scoutOverflow.classList.remove('expanded');
-  const scoutToggle = document.getElementById('r2-scout-toggle');
-  if (scoutToggle) { scoutToggle.style.display = 'none'; scoutToggle.textContent = '▼ READ FULL SCAN'; }
+  // Reset all expanders
+  [
+    ['r1-solver-overflow', 'r1-solver-toggle', 'READ FULL ARGUMENT'],
+    ['r2-scout-overflow',  'r2-scout-toggle',  'READ FULL SCAN'],
+    ['r3-solver-overflow', 'r3-solver-toggle', 'READ REVISED POSITION'],
+  ].forEach(([ovId, btnId, label]) => {
+    const ov = document.getElementById(ovId);
+    if (ov) ov.classList.remove('expanded');
+    const btn = document.getElementById(btnId);
+    if (btn) { btn.style.display = 'none'; btn.textContent = '▼ ' + label; }
+  });
   // Reset position delta
   const deltaEl = document.getElementById('r3-delta');
   if (deltaEl) deltaEl.style.display = 'none';
@@ -1854,6 +1866,8 @@ async function startFight() {
     document.getElementById('r1-solver-hl').textContent = extractHeadline(solverRaw);
     document.getElementById('r1-solver-body').textContent = extractBody(solverRaw);
     document.getElementById('r1-solver-tag').textContent = extractTag(solverRaw, 'solver');
+    const r1Toggle = document.getElementById('r1-solver-toggle');
+    if (r1Toggle) r1Toggle.style.display = 'block';
     document.getElementById('result-round1')?.classList.remove('round-active');
 
     // Populate R2 Solver reference card with R1 headline
@@ -1910,6 +1924,8 @@ async function startFight() {
     document.getElementById('r3-solver-hl').textContent = r3Headline;
     document.getElementById('r3-solver-body').textContent = extractBody(r3Raw);
     document.getElementById('r3-solver-tag').textContent = extractTag(r3Raw, 'solver');
+    const r3Toggle = document.getElementById('r3-solver-toggle');
+    if (r3Toggle) r3Toggle.style.display = 'block';
     // Position delta: compare R1 vs R3 headlines
     const deltaEl = document.getElementById('r3-delta');
     if (deltaEl && r1Headline && r3Headline) {
@@ -2173,13 +2189,13 @@ document.getElementById('api-key-input').addEventListener('input', function() {
   }
 });
 
-// Toggle Scout body expander
-function toggleScout() {
-  const overflow = document.getElementById('r2-scout-overflow');
-  const btn = document.getElementById('r2-scout-toggle');
+// Generic expander — used by solver (R1, R3) and scout
+function toggleExpander(overflowId, btnId, collapseLabel) {
+  const overflow = document.getElementById(overflowId);
+  const btn = document.getElementById(btnId);
   if (!overflow || !btn) return;
   const expanded = overflow.classList.toggle('expanded');
-  btn.textContent = expanded ? '▲ COLLAPSE' : '▼ READ FULL SCAN';
+  btn.textContent = expanded ? '▲ COLLAPSE' : '▼ ' + collapseLabel;
 }
 
 // Copy verdict to clipboard
