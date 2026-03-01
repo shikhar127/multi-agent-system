@@ -574,6 +574,72 @@
       #next-questions { padding: 28px 20px 36px; }
     }
 
+    /* ── QUESTION REFRAME PANEL ── */
+    #question-reframe {
+      background: #0E0D0C; border-bottom: 3px solid #2A2825;
+      padding: 56px 80px;
+    }
+    .reframe-inner { max-width: 720px; display: flex; flex-direction: column; gap: 24px; }
+    .reframe-warning-label {
+      font-family: 'Bebas Neue', sans-serif; font-size: 12px;
+      letter-spacing: 0.25em; color: #F5C800;
+    }
+    .reframe-why {
+      font-family: 'Inter', sans-serif; font-size: 15px;
+      color: #9A9060; line-height: 1.65;
+    }
+    .reframe-suggestion {
+      background: #1A1917; border-left: 4px solid #F5C800;
+      padding: 24px 28px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .reframe-suggestion-label {
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
+      letter-spacing: 0.22em; color: #7A7268;
+    }
+    .reframe-question-text {
+      font-family: 'Archivo Black', sans-serif; font-size: 20px;
+      color: #F7F4EF; line-height: 1.3;
+    }
+    .reframe-note {
+      font-family: 'Inter', sans-serif; font-size: 13px;
+      color: #5A5650; line-height: 1.5;
+    }
+    .reframe-buttons { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .reframe-btn-primary {
+      background: #F5C800; border: none; padding: 14px 28px; cursor: pointer;
+      font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 0.12em; color: #0A0A0A;
+    }
+    .reframe-btn-primary:hover { background: #D4A800; }
+    .reframe-btn-secondary {
+      background: transparent; border: 2px solid #3A3830; padding: 13px 24px; cursor: pointer;
+      font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 0.12em; color: #7A7268;
+    }
+    .reframe-btn-secondary:hover { border-color: #6A6860; color: #9A9060; }
+    .reframe-dismiss {
+      background: none; border: none; cursor: pointer;
+      font-family: 'Bebas Neue', sans-serif; font-size: 12px;
+      letter-spacing: 0.15em; color: #4A4840; padding: 13px 8px;
+    }
+    .reframe-dismiss:hover { color: #7A7268; }
+
+    /* Reframe notice banner inside battle-results */
+    #reframe-notice {
+      background: #1A1710; border-bottom: 1px solid rgba(245,200,0,0.15);
+      padding: 10px 60px; align-items: center; gap: 14px;
+    }
+    .reframe-notice-label {
+      font-family: 'Bebas Neue', sans-serif; font-size: 10px;
+      letter-spacing: 0.22em; color: #F5C800; flex-shrink: 0;
+    }
+    .reframe-notice-original {
+      font-family: 'Inter', sans-serif; font-size: 12px;
+      color: #5A5650; font-style: italic;
+    }
+    @media (max-width: 700px) {
+      #question-reframe { padding: 36px 20px; }
+      #reframe-notice { padding: 10px 20px; }
+    }
+
     /* error */
     .error-panel {
       background: #2A0000; border: 3px solid #CC1A1A; padding: 20px 24px; margin-top: 8px;
@@ -1016,9 +1082,35 @@
 </section>
 
 <!-- ════════════════════════════════════════
+  QUESTION REFRAME PANEL
+════════════════════════════════════════ -->
+<section id="question-reframe" style="display:none;">
+  <div class="reframe-inner">
+    <div class="reframe-warning-label">⚠ THIS QUESTION HAS NO SINGLE ANSWER</div>
+    <div class="reframe-why" id="reframe-why">—</div>
+    <div class="reframe-suggestion">
+      <div class="reframe-suggestion-label">WHAT YOU MIGHT HAVE MEANT</div>
+      <div class="reframe-question-text" id="reframe-question-text">—</div>
+      <div class="reframe-note" id="reframe-note"></div>
+    </div>
+    <div class="reframe-buttons">
+      <button class="reframe-btn-primary" onclick="proceedWithReframe()">FIGHT THE REAL QUESTION →</button>
+      <button class="reframe-btn-secondary" onclick="proceedAsIs()">FIGHT AS-IS →</button>
+      <button class="reframe-dismiss" onclick="dismissReframe()">✕ CANCEL</button>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
   BATTLE RESULTS (injected by JS)
 ════════════════════════════════════════ -->
 <section id="battle-results">
+
+  <!-- Reframe notice (shown when a reframed question was used) -->
+  <div id="reframe-notice" style="display:none;">
+    <span class="reframe-notice-label">REFRAMED FROM</span>
+    <span class="reframe-notice-original" id="reframe-notice-original">—</span>
+  </div>
 
   <!-- Loading -->
   <div id="loading-panel" style="display:none;">
@@ -1472,6 +1564,9 @@ let fightInProgress = false;       // prevents double-submit
 let currentAbortController = null; // for cancellation
 let lastApiKey = '';
 let lastSolverModel = '';
+let originalQuestion = '';
+let activeQuestion = '';
+let pendingFightConfig = null; // { apiKey, solverModel, challengerModel, scoutModel }
 
 // ── PAID MODELS ──────────────────────────────────
 const PAID_MODELS = {
@@ -1741,7 +1836,8 @@ function clearCardLoading(hlId, bodyId) {
 
 function resetArena() {
   ['battle-results','result-round1','result-round2','result-round3','result-verdict',
-   'clash-1','clash-2','loading-panel','try-again-bar','next-questions','form-error'].forEach(id => {
+   'clash-1','clash-2','loading-panel','try-again-bar','next-questions','form-error',
+   'question-reframe','reframe-notice'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
@@ -1771,6 +1867,10 @@ function resetArena() {
     <div class="nq-chip loading"><div class="nq-question">&nbsp;</div><div class="nq-action">&nbsp;</div></div>
     <div class="nq-chip loading"><div class="nq-question">&nbsp;</div><div class="nq-action">&nbsp;</div></div>
     <div class="nq-chip loading"><div class="nq-question">&nbsp;</div><div class="nq-action">&nbsp;</div></div>`;
+  // Reset reframe state
+  originalQuestion = '';
+  activeQuestion = '';
+  pendingFightConfig = null;
   // Intentionally NOT clearing question so user can refine and retry
   document.getElementById('question-input')?.focus();
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1778,6 +1878,100 @@ function resetArena() {
 
 function cancelFight() {
   if (currentAbortController) currentAbortController.abort('user_cancel');
+}
+
+// ── QUESTION REFRAME ─────────────────────────────
+
+async function classifyQuestion(apiKey, question) {
+  const ctrl = new AbortController();
+  const timeoutId = setTimeout(() => ctrl.abort(), 8000);
+  const model = pendingFightConfig?.solverModel || PAID_MODELS.solver;
+  const sys = `You are a question analyst. Classify whether the user's question has a defensible, evidence-based answer.
+
+Return ONLY valid JSON (no markdown):
+{
+  "type": "ANSWERABLE" | "FALSE_BINARY" | "SUBJECTIVE" | "UNANSWERABLE",
+  "why": "one sentence: why it can't have a single answer (omit if ANSWERABLE)",
+  "reframed": "a sharper, more debatable version of what the user probably meant (omit if ANSWERABLE)",
+  "reframe_note": "one sentence: what changed and why (omit if ANSWERABLE)"
+}
+
+Rules:
+- ANSWERABLE: has a defensible answer backed by evidence or logic. When in doubt, classify ANSWERABLE.
+- FALSE_BINARY: assumes two sides when the real variable is a spectrum or context.
+- SUBJECTIVE: answer depends entirely on personal values, not facts.
+- UNANSWERABLE: missing essential context, unmeasurable, or purely hypothetical.
+- reframed must be sharper and more debatable — never a watered-down version.`;
+  try {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'HTTP-Referer': window.location.href,
+        'X-Title': 'Robots versus Robots',
+      },
+      body: JSON.stringify({ model, max_tokens: 250, messages: [
+        { role: 'system', content: sys },
+        { role: 'user', content: question },
+      ]}),
+      signal: ctrl.signal,
+    });
+    clearTimeout(timeoutId);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const text = data.choices?.[0]?.message?.content || '';
+    const m = text.match(/\{[\s\S]*?\}/);
+    if (!m) return null;
+    return JSON.parse(m[0]);
+  } catch (_) {
+    clearTimeout(timeoutId);
+    return null; // silently fail — never block the fight
+  }
+}
+
+function showReframePanel(c) {
+  const panel = document.getElementById('question-reframe');
+  if (!panel) return;
+  document.getElementById('reframe-why').textContent = c.why || '—';
+  document.getElementById('reframe-question-text').textContent = c.reframed || originalQuestion;
+  const noteEl = document.getElementById('reframe-note');
+  if (noteEl) noteEl.textContent = c.reframe_note || '';
+  panel.style.display = 'block';
+  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+function dismissReframe() {
+  document.getElementById('question-reframe').style.display = 'none';
+  document.getElementById('battle-results').style.display = 'none';
+  fightInProgress = false;
+  currentAbortController = null;
+  const btn = document.getElementById('fight-btn');
+  if (btn) { btn.disabled = false; btn.textContent = 'START THE FIGHT →'; btn.onclick = startFight; }
+  document.getElementById('cancel-btn-form').style.display = 'none';
+}
+
+async function proceedWithReframe() {
+  const q = document.getElementById('reframe-question-text')?.textContent || originalQuestion;
+  document.getElementById('question-reframe').style.display = 'none';
+  const inputEl = document.getElementById('question-input');
+  if (inputEl) { inputEl.value = q; inputEl.dispatchEvent(new Event('input')); }
+  activeQuestion = q;
+  showEl('battle-results', true);
+  showEl('loading-panel', true);
+  document.getElementById('cancel-btn').style.display = 'block';
+  setStatus('SOLVER IS BUILDING THE CASE…', 'ROUND 01 · INITIAL PROPOSAL');
+  await executeRounds(q);
+}
+
+async function proceedAsIs() {
+  document.getElementById('question-reframe').style.display = 'none';
+  activeQuestion = originalQuestion;
+  showEl('battle-results', true);
+  showEl('loading-panel', true);
+  document.getElementById('cancel-btn').style.display = 'block';
+  setStatus('SOLVER IS BUILDING THE CASE…', 'ROUND 01 · INITIAL PROPOSAL');
+  await executeRounds(originalQuestion);
 }
 
 async function startFight() {
@@ -1848,9 +2042,44 @@ async function startFight() {
     scoutModel = document.getElementById('scout-model')?.value || PAID_MODELS.scout;
   }
 
+  pendingFightConfig = { apiKey, solverModel, challengerModel, scoutModel };
+  originalQuestion = question;
   lastApiKey = apiKey;
   lastSolverModel = solverModel;
+  if (btn) btn.textContent = 'ANALYSING QUESTION…';
+
+  // Pre-flight: classify the question
+  setStatus('READING YOUR QUESTION…', 'PRE-FLIGHT ANALYSIS');
+  const classification = await classifyQuestion(apiKey, question);
+  if (classification && classification.type !== 'ANSWERABLE') {
+    document.getElementById('loading-panel').style.display = 'none';
+    showReframePanel(classification);
+    // fightInProgress stays true — user must click a button to continue or dismiss
+    return;
+  }
+
+  // ANSWERABLE or classifier failed silently — proceed directly
+  activeQuestion = question;
   if (btn) btn.textContent = 'THE BATTLE IS ON…';
+  await executeRounds(question);
+}
+
+async function executeRounds(q) {
+  const { apiKey, solverModel, challengerModel, scoutModel } = pendingFightConfig;
+  const cancelBtn = document.getElementById('cancel-btn');
+  const cancelBtnForm = document.getElementById('cancel-btn-form');
+  const btn = document.getElementById('fight-btn');
+  const isReframed = !!(originalQuestion && q !== originalQuestion);
+  const reframeCtx = isReframed
+    ? `[Note: the user's original question was "${originalQuestion}". It was reframed to "${q}" for a more focused debate. Debate the reframed question.]\n\n`
+    : '';
+
+  if (isReframed) {
+    const noticeEl = document.getElementById('reframe-notice');
+    if (noticeEl) noticeEl.style.display = 'flex';
+    const origEl = document.getElementById('reframe-notice-original');
+    if (origEl) origEl.textContent = originalQuestion;
+  }
 
   try {
     // ── ROUND 1: SOLVER ──────────────────────────
@@ -1861,7 +2090,7 @@ async function startFight() {
 
     const solverPrompt = `You are SOLVER, a thoughtful analyst in a multi-perspective deliberation system called "Robots versus Robots". Your role is to construct the most carefully reasoned initial answer to a question. Be intellectually honest: acknowledge genuine complexity and competing considerations where they exist, but still commit to a clear, defensible position. Argue in flowing prose — no bullet points. Keep your response to 3 paragraphs. Open with a single bold claim in quotes, then support it with your strongest evidence and reasoning. Intellectual depth and nuance over rhetorical confidence.`;
 
-    const solverRaw = await callWithFallback(apiKey, solverModel, solverPrompt, question);
+    const solverRaw = await callWithFallback(apiKey, solverModel, solverPrompt, reframeCtx + q);
     clearCardLoading('r1-solver-hl', 'r1-solver-body');
     document.getElementById('r1-solver-hl').textContent = extractHeadline(solverRaw);
     document.getElementById('r1-solver-body').textContent = extractBody(solverRaw);
@@ -1885,7 +2114,7 @@ async function startFight() {
     const challengerPrompt = `You are CHALLENGER, a rigorous critical thinker in "Robots versus Robots". SOLVER has proposed an answer. Your job is to stress-test it seriously — find the weakest assumptions, identify what's missing, surface risks they overlooked, and probe where the logic doesn't hold. Be precise and intellectually honest: explicitly acknowledge the parts of SOLVER's argument that are genuinely strong before explaining where and why it falls short. Your goal is to make the final answer better, not just to win. Start with a one-sentence counter-claim in quotes, then deliver your critique in 2-3 paragraphs. No bullet points.`;
 
     const challengerRaw = await callWithFallback(apiKey, challengerModel, challengerPrompt,
-      `The question: "${question}"\n\nSOLVER's position: ${solverRaw}\n\nNow attack it.`);
+      `The question: "${q}"\n\n${reframeCtx}SOLVER's position: ${solverRaw}\n\nNow attack it.`);
     clearCardLoading('r2-challenger-hl', 'r2-challenger-body');
     document.getElementById('r2-challenger-hl').textContent = extractHeadline(challengerRaw);
     document.getElementById('r2-challenger-body').textContent = extractBody(challengerRaw);
@@ -1897,7 +2126,7 @@ async function startFight() {
     const scoutPrompt = `You are SCOUT, a lateral thinker in "Robots versus Robots". You've read both SOLVER's position and CHALLENGER's critique carefully. Your role is to enrich the debate — find what both missed, bring in evidence or framings they didn't consider, and synthesize the strongest insights from each side into a more complete picture. You're not trying to defeat either of them; you're trying to find the truth that their disagreement is circling. Explicitly build on the best point from each side, then add your own orthogonal insight. Start with a one-sentence reframe in quotes, then explore in 2-3 paragraphs. No bullet points.`;
 
     const scoutRaw = await callWithFallback(apiKey, scoutModel, scoutPrompt,
-      `The question: "${question}"\n\nSOLVER said: ${solverRaw}\n\nCHALLENGER attacked: ${challengerRaw}\n\nFind what they both missed.`);
+      `The question: "${q}"\n\n${reframeCtx}SOLVER said: ${solverRaw}\n\nCHALLENGER attacked: ${challengerRaw}\n\nFind what they both missed.`);
     clearCardLoading('r2-scout-hl', 'r2-scout-body');
     document.getElementById('r2-scout-hl').textContent = extractHeadline(scoutRaw);
     document.getElementById('r2-scout-body').textContent = extractBody(scoutRaw);
@@ -1917,7 +2146,7 @@ async function startFight() {
     const r3Prompt = `You are SOLVER in "Robots versus Robots". You've now heard CHALLENGER's critique and SCOUT's lateral analysis. This is your chance to think carefully and arrive at the most defensible, nuanced final position. Be genuinely open: if CHALLENGER identified a real flaw, concede it clearly and explain how it changes your view. If SCOUT surfaced a better framing, adopt it. Hold firm only where your original reasoning was sound and the critique didn't land. The goal is the best possible answer, not defending your R1 position. Start with your revised one-sentence position in quotes, then explain what changed and why in 2-3 paragraphs. No bullet points.`;
 
     const r3Raw = await callWithFallback(apiKey, solverModel, r3Prompt,
-      `The question: "${question}"\n\nYour original position: ${solverRaw}\n\nCHALLENGER's attack: ${challengerRaw}\n\nSCOUT's alternative: ${scoutRaw}\n\nRevise your position.`);
+      `The question: "${q}"\n\nYour original position: ${solverRaw}\n\nCHALLENGER's attack: ${challengerRaw}\n\nSCOUT's alternative: ${scoutRaw}\n\nRevise your position.`);
     clearCardLoading('r3-solver-hl', 'r3-solver-body');
     const r3Headline = extractHeadline(r3Raw);
     const r1Headline = document.getElementById('r1-solver-hl')?.textContent || '';
@@ -1959,10 +2188,10 @@ Structure your response as JSON with these exact fields:
   "r3_trace": "one sentence: Solver's final position",
   "verdict_trace": "one sentence: final call"
 }
-Rules: reasoning must be a single string (not an array). action_items = 1-3 strings, ONLY if something needs to be done — empty array for trivia/philosophy questions. No buzzwords, no "it is worth noting", no "in conclusion".`;
+Rules: reasoning must be a single string (not an array). action_items = 1-3 strings, ONLY if something needs to be done — empty array for trivia/philosophy questions. No buzzwords, no "it is worth noting", no "in conclusion".${isReframed ? `\n[Note: the user's original question was "${originalQuestion}" and was reframed to "${q}". Briefly acknowledge this in your summary if it adds clarity.]` : ''}`;
 
     const verdictRaw = await callWithFallback(apiKey, solverModel, verdictPrompt,
-      `The question: "${question}"\n\nR1 SOLVER: ${solverRaw}\n\nR2 CHALLENGER: ${challengerRaw}\n\nR2 SCOUT: ${scoutRaw}\n\nR3 SOLVER (revised): ${r3Raw}\n\nDeliver the final verdict as JSON.`);
+      `The question: "${q}"\n\nR1 SOLVER: ${solverRaw}\n\nR2 CHALLENGER: ${challengerRaw}\n\nR2 SCOUT: ${scoutRaw}\n\nR3 SOLVER (revised): ${r3Raw}\n\nDeliver the final verdict as JSON.`);
 
     // Robust field extractor — handles unescaped quotes inside string values
     function extractField(raw, key) {
@@ -1998,6 +2227,37 @@ Rules: reasoning must be a single string (not an array). action_items = 1-3 stri
         verdict_trace:   extractField(verdictRaw, 'verdict_trace')   || 'Final judgment delivered.',
       };
     }
+
+    // Normalize model values into plain readable strings.
+    function toText(value) {
+      if (typeof value === 'string') return value.trim();
+      if (Array.isArray(value)) return value.map(v => toText(v)).filter(Boolean).join(' ');
+      if (value && typeof value === 'object') return Object.values(value).map(v => toText(v)).filter(Boolean).join(' ');
+      return '';
+    }
+
+    // Some models drift from the exact key names or return non-string shapes.
+    const normalizedSummary =
+      toText(vd.summary) ||
+      toText(vd.verdict) ||
+      toText(extractField(verdictRaw, 'summary')) ||
+      toText(extractField(verdictRaw, 'verdict')) ||
+      'The debate has concluded.';
+
+    const normalizedReasoning =
+      toText(vd.reasoning) ||
+      toText(vd.full_reasoning) ||
+      toText(vd.explanation) ||
+      toText(vd.analysis) ||
+      toText(vd.rationale) ||
+      toText(extractField(verdictRaw, 'reasoning')) ||
+      toText(extractField(verdictRaw, 'full_reasoning')) ||
+      toText(extractField(verdictRaw, 'explanation')) ||
+      toText(extractField(verdictRaw, 'analysis')) ||
+      normalizedSummary;
+
+    vd.summary = normalizedSummary;
+    vd.reasoning = normalizedReasoning;
 
     // Guard against verdict field containing raw JSON (extraction failed gracefully)
     if (typeof vd.verdict === 'string' && vd.verdict.trim().startsWith('{')) {
@@ -2047,7 +2307,7 @@ Rules: reasoning must be a single string (not an array). action_items = 1-3 stri
     }
     showEl('try-again-bar', true);
     document.getElementById('result-verdict')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    generateNextQuestions(question, vd.summary || vd.verdict || '');
+    generateNextQuestions(q, vd.summary || vd.verdict || '');
 
   } catch (err) {
     document.getElementById('loading-panel').style.display = 'none';
