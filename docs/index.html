@@ -1114,7 +1114,39 @@ async function callModel(apiKey, model, systemPrompt, userMessage) {
     throw new Error(err.error?.message || `API error ${res.status}`);
   }
   const data = await res.json();
-  return data.choices[0].message.content;
+  const content = data.choices?.[0]?.message?.content;
+  if (!content) throw new Error(`Empty response from ${model}`);
+  return content;
+}
+
+// Fallback chain: if primary model fails, try backups in order
+const FREE_FALLBACKS = [
+  'meta-llama/llama-3.3-70b-instruct:free',
+  'qwen/qwen-2.5-72b-instruct:free',
+  'google/gemma-2-9b-it:free',
+  'mistralai/mistral-7b-instruct:free',
+];
+const PAID_FALLBACKS = [
+  'anthropic/claude-sonnet-4-5',
+  'openai/gpt-4o',
+  'google/gemini-flash-1.5',
+  'openai/gpt-4o-mini',
+];
+
+async function callWithFallback(apiKey, primaryModel, systemPrompt, userMessage) {
+  const isFree = primaryModel.endsWith(':free');
+  const pool = isFree ? FREE_FALLBACKS : PAID_FALLBACKS;
+  const chain = [primaryModel, ...pool.filter(m => m !== primaryModel)];
+  let lastError;
+  for (const model of chain) {
+    try {
+      return await callModel(apiKey, model, systemPrompt, userMessage);
+    } catch (err) {
+      console.warn(`Model ${model} failed: ${err.message}`);
+      lastError = err;
+    }
+  }
+  throw new Error(`All models failed. Last error: ${lastError?.message}`);
 }
 
 function extractHeadline(text) {
@@ -1196,7 +1228,7 @@ async function startFight() {
 
     const solverPrompt = `You are SOLVER, a debate robot in a system called "Robots versus Robots". Your role is to construct the best possible initial answer to a question. Be decisive, confident, and comprehensive. State your position clearly in the first sentence. Argue in flowing prose — no bullet points. Keep your response to 3 short paragraphs maximum. Start your response with a bold one-sentence position statement in quotes, then elaborate.`;
 
-    const solverRaw = await callModel(apiKey, solverModel, solverPrompt, question);
+    const solverRaw = await callWithFallback(apiKey, solverModel, solverPrompt, question);
     const solverHl = extractHeadline(solverRaw);
     const solverBody = extractBody(solverRaw);
     const solverTag = extractTag(solverRaw, 'solver');
@@ -1213,7 +1245,7 @@ async function startFight() {
 
     const challengerPrompt = `You are CHALLENGER, a debate robot in "Robots versus Robots". SOLVER has just proposed an answer to a question. Your job is to attack it — find flaws, challenge assumptions, expose risks, and stress-test the logic. Be aggressive but rigorous. No ad hominem — only logical assault. Start with a provocative one-sentence counter-position in quotes, then deliver your attack in 2-3 paragraphs. No bullet points.`;
 
-    const challengerRaw = await callModel(apiKey, challengerModel, challengerPrompt,
+    const challengerRaw = await callWithFallback(apiKey, challengerModel, challengerPrompt,
       `The question: "${question}"\n\nSOLVER's position: ${solverRaw}\n\nNow attack it.`);
     const challengerHl = extractHeadline(challengerRaw);
     const challengerBody = extractBody(challengerRaw);
@@ -1228,7 +1260,7 @@ async function startFight() {
 
     const scoutPrompt = `You are SCOUT, a debate robot in "Robots versus Robots". You've observed SOLVER's answer and CHALLENGER's attack. Your role is to find what neither of them considered — alternative framings, overlooked evidence, third options, analogies from other domains. You are the lateral thinker. Start with an intriguing one-sentence reframe in quotes, then explore your finding in 2-3 paragraphs. No bullet points.`;
 
-    const scoutRaw = await callModel(apiKey, scoutModel, scoutPrompt,
+    const scoutRaw = await callWithFallback(apiKey, scoutModel, scoutPrompt,
       `The question: "${question}"\n\nSOLVER said: ${solverRaw}\n\nCHALLENGER attacked: ${challengerRaw}\n\nFind what they both missed.`);
     const scoutHl = extractHeadline(scoutRaw);
     const scoutBody = extractBody(scoutRaw);
@@ -1246,7 +1278,7 @@ async function startFight() {
 
     const r3Prompt = `You are SOLVER in "Robots versus Robots". You've now heard CHALLENGER's attack and SCOUT's alternative perspective. Revise your position to incorporate valid criticisms and insights. Show that you've genuinely updated your thinking. Be decisive about your final position. Start with a revised one-sentence position in quotes, then deliver your final argument in 2-3 paragraphs. No bullet points.`;
 
-    const r3Raw = await callModel(apiKey, solverModel, r3Prompt,
+    const r3Raw = await callWithFallback(apiKey, solverModel, r3Prompt,
       `The question: "${question}"\n\nYour original position: ${solverRaw}\n\nCHALLENGER's attack: ${challengerRaw}\n\nSCOUT's alternative: ${scoutRaw}\n\nRevise your position.`);
     const r3Hl = extractHeadline(r3Raw);
     const r3Body = extractBody(r3Raw);
@@ -1273,7 +1305,7 @@ async function startFight() {
   "verdict_trace": "one sentence final judgment summary"
 }`;
 
-    const verdictRaw = await callModel(apiKey, solverModel, verdictPrompt,
+    const verdictRaw = await callWithFallback(apiKey, solverModel, verdictPrompt,
       `The question: "${question}"\n\nR1 SOLVER: ${solverRaw}\n\nR2 CHALLENGER: ${challengerRaw}\n\nR2 SCOUT: ${scoutRaw}\n\nR3 SOLVER (revised): ${r3Raw}\n\nDeliver the final verdict as JSON.`);
 
     let vd;
