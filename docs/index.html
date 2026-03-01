@@ -240,7 +240,7 @@
       flex: 1; padding: 32px 36px;
       display: flex; flex-direction: column; gap: 14px;
       border-right: 4px solid #0A0A0A; position: relative; overflow: hidden;
-      min-height: 280px;
+      min-height: 280px; max-height: 520px; overflow-y: auto;
     }
     .arg-card:last-child { border-right: none; }
     .arg-role-line {
@@ -283,6 +283,49 @@
 
     /* active round highlight */
     .result-round.round-active { box-shadow: inset 0 0 0 3px #F5C800; }
+
+    /* error text mobile overflow */
+    .error-text { overflow-wrap: break-word; word-break: break-word; }
+
+    /* focus styles for keyboard nav */
+    button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+      outline: 3px solid #F5C800; outline-offset: 2px;
+    }
+
+    /* copy verdict button */
+    .copy-btn {
+      font-family: 'Bebas Neue', sans-serif; font-size: 12px; letter-spacing: 0.18em;
+      color: #9A9A90; background: transparent; border: 2px solid #3A3A35;
+      padding: 6px 18px; cursor: pointer; transition: all 0.1s; align-self: flex-start;
+    }
+    .copy-btn:hover { border-color: #F5C800; color: #F5C800; }
+    .copy-btn.copied { border-color: #22C55E; color: #22C55E; }
+
+    /* confidence legend */
+    .conf-legend {
+      font-family: 'Inter Tight', sans-serif; font-size: 11px; color: #6A6A62;
+      line-height: 18px; margin-top: 4px;
+    }
+    .conf-legend span { margin-right: 10px; }
+
+    /* more options tier label */
+    .more-options-tier-label {
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 0.2em;
+      color: #F5C800; padding: 0 0 8px; border-bottom: 2px solid #2A2A25;
+      width: 100%;
+    }
+
+    /* session key checkbox */
+    .remember-row {
+      display: flex; align-items: center; gap: 8px; margin-top: 6px;
+    }
+    .remember-row input[type=checkbox] { accent-color: #F5C800; cursor: pointer; }
+    .remember-row label {
+      font-family: 'Inter Tight', sans-serif; font-size: 12px; color: #7A7A70; cursor: pointer;
+    }
+
+    /* nav iOS safe area */
+    nav { padding-top: max(0px, env(safe-area-inset-top)); height: calc(56px + max(0px, env(safe-area-inset-top))); }
 
     /* Verdict result */
     #result-verdict {
@@ -586,12 +629,12 @@
     <!-- Form col -->
     <div class="arena-form-col">
       <div class="form-field">
-        <div class="field-label">THE QUESTION</div>
+        <label class="field-label" for="question-input">THE QUESTION</label>
         <textarea id="question-input" class="question-input" rows="4" placeholder="Ask something hard. Something that deserves a fight…"></textarea>
       </div>
 
       <div class="form-field">
-        <div class="field-label">CHOOSE YOUR TIER</div>
+        <div class="field-label" id="tier-label">CHOOSE YOUR TIER</div>
         <div class="tier-row">
           <button class="tier-btn" id="tier-free" onclick="setTier('free')">
             <span class="tier-btn-label">FREE FIGHTER</span>
@@ -605,9 +648,13 @@
       </div>
 
       <div class="form-field">
-        <div class="field-label">BATTLE KEY (OPENROUTER API KEY)</div>
+        <label class="field-label" for="api-key-input">BATTLE KEY (OPENROUTER API KEY)</label>
         <input id="api-key-input" type="password" class="key-input" style="width:100%;" placeholder="sk-or-v1-…" autocomplete="off" />
         <div class="form-note">One key for all models. Get a free key at openrouter.ai — no separate Anthropic or OpenAI key needed.</div>
+        <div class="remember-row">
+          <input type="checkbox" id="remember-key" onchange="toggleRememberKey()" />
+          <label for="remember-key">Remember for this session</label>
+        </div>
       </div>
 
       <div class="form-field">
@@ -616,6 +663,7 @@
           <span id="more-options-arrow">▼</span>
         </button>
         <div class="more-options-panel" id="more-options-panel" style="display:none;">
+          <div class="more-options-tier-label" id="more-options-tier-label">PAID FIGHTER MODELS</div>
           <div class="robot-model-row">
             <span class="robot-model-label" style="color:#F5C800;">SOLVER</span>
             <select id="solver-model" class="model-select">
@@ -730,6 +778,11 @@
         <div class="round-num-text" style="color:#F5F5F0;">ROUND 02</div>
       </div>
       <div class="round-cards" id="round2-cards">
+        <div class="arg-card" style="background:#FAFAF5;opacity:0.75;flex:0.7;">
+          <div class="arg-role-line" style="color:#8A6A00;"><div class="role-pip solver-pip"></div>SOLVER — UNDER ATTACK</div>
+          <div class="arg-headline-text" id="r2-solver-ref" style="font-size:20px;color:#5A5A50;"></div>
+          <div class="arg-tag solver-tag" style="color:#B0A070;border-color:#D0C080;">R1 POSITION</div>
+        </div>
         <div class="arg-card" style="background:#FFF0F0;">
           <div class="arg-role-line" style="color:#CC1A1A;"><div class="role-pip challenger-pip"></div>CHALLENGER — UNIT 02</div>
           <div class="arg-headline-text" id="r2-challenger-hl">Locating weaknesses…</div>
@@ -778,12 +831,18 @@
         <div class="verdict-chapter-label">— FINAL JUDGMENT —</div>
         <div class="verdict-big">THE<br/>VERDICT</div>
         <div class="verdict-confidence-badge">
-          <span class="vc-label" id="verdict-confidence">⬡ HIGH CONFIDENCE</span>
+          <span class="vc-label" id="verdict-confidence">HIGH CONFIDENCE</span>
           <span class="vc-note" id="verdict-conf-note">All 3 robots converged</span>
+        </div>
+        <div class="conf-legend">
+          <span style="color:#22C55E;">HIGH</span> = all 3 converged &nbsp;
+          <span style="color:#F5C800;">MEDIUM</span> = partial agreement &nbsp;
+          <span style="color:#CC1A1A;">LOW</span> = unresolved conflict
         </div>
         <div class="verdict-answer-text">
           <p id="verdict-answer">The robots have reached their verdict.</p>
         </div>
+        <button class="copy-btn" id="copy-verdict-btn" onclick="copyVerdict()">COPY VERDICT</button>
         <div class="verdict-war-cry">THE DEBATE IS OVER. THE TRUTH REMAINS.</div>
       </div>
       <div class="verdict-right">
@@ -1145,6 +1204,7 @@ function setTier(tier) {
   if (tier === 'paid') populatePaidSelects();
   else if (liveFreeModels.length > 0) populateFreeSelects(liveFreeModels);
   else showFreeSelectPlaceholder(); // clear paid options so they don't mislead
+  updateMoreOptionsTierLabel();
 }
 
 function toggleMoreOptions() {
@@ -1240,6 +1300,7 @@ async function validateKeyAndFetchModels(apiKey) {
     if (freeNote) freeNote.textContent = `${liveFreeModels.length} free models loaded`;
     // Only repopulate selects if currently on free tier
     if (currentTier === 'free' && liveFreeModels.length > 0) populateFreeSelects(liveFreeModels);
+    updateMoreOptionsTierLabel();
   }
 }
 
@@ -1286,7 +1347,9 @@ async function callWithFallback(apiKey, primaryModel, systemPrompt, userMessage)
 function extractHeadline(text) {
   const lines = text.trim().split('\n').filter(l => l.trim());
   const first = lines[0].replace(/^["']|["']$/g, '').trim();
-  return first.length > 90 ? first.slice(0, 87) + '…' : first;
+  if (first.length <= 90) return first;
+  const cut = first.slice(0, 87).lastIndexOf(' ');
+  return first.slice(0, cut > 50 ? cut : 87) + '…';
 }
 
 function extractBody(text) {
@@ -1440,6 +1503,10 @@ async function startFight() {
     document.getElementById('r1-solver-tag').textContent = extractTag(solverRaw, 'solver');
     document.getElementById('result-round1')?.classList.remove('round-active');
 
+    // Populate R2 Solver reference card with R1 headline
+    const r2SolverRef = document.getElementById('r2-solver-ref');
+    if (r2SolverRef) r2SolverRef.textContent = extractHeadline(solverRaw);
+
     // ── ROUND 2: CHALLENGER ──────────────────────
     setStatus('CHALLENGER IS SHARPENING ITS ATTACK…', 'ROUND 02 · CHALLENGER ENGAGES');
     showEl('clash-1', true); // fix: was false (display:block broke flex layout)
@@ -1545,7 +1612,7 @@ async function startFight() {
     vd.confidence = ['HIGH','MEDIUM','LOW'].includes((vd.confidence || '').toUpperCase())
       ? vd.confidence.toUpperCase() : 'MEDIUM';
 
-    const confColors = { HIGH: '#4ADE80', MEDIUM: '#F5C800', LOW: '#CC1A1A' };
+    const confColors = { HIGH: '#22C55E', MEDIUM: '#F5C800', LOW: '#CC1A1A' };
     const vc = document.getElementById('verdict-confidence');
     if (vc) { vc.textContent = `${vd.confidence} CONFIDENCE`; vc.style.color = confColors[vd.confidence] || '#F5C800'; }
     const vcn = document.getElementById('verdict-conf-note'); if (vcn) vcn.textContent = vd.confidence_note;
@@ -1585,10 +1652,72 @@ async function startFight() {
   }
 }
 
-// Cmd/Ctrl+Enter submits
+// Cmd/Ctrl+Enter submits or retries
 document.getElementById('question-input').addEventListener('keydown', e => {
   if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) startFight();
 });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+    const bar = document.getElementById('try-again-bar');
+    if (bar && bar.style.display !== 'none') resetArena();
+  }
+});
+
+// Textarea auto-resize
+document.getElementById('question-input').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = this.scrollHeight + 'px';
+});
+
+// SessionStorage key persistence
+(function initSavedKey() {
+  const saved = sessionStorage.getItem('rvr_api_key');
+  if (saved) {
+    const inp = document.getElementById('api-key-input');
+    if (inp) inp.value = saved;
+    const cb = document.getElementById('remember-key');
+    if (cb) cb.checked = true;
+  }
+})();
+function toggleRememberKey() {
+  const cb = document.getElementById('remember-key');
+  const key = document.getElementById('api-key-input')?.value || '';
+  if (cb?.checked) sessionStorage.setItem('rvr_api_key', key);
+  else sessionStorage.removeItem('rvr_api_key');
+}
+document.getElementById('api-key-input').addEventListener('input', function() {
+  if (document.getElementById('remember-key')?.checked) {
+    sessionStorage.setItem('rvr_api_key', this.value);
+  }
+});
+
+// Copy verdict to clipboard
+function copyVerdict() {
+  const verdict = document.getElementById('verdict-answer')?.textContent || '';
+  const conf = document.getElementById('verdict-confidence')?.textContent || '';
+  const text = `[Robots versus Robots — ${conf}]\n\n${verdict}`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-verdict-btn');
+    if (btn) { btn.textContent = 'COPIED!'; btn.classList.add('copied'); }
+    setTimeout(() => {
+      const btn2 = document.getElementById('copy-verdict-btn');
+      if (btn2) { btn2.textContent = 'COPY VERDICT'; btn2.classList.remove('copied'); }
+    }, 2000);
+  });
+}
+
+// Update more options tier label whenever tier changes
+function updateMoreOptionsTierLabel() {
+  const lbl = document.getElementById('more-options-tier-label');
+  if (!lbl) return;
+  if (currentTier === 'free') {
+    lbl.textContent = liveFreeModels.length > 0
+      ? `FREE FIGHTER MODELS (${liveFreeModels.length} available)`
+      : 'FREE FIGHTER MODELS (enter key to load)';
+  } else {
+    lbl.textContent = 'PAID FIGHTER MODELS';
+  }
+}
 </script>
 
 </body>
