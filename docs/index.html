@@ -1403,8 +1403,10 @@ async function startFight() {
 
     let vd;
     try {
-      const jsonMatch = verdictRaw.match(/\{[\s\S]*\}/);
-      vd = JSON.parse(jsonMatch ? jsonMatch[0] : verdictRaw);
+      // Strip markdown code fences (```json ... ```) that some models add
+      const cleaned = verdictRaw.replace(/^```(?:json)?\s*/im, '').replace(/```\s*$/m, '').trim();
+      const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+      vd = JSON.parse(jsonMatch ? jsonMatch[0] : cleaned);
     } catch {
       vd = {
         confidence: 'MEDIUM',
