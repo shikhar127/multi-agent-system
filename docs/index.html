@@ -1032,6 +1032,14 @@
       <div class="verdict-left">
         <div class="verdict-chapter-label">— FINAL JUDGMENT —</div>
         <div class="verdict-big">THE<br/>VERDICT</div>
+        <div class="verdict-answer-text" id="verdict-answer-block">
+          <div class="verdict-summary" id="verdict-summary"></div>
+          <ul class="verdict-reasons" id="verdict-reasons"></ul>
+          <div id="verdict-actions-wrap" style="display:none">
+            <div class="verdict-actions-label">ACTION ITEMS</div>
+            <ul class="verdict-actions" id="verdict-actions"></ul>
+          </div>
+        </div>
         <div class="verdict-confidence-badge">
           <span class="vc-label" id="verdict-confidence">HIGH CONFIDENCE</span>
           <span class="vc-note" id="verdict-conf-note">All 3 robots converged</span>
@@ -1040,14 +1048,6 @@
           <span style="color:#22C55E;">HIGH</span> = all 3 converged &nbsp;
           <span style="color:#F5C800;">MEDIUM</span> = partial agreement &nbsp;
           <span style="color:#CC1A1A;">LOW</span> = unresolved conflict
-        </div>
-        <div class="verdict-answer-text" id="verdict-answer-block">
-          <div class="verdict-summary" id="verdict-summary"></div>
-          <ul class="verdict-reasons" id="verdict-reasons"></ul>
-          <div id="verdict-actions-wrap" style="display:none">
-            <div class="verdict-actions-label">ACTION ITEMS</div>
-            <ul class="verdict-actions" id="verdict-actions"></ul>
-          </div>
         </div>
         <button class="copy-btn" id="copy-verdict-btn" onclick="copyVerdict()">COPY VERDICT</button>
         <div class="verdict-war-cry">THE DEBATE IS OVER. THE TRUTH REMAINS.</div>
