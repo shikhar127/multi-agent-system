@@ -1074,10 +1074,11 @@
 ════════════════════════════════════════ -->
 <script>
 // ── TIER / MORE OPTIONS ──────────────────────────
+// Placeholder — overwritten dynamically after key validation fetches live models
 const FREE_MODELS = {
-  solver: 'deepseek/deepseek-r1-0528:free',
-  challenger: 'qwen/qwen3-30b-a3b:free',
-  scout: 'meta-llama/llama-3.3-70b-instruct:free',
+  solver: 'auto',
+  challenger: 'auto',
+  scout: 'auto',
 };
 const PAID_MODELS = {
   solver: 'anthropic/claude-opus-4-6',
@@ -1151,28 +1152,55 @@ async function callModel(apiKey, model, systemPrompt, userMessage) {
   return content;
 }
 
-// Pre-flight: validate key with a minimal call before the full battle
-async function validateKey(apiKey) {
-  const res = await fetch('https://openrouter.ai/api/v1/auth/key', {
+// Live free model list fetched from OpenRouter — no hardcoding
+let liveFreeModels = [];
+
+async function validateKeyAndFetchModels(apiKey) {
+  // Validate key
+  const keyRes = await fetch('https://openrouter.ai/api/v1/auth/key', {
     headers: { 'Authorization': `Bearer ${apiKey}` },
   });
-  if (!res.ok) throw new Error('Invalid OpenRouter API key. Check your key at openrouter.ai/keys');
-  const data = await res.json();
-  // label is null for invalid keys
-  if (!data.data?.label && data.data?.label !== undefined) {
-    throw new Error('API key not recognized by OpenRouter.');
+  if (!keyRes.ok) throw new Error('Invalid OpenRouter API key. Check your key at openrouter.ai/keys');
+
+  // Fetch live model list and find free ones
+  const modelsRes = await fetch('https://openrouter.ai/api/v1/models', {
+    headers: { 'Authorization': `Bearer ${apiKey}` },
+  });
+  if (modelsRes.ok) {
+    const modelsData = await modelsRes.json();
+    liveFreeModels = (modelsData.data || [])
+      .filter(m => m.pricing?.prompt === '0' && m.pricing?.completion === '0')
+      .map(m => m.id);
+    console.log(`[RvR] Found ${liveFreeModels.length} free models`);
+
+    // Auto-update the free selects if tier is set to free
+    if (liveFreeModels.length > 0) {
+      populateFreeSelects(liveFreeModels);
+    }
   }
 }
 
-// Fallback chain: if primary model fails, try backups in order
-const FREE_FALLBACKS = [
-  'deepseek/deepseek-r1-0528:free',
-  'qwen/qwen3-30b-a3b:free',
-  'meta-llama/llama-3.3-70b-instruct:free',
-  'qwen/qwen-2.5-72b-instruct:free',
-  'deepseek/deepseek-r1-0528-qwen3-8b:free',
-  'microsoft/phi-4-reasoning-plus:free',
-];
+function populateFreeSelects(models) {
+  ['solver-model', 'challenger-model', 'scout-model'].forEach((selId, i) => {
+    const sel = document.getElementById(selId);
+    // Only replace if currently showing a free model
+    const currentVal = sel.value;
+    if (!currentVal.endsWith(':free') && liveFreeModels.indexOf(currentVal) === -1) return;
+    // Clear existing free options and add live ones
+    Array.from(sel.options).forEach(opt => {
+      if (opt.value.endsWith(':free') || liveFreeModels.includes(opt.value)) opt.remove();
+    });
+    models.slice(0, 8).forEach((id, idx) => {
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = id.split('/')[1].toUpperCase().replace(/-/g, ' ');
+      if (idx === i) opt.selected = true; // assign different defaults per robot
+      sel.appendChild(opt);
+    });
+  });
+}
+
+// Paid fallback chain (these IDs are stable)
 const PAID_FALLBACKS = [
   'anthropic/claude-opus-4-6',
   'openai/gpt-5',
@@ -1185,8 +1213,9 @@ const PAID_FALLBACKS = [
 ];
 
 async function callWithFallback(apiKey, primaryModel, systemPrompt, userMessage) {
-  const isFree = primaryModel.endsWith(':free');
-  const pool = isFree ? FREE_FALLBACKS : PAID_FALLBACKS;
+  const isFree = primaryModel.endsWith(':free') || liveFreeModels.includes(primaryModel);
+  // Build chain: primary first, then remaining live free models or paid fallbacks
+  const pool = isFree ? liveFreeModels : PAID_FALLBACKS;
   const chain = [primaryModel, ...pool.filter(m => m !== primaryModel)];
   const errors = [];
   for (const model of chain) {
@@ -1269,7 +1298,7 @@ async function startFight() {
   document.getElementById('fight-btn').disabled = true;
   document.getElementById('fight-btn').textContent = 'CHECKING KEY…';
 
-  try { await validateKey(apiKey); }
+  try { await validateKeyAndFetchModels(apiKey); }
   catch (err) { showError(err.message); return; }
 
   document.getElementById('fight-btn').textContent = 'THE BATTLE IS ON…';
