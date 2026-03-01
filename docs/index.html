@@ -616,10 +616,11 @@
               <option value="openai/gpt-4o">GPT-4O</option>
               <option value="google/gemini-2.5-pro">GEMINI 2.5 PRO</option>
               <option value="google/gemini-2.0-flash">GEMINI 2.0 FLASH</option>
+              <option value="deepseek/deepseek-r1-0528:free">DEEPSEEK R1 0528 (FREE)</option>
+              <option value="qwen/qwen3-30b-a3b:free">QWEN3 30B (FREE)</option>
               <option value="meta-llama/llama-3.3-70b-instruct:free">LLAMA 3.3 70B (FREE)</option>
-              <option value="deepseek/deepseek-r1:free">DEEPSEEK R1 (FREE)</option>
-              <option value="deepseek/deepseek-chat:free">DEEPSEEK CHAT (FREE)</option>
               <option value="qwen/qwen-2.5-72b-instruct:free">QWEN 2.5 72B (FREE)</option>
+              <option value="microsoft/phi-4-reasoning-plus:free">PHI-4 REASONING (FREE)</option>
             </select>
           </div>
           <div class="robot-model-row">
@@ -633,9 +634,9 @@
               <option value="openai/gpt-4o">GPT-4O</option>
               <option value="google/gemini-2.5-pro">GEMINI 2.5 PRO</option>
               <option value="google/gemini-2.0-flash">GEMINI 2.0 FLASH</option>
-              <option value="deepseek/deepseek-r1:free">DEEPSEEK R1 (FREE)</option>
+              <option value="deepseek/deepseek-r1-0528:free">DEEPSEEK R1 0528 (FREE)</option>
+              <option value="qwen/qwen3-30b-a3b:free">QWEN3 30B (FREE)</option>
               <option value="meta-llama/llama-3.3-70b-instruct:free">LLAMA 3.3 70B (FREE)</option>
-              <option value="deepseek/deepseek-chat:free">DEEPSEEK CHAT (FREE)</option>
               <option value="qwen/qwen-2.5-72b-instruct:free">QWEN 2.5 72B (FREE)</option>
             </select>
           </div>
@@ -1074,9 +1075,9 @@
 <script>
 // ── TIER / MORE OPTIONS ──────────────────────────
 const FREE_MODELS = {
-  solver: 'meta-llama/llama-3.3-70b-instruct:free',
-  challenger: 'deepseek/deepseek-r1:free',
-  scout: 'deepseek/deepseek-chat:free',
+  solver: 'deepseek/deepseek-r1-0528:free',
+  challenger: 'qwen/qwen3-30b-a3b:free',
+  scout: 'meta-llama/llama-3.3-70b-instruct:free',
 };
 const PAID_MODELS = {
   solver: 'anthropic/claude-opus-4-6',
@@ -1165,11 +1166,12 @@ async function validateKey(apiKey) {
 
 // Fallback chain: if primary model fails, try backups in order
 const FREE_FALLBACKS = [
+  'deepseek/deepseek-r1-0528:free',
+  'qwen/qwen3-30b-a3b:free',
   'meta-llama/llama-3.3-70b-instruct:free',
-  'deepseek/deepseek-r1:free',
-  'deepseek/deepseek-chat:free',
   'qwen/qwen-2.5-72b-instruct:free',
-  'mistralai/mistral-small-3.1-24b-instruct:free',
+  'deepseek/deepseek-r1-0528-qwen3-8b:free',
+  'microsoft/phi-4-reasoning-plus:free',
 ];
 const PAID_FALLBACKS = [
   'anthropic/claude-opus-4-6',
