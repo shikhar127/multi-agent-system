@@ -1126,12 +1126,25 @@ function populatePaidSelects() {
   });
 }
 
+function showFreeSelectPlaceholder() {
+  ['solver-model', 'challenger-model', 'scout-model'].forEach(selId => {
+    const sel = document.getElementById(selId);
+    if (!sel) return;
+    sel.innerHTML = '';
+    const o = document.createElement('option');
+    o.value = ''; o.textContent = '— auto-assigned after key validation —';
+    o.disabled = true; o.selected = true;
+    sel.appendChild(o);
+  });
+}
+
 function setTier(tier) {
   currentTier = tier;
   document.getElementById('tier-free')?.classList.toggle('active', tier === 'free');
   document.getElementById('tier-paid')?.classList.toggle('active', tier === 'paid');
   if (tier === 'paid') populatePaidSelects();
   else if (liveFreeModels.length > 0) populateFreeSelects(liveFreeModels);
+  else showFreeSelectPlaceholder(); // clear paid options so they don't mislead
 }
 
 function toggleMoreOptions() {
@@ -1142,7 +1155,8 @@ function toggleMoreOptions() {
   if (!open) {
     // Refresh selects to match current tier whenever panel opens
     if (currentTier === 'free' && liveFreeModels.length > 0) populateFreeSelects(liveFreeModels);
-    else if (currentTier === 'paid') populatePaidSelects();
+    else if (currentTier === 'free') showFreeSelectPlaceholder();
+    else populatePaidSelects();
   }
   panel.style.display = open ? 'none' : 'flex';
   arrow.textContent = open ? '▼' : '▲';
