@@ -2107,6 +2107,11 @@ async function generateNextQuestions(question, verdictText) {
   if (!section || !lastApiKey || !lastSolverModel) return;
   section.style.display = 'block';
 
+  // callModel requires a live currentAbortController — create one for suggestions
+  // since the fight's controller is already nulled by the finally block
+  const suggestionsCtl = new AbortController();
+  currentAbortController = suggestionsCtl;
+
   const sys = `You are a debate curator. Given a debate question and its verdict, suggest 3 follow-up questions for the next fight. Make each one probe a distinct angle: one that goes deeper on the same topic, one that challenges the verdict's core assumption, one that applies the same tension to a different context. Return ONLY a raw JSON array of 3 question strings. No preamble, no markdown, no numbering.`;
   const msg = `Original question: "${question}"\n\nVerdict: "${verdictText}"\n\nReturn a JSON array of 3 follow-up debate questions.`;
 
@@ -2135,6 +2140,8 @@ async function generateNextQuestions(question, verdictText) {
     });
   } catch (_) {
     section.style.display = 'none';
+  } finally {
+    if (currentAbortController === suggestionsCtl) currentAbortController = null;
   }
 }
 
