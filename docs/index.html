@@ -1082,16 +1082,39 @@ const PAID_MODELS = {
   scout: 'google/gemini-2.5-pro',
 };
 
+const PAID_OPTIONS = [
+  { value: 'anthropic/claude-opus-4-6',  label: 'CLAUDE OPUS 4.6' },
+  { value: 'anthropic/claude-opus-4-5',  label: 'CLAUDE OPUS 4.5' },
+  { value: 'anthropic/claude-sonnet-4-5',label: 'CLAUDE SONNET 4.5' },
+  { value: 'openai/gpt-5',               label: 'GPT-5' },
+  { value: 'openai/o1',                  label: 'O1' },
+  { value: 'openai/gpt-4o',             label: 'GPT-4O' },
+  { value: 'google/gemini-2.5-pro',      label: 'GEMINI 2.5 PRO' },
+  { value: 'google/gemini-2.0-flash',    label: 'GEMINI 2.0 FLASH' },
+];
+
+function populatePaidSelects() {
+  const defaults = [PAID_MODELS.solver, PAID_MODELS.challenger, PAID_MODELS.scout];
+  ['solver-model', 'challenger-model', 'scout-model'].forEach((selId, i) => {
+    const sel = document.getElementById(selId);
+    sel.innerHTML = '';
+    PAID_OPTIONS.forEach(opt => {
+      const el = document.createElement('option');
+      el.value = opt.value;
+      el.textContent = opt.label;
+      if (opt.value === defaults[i]) el.selected = true;
+      sel.appendChild(el);
+    });
+  });
+}
+
 function setTier(tier) {
   currentTier = tier;
   document.getElementById('tier-free').classList.toggle('active', tier === 'free');
   document.getElementById('tier-paid').classList.toggle('active', tier === 'paid');
   if (tier === 'paid') {
-    setSelectValue('solver-model', PAID_MODELS.solver);
-    setSelectValue('challenger-model', PAID_MODELS.challenger);
-    setSelectValue('scout-model', PAID_MODELS.scout);
+    populatePaidSelects();
   } else {
-    // Free: populate selects if we already have live models, otherwise just mark tier
     if (liveFreeModels.length > 0) populateFreeSelects(liveFreeModels);
   }
 }
