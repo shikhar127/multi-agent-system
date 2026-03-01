@@ -270,8 +270,19 @@
     .scout-tag { color: #4A6FD4; border-color: #4A6FD4; }
 
     /* skeleton loader for cards */
-    .skeleton { background: linear-gradient(90deg, #2A2A25 25%, #3A3A35 50%, #2A2A25 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 2px; }
+    .skeleton { background: linear-gradient(90deg, #2A2A25 25%, #3A3A35 50%, #2A2A25 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 2px; color: transparent !important; }
     @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    /* cancel fight button */
+    .cancel-btn {
+      font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 0.18em;
+      color: #CC1A1A; background: transparent; border: 2px solid #CC1A1A;
+      padding: 8px 24px; cursor: pointer; z-index: 2; transition: all 0.1s;
+    }
+    .cancel-btn:hover { background: #CC1A1A; color: #F5F5F0; }
+
+    /* active round highlight */
+    .result-round.round-active { box-shadow: inset 0 0 0 3px #F5C800; }
 
     /* Verdict result */
     #result-verdict {
@@ -684,6 +695,7 @@
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
     <div class="loading-status" id="loading-status">INITIATING DELIBERATION PROTOCOL</div>
+    <button class="cancel-btn" id="cancel-btn" onclick="cancelFight()" style="display:none;">ABORT FIGHT</button>
   </div>
 
   <!-- Round 1 -->
@@ -1073,9 +1085,12 @@
   JAVASCRIPT — BATTLE ENGINE
 ════════════════════════════════════════ -->
 <script>
-// ── TIER / MORE OPTIONS ──────────────────────────
+// ── GLOBALS ──────────────────────────────────────
 let currentTier = 'paid';
+let fightInProgress = false;       // prevents double-submit
+let currentAbortController = null; // for cancellation
 
+// ── PAID MODELS ──────────────────────────────────
 const PAID_MODELS = {
   solver: 'anthropic/claude-opus-4-6',
   challenger: 'openai/gpt-5',
@@ -1088,48 +1103,47 @@ const PAID_OPTIONS = [
   { value: 'anthropic/claude-sonnet-4-5',label: 'CLAUDE SONNET 4.5' },
   { value: 'openai/gpt-5',               label: 'GPT-5' },
   { value: 'openai/o1',                  label: 'O1' },
-  { value: 'openai/gpt-4o',             label: 'GPT-4O' },
+  { value: 'openai/gpt-4o',              label: 'GPT-4O' },
   { value: 'google/gemini-2.5-pro',      label: 'GEMINI 2.5 PRO' },
   { value: 'google/gemini-2.0-flash',    label: 'GEMINI 2.0 FLASH' },
 ];
+
+// Derived from PAID_OPTIONS — never out of sync with the dropdown
+const PAID_FALLBACKS = PAID_OPTIONS.map(o => o.value);
 
 function populatePaidSelects() {
   const defaults = [PAID_MODELS.solver, PAID_MODELS.challenger, PAID_MODELS.scout];
   ['solver-model', 'challenger-model', 'scout-model'].forEach((selId, i) => {
     const sel = document.getElementById(selId);
+    if (!sel) return;
     sel.innerHTML = '';
     PAID_OPTIONS.forEach(opt => {
-      const el = document.createElement('option');
-      el.value = opt.value;
-      el.textContent = opt.label;
-      if (opt.value === defaults[i]) el.selected = true;
-      sel.appendChild(el);
+      const o = document.createElement('option');
+      o.value = opt.value; o.textContent = opt.label;
+      if (opt.value === defaults[i]) o.selected = true;
+      sel.appendChild(o);
     });
   });
 }
 
 function setTier(tier) {
   currentTier = tier;
-  document.getElementById('tier-free').classList.toggle('active', tier === 'free');
-  document.getElementById('tier-paid').classList.toggle('active', tier === 'paid');
-  if (tier === 'paid') {
-    populatePaidSelects();
-  } else {
-    if (liveFreeModels.length > 0) populateFreeSelects(liveFreeModels);
-  }
-}
-
-function setSelectValue(id, value) {
-  const sel = document.getElementById(id);
-  for (let i = 0; i < sel.options.length; i++) {
-    if (sel.options[i].value === value) { sel.selectedIndex = i; return; }
-  }
+  document.getElementById('tier-free')?.classList.toggle('active', tier === 'free');
+  document.getElementById('tier-paid')?.classList.toggle('active', tier === 'paid');
+  if (tier === 'paid') populatePaidSelects();
+  else if (liveFreeModels.length > 0) populateFreeSelects(liveFreeModels);
 }
 
 function toggleMoreOptions() {
   const panel = document.getElementById('more-options-panel');
   const arrow = document.getElementById('more-options-arrow');
+  if (!panel || !arrow) return;
   const open = panel.style.display !== 'none';
+  if (!open) {
+    // Refresh selects to match current tier whenever panel opens
+    if (currentTier === 'free' && liveFreeModels.length > 0) populateFreeSelects(liveFreeModels);
+    else if (currentTier === 'paid') populatePaidSelects();
+  }
   panel.style.display = open ? 'none' : 'flex';
   arrow.textContent = open ? '▼' : '▲';
 }
@@ -1138,57 +1152,68 @@ function toggleMoreOptions() {
 function parseOpenRouterError(data, status) {
   if (!data.error) return null;
   const e = data.error;
-  // Pull the most useful detail: raw provider message > code > generic message
   const raw = e.metadata?.raw;
   const provider = e.metadata?.provider_name;
   let msg = e.message || `HTTP ${status}`;
-  if (raw) {
-    try { msg = JSON.parse(raw)?.error?.message || raw; } catch { msg = raw; }
-  }
+  if (raw) { try { msg = JSON.parse(raw)?.error?.message || raw; } catch { msg = raw; } }
   if (provider) msg = `[${provider}] ${msg}`;
   return msg;
 }
 
 async function callModel(apiKey, model, systemPrompt, userMessage) {
-  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-      'HTTP-Referer': window.location.href,
-      'X-Title': 'Robots versus Robots',
-    },
-    body: JSON.stringify({
-      model,
-      max_tokens: 600,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userMessage },
-      ],
-    }),
-  });
-  const data = await res.json();
-  const errMsg = parseOpenRouterError(data, res.status);
-  if (errMsg) throw new Error(errMsg);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const content = data.choices?.[0]?.message?.content;
-  if (!content) throw new Error(`Empty response`);
-  return content;
+  const controller = currentAbortController;
+  if (!controller) throw new Error('Fight not active');
+  // 90-second per-call timeout
+  const timeoutId = setTimeout(() => { if (!controller.signal.aborted) controller.abort('timeout'); }, 90000);
+  try {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'HTTP-Referer': window.location.href,
+        'X-Title': 'Robots versus Robots',
+      },
+      body: JSON.stringify({
+        model, max_tokens: 600,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMessage },
+        ],
+      }),
+      signal: controller.signal,
+    });
+    const data = await res.json();
+    const errMsg = parseOpenRouterError(data, res.status);
+    if (errMsg) throw new Error(errMsg);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const content = data.choices?.[0]?.message?.content;
+    if (!content) throw new Error('Empty response');
+    return content;
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      const reason = controller.signal.reason;
+      throw new Error(reason === 'timeout' ? 'Request timed out (90s). Try again.' : 'Fight cancelled.');
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
-// Live free model list fetched from OpenRouter — no hardcoding
+// Live free model list fetched from OpenRouter
 let liveFreeModels = [];
 
 async function validateKeyAndFetchModels(apiKey) {
-  // Validate key
   const keyRes = await fetch('https://openrouter.ai/api/v1/auth/key', {
     headers: { 'Authorization': `Bearer ${apiKey}` },
+    signal: currentAbortController?.signal,
   });
   if (!keyRes.ok) throw new Error('Invalid OpenRouter API key. Check your key at openrouter.ai/keys');
 
-  // Fetch live model list and find free ones
   const modelsRes = await fetch('https://openrouter.ai/api/v1/models', {
     headers: { 'Authorization': `Bearer ${apiKey}` },
+    signal: currentAbortController?.signal,
   });
   if (modelsRes.ok) {
     const modelsData = await modelsRes.json();
@@ -1196,59 +1221,54 @@ async function validateKeyAndFetchModels(apiKey) {
       .filter(m => m.pricing?.prompt === '0' && m.pricing?.completion === '0')
       .map(m => m.id);
     console.log(`[RvR] Found ${liveFreeModels.length} free models`);
-
-    // Auto-update the free selects if tier is set to free
-    if (liveFreeModels.length > 0) {
-      populateFreeSelects(liveFreeModels);
-    }
+    // Show count in the tier button note
+    const freeNote = document.querySelector('#tier-free .tier-btn-note');
+    if (freeNote) freeNote.textContent = `${liveFreeModels.length} free models loaded`;
+    // Only repopulate selects if currently on free tier
+    if (currentTier === 'free' && liveFreeModels.length > 0) populateFreeSelects(liveFreeModels);
   }
 }
 
 function populateFreeSelects(models) {
   ['solver-model', 'challenger-model', 'scout-model'].forEach((selId, i) => {
     const sel = document.getElementById(selId);
-    // Replace all options with live free models
+    if (!sel) return;
     sel.innerHTML = '';
     models.slice(0, 10).forEach((id, idx) => {
-      const opt = document.createElement('option');
-      opt.value = id;
-      opt.textContent = id.split('/')[1].toUpperCase().replace(/-/g, ' ');
-      if (idx === i % models.length) opt.selected = true;
-      sel.appendChild(opt);
+      const o = document.createElement('option');
+      o.value = id;
+      o.textContent = id.split('/')[1].toUpperCase().replace(/-/g, ' ');
+      if (idx === i % models.length) o.selected = true;
+      sel.appendChild(o);
     });
   });
 }
 
-// Paid fallback chain (these IDs are stable)
-const PAID_FALLBACKS = [
-  'anthropic/claude-opus-4-6',
-  'openai/gpt-5',
-  'google/gemini-2.5-pro',
-  'anthropic/claude-opus-4-5',
-  'openai/o1',
-  'google/gemini-2.0-flash',
-  'anthropic/claude-sonnet-4-5',
-  'openai/gpt-4o',
-];
-
 async function callWithFallback(apiKey, primaryModel, systemPrompt, userMessage) {
   const isFree = primaryModel.endsWith(':free') || liveFreeModels.includes(primaryModel);
-  // Build chain: primary first, then remaining live free models or paid fallbacks
   const pool = isFree ? liveFreeModels : PAID_FALLBACKS;
-  const chain = [primaryModel, ...pool.filter(m => m !== primaryModel)];
+  // Cap free attempts at 5 to avoid iterating 100+ models
+  const chain = [primaryModel, ...pool.filter(m => m !== primaryModel)].slice(0, isFree ? 5 : pool.length);
   const errors = [];
   for (const model of chain) {
     try {
       return await callModel(apiKey, model, systemPrompt, userMessage);
     } catch (err) {
+      // Propagate cancellation / timeout immediately — no fallback
+      if (err.message.includes('Fight cancelled') || err.message.includes('timed out')) throw err;
       console.warn(`[RvR] ${model} failed: ${err.message}`);
       errors.push(`${model}: ${err.message}`);
+      // 3-second backoff on rate limit before trying next model
+      if (/429|rate.?limit|too many requests/i.test(err.message)) {
+        await new Promise(r => setTimeout(r, 3000));
+      }
     }
   }
   const summary = errors.slice(0, 3).join('\n');
   throw new Error(`All models failed:\n${summary}\n\nCheck: key validity, credits, rate limits at openrouter.ai`);
 }
 
+// ── HELPERS ──────────────────────────────────────
 function extractHeadline(text) {
   const lines = text.trim().split('\n').filter(l => l.trim());
   const first = lines[0].replace(/^["']|["']$/g, '').trim();
@@ -1269,107 +1289,159 @@ function extractTag(text, role) {
 
 function showEl(id, flex) {
   const el = document.getElementById(id);
+  if (!el) { console.warn(`[RvR] showEl: #${id} not found`); return; }
   el.style.display = flex ? 'flex' : 'block';
 }
 
 function setStatus(title, status) {
-  document.getElementById('loading-title').textContent = title;
-  document.getElementById('loading-status').textContent = status;
+  const t = document.getElementById('loading-title');
+  const s = document.getElementById('loading-status');
+  if (t) t.textContent = title;
+  if (s) s.textContent = status;
 }
 
 function showError(msg) {
-  document.getElementById('form-error').style.display = 'block';
-  document.getElementById('error-text').textContent = msg;
-  document.getElementById('fight-btn').disabled = false;
-  document.getElementById('fight-btn').textContent = 'START THE FIGHT →';
+  const errEl = document.getElementById('form-error');
+  const textEl = document.getElementById('error-text');
+  const btn = document.getElementById('fight-btn');
+  if (errEl) errEl.style.display = 'block';
+  if (textEl) textEl.textContent = msg;
+  if (btn) { btn.disabled = false; btn.textContent = 'START THE FIGHT →'; }
+}
+
+function setCardLoading(hlId, bodyId) {
+  [hlId, bodyId].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = '';
+    el.classList.add('skeleton');
+    el.style.minHeight = i === 0 ? '26px' : '64px';
+  });
+}
+
+function clearCardLoading(hlId, bodyId) {
+  [hlId, bodyId].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('skeleton');
+    el.style.minHeight = '';
+  });
 }
 
 function resetArena() {
-  document.getElementById('battle-results').style.display = 'none';
-  document.getElementById('result-round1').style.display = 'none';
-  document.getElementById('result-round2').style.display = 'none';
-  document.getElementById('result-round3').style.display = 'none';
-  document.getElementById('result-verdict').style.display = 'none';
-  document.getElementById('clash-1').style.display = 'none';
-  document.getElementById('clash-2').style.display = 'none';
-  document.getElementById('loading-panel').style.display = 'none';
-  document.getElementById('try-again-bar').style.display = 'none';
-  document.getElementById('form-error').style.display = 'none';
-  document.getElementById('fight-btn').disabled = false;
-  document.getElementById('fight-btn').textContent = 'START THE FIGHT →';
-  document.getElementById('question-input').value = '';
-  document.getElementById('question-input').focus();
+  ['battle-results','result-round1','result-round2','result-round3','result-verdict',
+   'clash-1','clash-2','loading-panel','try-again-bar','form-error'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  ['result-round1','result-round2','result-round3'].forEach(id =>
+    document.getElementById(id)?.classList.remove('round-active'));
+  const btn = document.getElementById('fight-btn');
+  if (btn) { btn.disabled = false; btn.textContent = 'START THE FIGHT →'; }
+  // Intentionally NOT clearing question so user can refine and retry
+  document.getElementById('question-input')?.focus();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+function cancelFight() {
+  if (currentAbortController) currentAbortController.abort('user_cancel');
+}
+
 async function startFight() {
-  const question = document.getElementById('question-input').value.trim();
-  const apiKey = document.getElementById('api-key-input').value.trim();
-
-  document.getElementById('form-error').style.display = 'none';
-
+  if (fightInProgress) return; // prevent double-submit
+  const question = (document.getElementById('question-input')?.value || '').trim();
+  const apiKey = (document.getElementById('api-key-input')?.value || '').trim();
+  const errEl = document.getElementById('form-error');
+  if (errEl) errEl.style.display = 'none';
   if (!question) { showError('Enter a question for the robots to fight over.'); return; }
   if (!apiKey) { showError('Enter your OpenRouter API key. Get one free at openrouter.ai'); return; }
 
-  document.getElementById('fight-btn').disabled = true;
-  document.getElementById('fight-btn').textContent = 'CHECKING KEY…';
+  fightInProgress = true;
+  currentAbortController = new AbortController();
+  const cancelBtn = document.getElementById('cancel-btn');
+  const btn = document.getElementById('fight-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'CHECKING KEY…'; }
+
+  // Show loading panel immediately during key check so it doesn't feel frozen
+  showEl('battle-results', true);
+  showEl('loading-panel', true);
+  if (cancelBtn) cancelBtn.style.display = 'block';
+  setStatus('VALIDATING KEY…', 'CONNECTING TO OPENROUTER');
+  setTimeout(() => document.getElementById('battle-results')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
 
   try { await validateKeyAndFetchModels(apiKey); }
-  catch (err) { showError(err.message); return; }
-
-  // Determine models — if free tier, use live free models; otherwise use selects
-  let solverModel, challengerModel, scoutModel;
-  if (currentTier === 'free' && liveFreeModels.length >= 3) {
-    solverModel = liveFreeModels[0];
-    challengerModel = liveFreeModels[1];
-    scoutModel = liveFreeModels[2];
-  } else if (currentTier === 'free' && liveFreeModels.length > 0) {
-    solverModel = challengerModel = scoutModel = liveFreeModels[0];
-  } else {
-    solverModel = document.getElementById('solver-model').value;
-    challengerModel = document.getElementById('challenger-model').value;
-    scoutModel = document.getElementById('scout-model').value;
+  catch (err) {
+    document.getElementById('loading-panel').style.display = 'none';
+    document.getElementById('battle-results').style.display = 'none';
+    if (cancelBtn) cancelBtn.style.display = 'none';
+    if (!err.message.includes('cancelled')) showError(err.message);
+    else resetArena();
+    fightInProgress = false;
+    currentAbortController = null;
+    return;
   }
 
-  document.getElementById('fight-btn').textContent = 'THE BATTLE IS ON…';
+  // Fail fast if free tier has no usable models
+  if (currentTier === 'free' && liveFreeModels.length === 0) {
+    document.getElementById('loading-panel').style.display = 'none';
+    document.getElementById('battle-results').style.display = 'none';
+    if (cancelBtn) cancelBtn.style.display = 'none';
+    showError('No free models found on OpenRouter. Switch to PAID FIGHTER or try again later.');
+    fightInProgress = false;
+    currentAbortController = null;
+    return;
+  }
 
-  // Show results section, scroll to it
-  showEl('battle-results', false);
-  showEl('loading-panel', false);
-  setTimeout(() => document.getElementById('battle-results').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  // Determine which models to use
+  let solverModel, challengerModel, scoutModel;
+  if (currentTier === 'free' && liveFreeModels.length >= 3) {
+    [solverModel, challengerModel, scoutModel] = liveFreeModels;
+  } else if (currentTier === 'free') {
+    // Cycle through available free models instead of all using the same one
+    const n = liveFreeModels.length;
+    solverModel = liveFreeModels[0 % n];
+    challengerModel = liveFreeModels[1 % n];
+    scoutModel = liveFreeModels[2 % n];
+  } else {
+    solverModel = document.getElementById('solver-model')?.value || PAID_MODELS.solver;
+    challengerModel = document.getElementById('challenger-model')?.value || PAID_MODELS.challenger;
+    scoutModel = document.getElementById('scout-model')?.value || PAID_MODELS.scout;
+  }
+
+  if (btn) btn.textContent = 'THE BATTLE IS ON…';
 
   try {
     // ── ROUND 1: SOLVER ──────────────────────────
     setStatus('SOLVER IS BUILDING THE CASE…', 'ROUND 01 · INITIAL PROPOSAL');
+    setCardLoading('r1-solver-hl', 'r1-solver-body');
+    document.getElementById('result-round1').style.display = 'block';
+    document.getElementById('result-round1')?.classList.add('round-active');
 
     const solverPrompt = `You are SOLVER, a debate robot in a system called "Robots versus Robots". Your role is to construct the best possible initial answer to a question. Be decisive, confident, and comprehensive. State your position clearly in the first sentence. Argue in flowing prose — no bullet points. Keep your response to 3 short paragraphs maximum. Start your response with a bold one-sentence position statement in quotes, then elaborate.`;
 
     const solverRaw = await callWithFallback(apiKey, solverModel, solverPrompt, question);
-    const solverHl = extractHeadline(solverRaw);
-    const solverBody = extractBody(solverRaw);
-    const solverTag = extractTag(solverRaw, 'solver');
-
-    document.getElementById('r1-solver-hl').textContent = solverHl;
-    document.getElementById('r1-solver-body').textContent = solverBody;
-    document.getElementById('r1-solver-tag').textContent = solverTag;
-    showEl('result-round1', false);
-    document.getElementById('result-round1').style.display = 'block';
+    clearCardLoading('r1-solver-hl', 'r1-solver-body');
+    document.getElementById('r1-solver-hl').textContent = extractHeadline(solverRaw);
+    document.getElementById('r1-solver-body').textContent = extractBody(solverRaw);
+    document.getElementById('r1-solver-tag').textContent = extractTag(solverRaw, 'solver');
+    document.getElementById('result-round1')?.classList.remove('round-active');
 
     // ── ROUND 2: CHALLENGER ──────────────────────
     setStatus('CHALLENGER IS SHARPENING ITS ATTACK…', 'ROUND 02 · CHALLENGER ENGAGES');
-    showEl('clash-1', false);
+    showEl('clash-1', true); // fix: was false (display:block broke flex layout)
+    setCardLoading('r2-challenger-hl', 'r2-challenger-body');
+    setCardLoading('r2-scout-hl', 'r2-scout-body');
+    document.getElementById('result-round2').style.display = 'block';
+    document.getElementById('result-round2')?.classList.add('round-active');
 
     const challengerPrompt = `You are CHALLENGER, a debate robot in "Robots versus Robots". SOLVER has just proposed an answer to a question. Your job is to attack it — find flaws, challenge assumptions, expose risks, and stress-test the logic. Be aggressive but rigorous. No ad hominem — only logical assault. Start with a provocative one-sentence counter-position in quotes, then deliver your attack in 2-3 paragraphs. No bullet points.`;
 
     const challengerRaw = await callWithFallback(apiKey, challengerModel, challengerPrompt,
       `The question: "${question}"\n\nSOLVER's position: ${solverRaw}\n\nNow attack it.`);
-    const challengerHl = extractHeadline(challengerRaw);
-    const challengerBody = extractBody(challengerRaw);
-    const challengerTag = extractTag(challengerRaw, 'challenger');
-
-    document.getElementById('r2-challenger-hl').textContent = challengerHl;
-    document.getElementById('r2-challenger-body').textContent = challengerBody;
-    document.getElementById('r2-challenger-tag').textContent = challengerTag;
+    clearCardLoading('r2-challenger-hl', 'r2-challenger-body');
+    document.getElementById('r2-challenger-hl').textContent = extractHeadline(challengerRaw);
+    document.getElementById('r2-challenger-body').textContent = extractBody(challengerRaw);
+    document.getElementById('r2-challenger-tag').textContent = extractTag(challengerRaw, 'challenger');
 
     // ── ROUND 2: SCOUT ───────────────────────────
     setStatus('SCOUT IS SCANNING FOR HIDDEN PATHS…', 'ROUND 02 · SCOUT EXPLORES');
@@ -1378,33 +1450,28 @@ async function startFight() {
 
     const scoutRaw = await callWithFallback(apiKey, scoutModel, scoutPrompt,
       `The question: "${question}"\n\nSOLVER said: ${solverRaw}\n\nCHALLENGER attacked: ${challengerRaw}\n\nFind what they both missed.`);
-    const scoutHl = extractHeadline(scoutRaw);
-    const scoutBody = extractBody(scoutRaw);
-    const scoutTag = extractTag(scoutRaw, 'scout');
-
-    document.getElementById('r2-scout-hl').textContent = scoutHl;
-    document.getElementById('r2-scout-body').textContent = scoutBody;
-    document.getElementById('r2-scout-tag').textContent = scoutTag;
-    showEl('result-round2', false);
-    document.getElementById('result-round2').style.display = 'block';
+    clearCardLoading('r2-scout-hl', 'r2-scout-body');
+    document.getElementById('r2-scout-hl').textContent = extractHeadline(scoutRaw);
+    document.getElementById('r2-scout-body').textContent = extractBody(scoutRaw);
+    document.getElementById('r2-scout-tag').textContent = extractTag(scoutRaw, 'scout');
+    document.getElementById('result-round2')?.classList.remove('round-active');
 
     // ── ROUND 3: SOLVER REVISED ──────────────────
     setStatus('SOLVER IS FORGING THE FINAL POSITION…', 'ROUND 03 · CONVERGENCE');
-    showEl('clash-2', false);
+    showEl('clash-2', true); // fix: was false (display:block broke flex layout)
+    setCardLoading('r3-solver-hl', 'r3-solver-body');
+    document.getElementById('result-round3').style.display = 'block';
+    document.getElementById('result-round3')?.classList.add('round-active');
 
     const r3Prompt = `You are SOLVER in "Robots versus Robots". You've now heard CHALLENGER's attack and SCOUT's alternative perspective. Revise your position to incorporate valid criticisms and insights. Show that you've genuinely updated your thinking. Be decisive about your final position. Start with a revised one-sentence position in quotes, then deliver your final argument in 2-3 paragraphs. No bullet points.`;
 
     const r3Raw = await callWithFallback(apiKey, solverModel, r3Prompt,
       `The question: "${question}"\n\nYour original position: ${solverRaw}\n\nCHALLENGER's attack: ${challengerRaw}\n\nSCOUT's alternative: ${scoutRaw}\n\nRevise your position.`);
-    const r3Hl = extractHeadline(r3Raw);
-    const r3Body = extractBody(r3Raw);
-    const r3Tag = extractTag(r3Raw, 'solver');
-
-    document.getElementById('r3-solver-hl').textContent = r3Hl;
-    document.getElementById('r3-solver-body').textContent = r3Body;
-    document.getElementById('r3-solver-tag').textContent = r3Tag;
-    showEl('result-round3', false);
-    document.getElementById('result-round3').style.display = 'block';
+    clearCardLoading('r3-solver-hl', 'r3-solver-body');
+    document.getElementById('r3-solver-hl').textContent = extractHeadline(r3Raw);
+    document.getElementById('r3-solver-body').textContent = extractBody(r3Raw);
+    document.getElementById('r3-solver-tag').textContent = extractTag(r3Raw, 'solver');
+    document.getElementById('result-round3')?.classList.remove('round-active');
 
     // ── VERDICT ──────────────────────────────────
     setStatus('THE SYNTHESIZER IS DELIVERING THE VERDICT…', 'FINAL JUDGMENT');
@@ -1424,62 +1491,87 @@ async function startFight() {
     const verdictRaw = await callWithFallback(apiKey, solverModel, verdictPrompt,
       `The question: "${question}"\n\nR1 SOLVER: ${solverRaw}\n\nR2 CHALLENGER: ${challengerRaw}\n\nR2 SCOUT: ${scoutRaw}\n\nR3 SOLVER (revised): ${r3Raw}\n\nDeliver the final verdict as JSON.`);
 
-    // Extract a JSON string field value — handles unescaped quotes inside values
+    // Robust field extractor — handles unescaped quotes inside string values
     function extractField(raw, key) {
-      // Match from "key": " to the last " before the next "key": or }
-      const re = new RegExp(`"${key}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*\\})`, 'i');
-      const m = raw.match(re);
-      return m ? m[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') : null;
+      const start = raw.search(new RegExp('"' + key + '"\\s*:\\s*"', 'i'));
+      if (start === -1) return null;
+      const inner = raw.slice(start).replace(new RegExp('^"' + key + '"\\s*:\\s*"', 'i'), '');
+      // Match to the closing quote before next field or end of object
+      const endMatch = inner.match(/^([\s\S]*?)"(?=\s*(?:,\s*"\w+"\s*:|\s*\}))/);
+      if (endMatch) return endMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
+      // Fallback: take up to last quote in string
+      const lastQ = inner.lastIndexOf('"');
+      return lastQ > -1 ? inner.slice(0, lastQ).replace(/\\n/g, '\n').replace(/\\"/g, '"') : null;
     }
 
     let vd;
     try {
-      // Strip markdown code fences (```json ... ```) that some models add
-      const cleaned = verdictRaw.replace(/```(?:json)?/gi, '').trim();
-      const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-      vd = JSON.parse(jsonMatch ? jsonMatch[0] : cleaned);
+      const stripped = verdictRaw.replace(/```(?:json)?/gi, '').trim();
+      const jsonStr = (stripped.match(/\{[\s\S]*\}/) || [stripped])[0];
+      vd = JSON.parse(jsonStr);
     } catch {
-      // JSON.parse failed (likely unescaped quotes in values) — extract fields with regex
+      // JSON.parse failed — extract each field with the robust regex
       vd = {
-        confidence: extractField(verdictRaw, 'confidence') || 'MEDIUM',
+        confidence:      extractField(verdictRaw, 'confidence')      || 'MEDIUM',
         confidence_note: extractField(verdictRaw, 'confidence_note') || 'The robots reached a reasoned conclusion.',
-        verdict: extractField(verdictRaw, 'verdict') || verdictRaw,
-        r1_trace: extractField(verdictRaw, 'r1_trace') || 'Solver proposed initial position.',
-        r2c_trace: extractField(verdictRaw, 'r2c_trace') || 'Challenger identified key flaws.',
-        r2s_trace: extractField(verdictRaw, 'r2s_trace') || 'Scout found alternative perspective.',
-        r3_trace: extractField(verdictRaw, 'r3_trace') || 'Solver revised and converged.',
-        verdict_trace: extractField(verdictRaw, 'verdict_trace') || 'Final judgment delivered.',
+        verdict:         extractField(verdictRaw, 'verdict')         || 'The debate has concluded. See the round summaries above.',
+        r1_trace:        extractField(verdictRaw, 'r1_trace')        || 'Solver proposed initial position.',
+        r2c_trace:       extractField(verdictRaw, 'r2c_trace')       || 'Challenger identified key flaws.',
+        r2s_trace:       extractField(verdictRaw, 'r2s_trace')       || 'Scout found alternative perspective.',
+        r3_trace:        extractField(verdictRaw, 'r3_trace')        || 'Solver revised and converged.',
+        verdict_trace:   extractField(verdictRaw, 'verdict_trace')   || 'Final judgment delivered.',
       };
     }
 
+    // Guard against verdict field containing raw JSON (extraction failed gracefully)
+    if (typeof vd.verdict === 'string' && vd.verdict.trim().startsWith('{')) {
+      vd.verdict = 'The debate has concluded. See the round summaries above.';
+    }
+    // Normalise confidence value
+    vd.confidence = ['HIGH','MEDIUM','LOW'].includes((vd.confidence || '').toUpperCase())
+      ? vd.confidence.toUpperCase() : 'MEDIUM';
+
     const confColors = { HIGH: '#4ADE80', MEDIUM: '#F5C800', LOW: '#CC1A1A' };
     const vc = document.getElementById('verdict-confidence');
-    vc.textContent = `⬡ ${vd.confidence} CONFIDENCE`;
-    vc.style.color = confColors[vd.confidence] || '#F5C800';
-    document.getElementById('verdict-conf-note').textContent = vd.confidence_note;
-    document.getElementById('verdict-answer').textContent = vd.verdict;
-    document.getElementById('trace-r1').textContent = vd.r1_trace;
-    document.getElementById('trace-r2c').textContent = vd.r2c_trace;
-    document.getElementById('trace-r2s').textContent = vd.r2s_trace;
-    document.getElementById('trace-r3').textContent = vd.r3_trace;
-    document.getElementById('trace-verdict').textContent = vd.verdict_trace;
+    if (vc) { vc.textContent = `${vd.confidence} CONFIDENCE`; vc.style.color = confColors[vd.confidence] || '#F5C800'; }
+    const vcn = document.getElementById('verdict-conf-note'); if (vcn) vcn.textContent = vd.confidence_note;
+    const va = document.getElementById('verdict-answer');     if (va) va.textContent = vd.verdict;
+    ['r1','r2c','r2s','r3','verdict'].forEach(k => {
+      const el = document.getElementById(`trace-${k}`);
+      if (el) el.textContent = vd[`${k}_trace`] || '';
+    });
 
-    showEl('result-verdict', false);
     document.getElementById('result-verdict').style.display = 'block';
-
-    // Done
-    showEl('loading-panel', false);
     document.getElementById('loading-panel').style.display = 'none';
+    if (cancelBtn) cancelBtn.style.display = 'none';
     showEl('try-again-bar', true);
-    document.getElementById('result-verdict').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('result-verdict')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   } catch (err) {
     document.getElementById('loading-panel').style.display = 'none';
-    showError(err.message || 'Something went wrong. Check your API key and try again.');
+    if (cancelBtn) cancelBtn.style.display = 'none';
+    // Clear skeleton loaders left from incomplete rounds
+    ['r1-solver','r2-challenger','r2-scout','r3-solver'].forEach(role => {
+      clearCardLoading(`${role}-hl`, `${role}-body`);
+      const hl = document.getElementById(`${role}-hl`);
+      if (hl && !hl.textContent && !err.message.includes('cancelled')) {
+        hl.textContent = '— failed to load —';
+      }
+    });
+    ['result-round1','result-round2','result-round3'].forEach(id =>
+      document.getElementById(id)?.classList.remove('round-active'));
+    if (err.message.includes('Fight cancelled') || err.message.includes('cancelled')) {
+      resetArena();
+    } else {
+      showError(err.message || 'Something went wrong. Check your API key and try again.');
+    }
+  } finally {
+    fightInProgress = false;
+    currentAbortController = null;
   }
 }
 
-// Enter key submits
+// Cmd/Ctrl+Enter submits
 document.getElementById('question-input').addEventListener('keydown', e => {
   if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) startFight();
 });
