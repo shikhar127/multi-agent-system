@@ -425,6 +425,30 @@
     .vc-note {
       font-family: 'Inter Tight', sans-serif; font-size: 12px; color: #9A9A90;
     }
+    .verdict-summary {
+      font-family: 'Inter Tight', sans-serif; font-size: 16px; font-weight: 700;
+      color: #F5F5F0; line-height: 1.5; margin-bottom: 16px;
+    }
+    .verdict-reasons {
+      list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;
+    }
+    .verdict-reasons li {
+      font-family: 'Inter Tight', sans-serif; font-size: 14px; color: #C0BAB0;
+      line-height: 1.5; padding-left: 16px; position: relative;
+    }
+    .verdict-reasons li::before {
+      content: '—'; position: absolute; left: 0; color: #F5C800;
+    }
+    .verdict-actions { display: flex; flex-direction: column; gap: 6px; }
+    .verdict-actions-label {
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
+      letter-spacing: 0.2em; color: #5A5650; margin-bottom: 4px;
+    }
+    .verdict-actions li {
+      font-family: 'Inter Tight', sans-serif; font-size: 13px;
+      color: #A0D090; line-height: 1.5; padding-left: 16px; position: relative;
+    }
+    .verdict-actions li::before { content: '→'; position: absolute; left: 0; color: #A0D090; }
     .verdict-answer-text {
       border-left: 4px solid #F5C800; padding-left: 20px;
     }
@@ -488,24 +512,41 @@
     .nq-chip {
       flex: 1; background: #1A1917; border: 1px solid #2A2825;
       border-left: 3px solid #2A2825; padding: 20px 22px;
-      cursor: pointer; display: flex; flex-direction: column; gap: 14px;
+      display: flex; flex-direction: column; gap: 14px;
       transition: border-left-color 0.15s, background 0.15s;
     }
     .nq-chip:hover { border-left-color: #F5C800; background: #222018; }
+    .nq-chip:focus-within { border-left-color: #F5C800; background: #222018; }
     .nq-question {
       font-family: 'Inter', sans-serif; font-size: 14px;
       color: #D8D4CC; line-height: 1.55; flex: 1;
+      outline: none; cursor: text;
+      border-bottom: 1px dashed transparent; transition: border-color 0.15s;
     }
-    .nq-action {
-      font-family: 'Bebas Neue', sans-serif; font-size: 12px;
-      color: #5A5650; letter-spacing: 0.15em;
+    .nq-question[contenteditable]:focus {
+      border-bottom-color: #5A5650;
     }
-    .nq-chip:hover .nq-action { color: #F5C800; }
+    .nq-question[contenteditable]:empty::before {
+      content: attr(data-placeholder); color: #5A5650; pointer-events: none;
+    }
+    .nq-hint {
+      font-family: 'Bebas Neue', sans-serif; font-size: 10px;
+      color: #3A3830; letter-spacing: 0.15em; margin-bottom: -4px;
+    }
+    .nq-chip:hover .nq-hint, .nq-chip:focus-within .nq-hint { color: #5A5650; }
+    .nq-fight-btn {
+      font-family: 'Bebas Neue', sans-serif; font-size: 12px; letter-spacing: 0.15em;
+      color: #0A0A0A; background: #F5C800; border: none; padding: 8px 14px;
+      cursor: pointer; align-self: flex-start;
+      transition: background 0.15s, opacity 0.15s;
+    }
+    .nq-fight-btn:hover { background: #FFD700; }
+    .nq-fight-btn:active { opacity: 0.8; }
     .nq-chip.loading .nq-question {
       background: #2A2825; border-radius: 2px; min-height: 56px; color: transparent;
     }
-    .nq-chip.loading .nq-action {
-      background: #2A2825; border-radius: 2px; width: 72px; height: 14px; color: transparent;
+    .nq-chip.loading .nq-fight-btn {
+      background: #2A2825; color: transparent; pointer-events: none; width: 100px;
     }
     @media (max-width: 700px) {
       .nq-grid { flex-direction: column; }
@@ -829,7 +870,10 @@
         </div>
       </div>
 
-      <button class="fight-btn" id="fight-btn" onclick="startFight()">START THE FIGHT →</button>
+      <div style="display:flex;gap:12px;align-items:stretch;">
+        <button class="fight-btn" id="fight-btn" onclick="startFight()" style="flex:1;">START THE FIGHT →</button>
+        <button class="cancel-btn" id="cancel-btn-form" onclick="cancelFight()" style="display:none;">ABORT</button>
+      </div>
     </div>
   </div>
 </section>
@@ -958,8 +1002,13 @@
           <span style="color:#F5C800;">MEDIUM</span> = partial agreement &nbsp;
           <span style="color:#CC1A1A;">LOW</span> = unresolved conflict
         </div>
-        <div class="verdict-answer-text">
-          <p id="verdict-answer">The robots have reached their verdict.</p>
+        <div class="verdict-answer-text" id="verdict-answer-block">
+          <div class="verdict-summary" id="verdict-summary"></div>
+          <ul class="verdict-reasons" id="verdict-reasons"></ul>
+          <div id="verdict-actions-wrap" style="display:none">
+            <div class="verdict-actions-label">ACTION ITEMS</div>
+            <ul class="verdict-actions" id="verdict-actions"></ul>
+          </div>
         </div>
         <button class="copy-btn" id="copy-verdict-btn" onclick="copyVerdict()">COPY VERDICT</button>
         <div class="verdict-war-cry">THE DEBATE IS OVER. THE TRUTH REMAINS.</div>
@@ -1545,7 +1594,9 @@ function resetArena() {
   ['result-round1','result-round2','result-round3'].forEach(id =>
     document.getElementById(id)?.classList.remove('round-active'));
   const btn = document.getElementById('fight-btn');
-  if (btn) { btn.disabled = false; btn.textContent = 'START THE FIGHT →'; }
+  if (btn) { btn.disabled = false; btn.textContent = 'START THE FIGHT →'; btn.onclick = startFight; }
+  const cancelBtnForm = document.getElementById('cancel-btn-form');
+  if (cancelBtnForm) cancelBtnForm.style.display = 'none';
   // Reset scout expander
   const scoutOverflow = document.getElementById('r2-scout-overflow');
   if (scoutOverflow) scoutOverflow.classList.remove('expanded');
@@ -1581,8 +1632,10 @@ async function startFight() {
   fightInProgress = true;
   currentAbortController = new AbortController();
   const cancelBtn = document.getElementById('cancel-btn');
+  const cancelBtnForm = document.getElementById('cancel-btn-form');
   const btn = document.getElementById('fight-btn');
-  if (btn) { btn.disabled = true; btn.textContent = 'CHECKING KEY…'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'THE BATTLE IS ON…'; btn.onclick = null; }
+  if (cancelBtnForm) cancelBtnForm.style.display = 'block';
 
   // Show loading panel immediately during key check so it doesn't feel frozen
   showEl('battle-results', true);
@@ -1596,6 +1649,7 @@ async function startFight() {
     document.getElementById('loading-panel').style.display = 'none';
     document.getElementById('battle-results').style.display = 'none';
     if (cancelBtn) cancelBtn.style.display = 'none';
+    if (cancelBtnForm) cancelBtnForm.style.display = 'none';
     if (!err.message.includes('cancelled')) showError(err.message);
     else resetArena();
     fightInProgress = false;
@@ -1723,13 +1777,17 @@ async function startFight() {
 {
   "confidence": "HIGH" | "MEDIUM" | "LOW",
   "confidence_note": "one sentence explaining the confidence level",
-  "verdict": "2-3 paragraph final answer in flowing prose",
+  "summary": "1-2 sentence crisp bottom-line answer — the verdict in plain English",
+  "reasons": ["key reason 1", "key reason 2", "key reason 3"],
+  "action_items": ["concrete action 1", "concrete action 2"],
+  "verdict": "summary sentence for copy/reference (same as summary field)",
   "r1_trace": "one sentence summary of Solver's Round 1 position",
   "r2c_trace": "one sentence summary of Challenger's key attack",
   "r2s_trace": "one sentence summary of Scout's key finding",
   "r3_trace": "one sentence summary of Solver's revised position",
   "verdict_trace": "one sentence final judgment summary"
-}`;
+}
+Rules: reasons must be an array of 2-4 strings. action_items is an array of 1-3 strings — include ONLY if the question implies something to do or decide; omit (empty array) for purely philosophical or factual questions.`;
 
     const verdictRaw = await callWithFallback(apiKey, solverModel, verdictPrompt,
       `The question: "${question}"\n\nR1 SOLVER: ${solverRaw}\n\nR2 CHALLENGER: ${challengerRaw}\n\nR2 SCOUT: ${scoutRaw}\n\nR3 SOLVER (revised): ${r3Raw}\n\nDeliver the final verdict as JSON.`);
@@ -1757,6 +1815,9 @@ async function startFight() {
       vd = {
         confidence:      extractField(verdictRaw, 'confidence')      || 'MEDIUM',
         confidence_note: extractField(verdictRaw, 'confidence_note') || 'The robots reached a reasoned conclusion.',
+        summary:         extractField(verdictRaw, 'summary')         || extractField(verdictRaw, 'verdict') || 'The debate has concluded.',
+        reasons:         [],
+        action_items:    [],
         verdict:         extractField(verdictRaw, 'verdict')         || 'The debate has concluded. See the round summaries above.',
         r1_trace:        extractField(verdictRaw, 'r1_trace')        || 'Solver proposed initial position.',
         r2c_trace:       extractField(verdictRaw, 'r2c_trace')       || 'Challenger identified key flaws.',
@@ -1778,7 +1839,28 @@ async function startFight() {
     const vc = document.getElementById('verdict-confidence');
     if (vc) { vc.textContent = `${vd.confidence} CONFIDENCE`; vc.style.color = confColors[vd.confidence] || '#F5C800'; }
     const vcn = document.getElementById('verdict-conf-note'); if (vcn) vcn.textContent = vd.confidence_note;
-    const va = document.getElementById('verdict-answer');     if (va) va.textContent = vd.verdict;
+
+    // Render structured verdict
+    const summaryEl = document.getElementById('verdict-summary');
+    if (summaryEl) summaryEl.textContent = vd.summary || vd.verdict || '';
+
+    const reasonsEl = document.getElementById('verdict-reasons');
+    if (reasonsEl) {
+      const reasons = Array.isArray(vd.reasons) ? vd.reasons : [];
+      reasonsEl.innerHTML = reasons.map(r => `<li>${r}</li>`).join('');
+    }
+
+    const actionsEl = document.getElementById('verdict-actions');
+    const actionsWrap = document.getElementById('verdict-actions-wrap');
+    if (actionsEl && actionsWrap) {
+      const actions = Array.isArray(vd.action_items) && vd.action_items.length ? vd.action_items : [];
+      if (actions.length) {
+        actionsEl.innerHTML = actions.map(a => `<li>${a}</li>`).join('');
+        actionsWrap.style.display = 'block';
+      } else {
+        actionsWrap.style.display = 'none';
+      }
+    }
     ['r1','r2c','r2s','r3','verdict'].forEach(k => {
       const el = document.getElementById(`trace-${k}`);
       if (el) el.textContent = vd[`${k}_trace`] || '';
@@ -1787,9 +1869,16 @@ async function startFight() {
     document.getElementById('result-verdict').style.display = 'block';
     document.getElementById('loading-panel').style.display = 'none';
     if (cancelBtn) cancelBtn.style.display = 'none';
+    if (cancelBtnForm) cancelBtnForm.style.display = 'none';
+    // Re-enable fight button as "NEW FIGHT" in place — no need to scroll down
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'NEW FIGHT →';
+      btn.onclick = resetArena;
+    }
     showEl('try-again-bar', true);
     document.getElementById('result-verdict')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    generateNextQuestions(question, vd.verdict || '');
+    generateNextQuestions(question, vd.summary || vd.verdict || '');
 
   } catch (err) {
     document.getElementById('loading-panel').style.display = 'none';
@@ -1865,9 +1954,13 @@ function toggleScout() {
 
 // Copy verdict to clipboard
 function copyVerdict() {
-  const verdict = document.getElementById('verdict-answer')?.textContent || '';
+  const summary = document.getElementById('verdict-summary')?.textContent || '';
+  const reasons = [...(document.getElementById('verdict-reasons')?.querySelectorAll('li') || [])].map(li => '— ' + li.textContent).join('\n');
+  const actions = [...(document.getElementById('verdict-actions')?.querySelectorAll('li') || [])].map(li => '→ ' + li.textContent).join('\n');
   const conf = document.getElementById('verdict-confidence')?.textContent || '';
-  const text = `[Robots versus Robots — ${conf}]\n\n${verdict}`;
+  let text = `[Robots versus Robots — ${conf}]\n\n${summary}`;
+  if (reasons) text += `\n\nKEY REASONS\n${reasons}`;
+  if (actions) text += `\n\nACTION ITEMS\n${actions}`;
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.getElementById('copy-verdict-btn');
     if (btn) { btn.textContent = 'COPIED!'; btn.classList.add('copied'); }
@@ -1904,8 +1997,10 @@ async function generateNextQuestions(question, verdictText) {
     questions.slice(0, 3).forEach(q => {
       const chip = document.createElement('div');
       chip.className = 'nq-chip';
-      chip.innerHTML = `<div class="nq-question">${q}</div><div class="nq-action">FIGHT THIS →</div>`;
-      chip.onclick = () => loadNextQuestion(q);
+      chip.innerHTML = `
+        <div class="nq-hint">CLICK TO EDIT</div>
+        <div class="nq-question" contenteditable="true" data-placeholder="Type your question…" spellcheck="false">${q}</div>
+        <button class="nq-fight-btn" onclick="event.stopPropagation(); fightWithChip(this)">⚡ FIGHT THIS →</button>`;
       grid.appendChild(chip);
     });
   } catch (_) {
@@ -1918,9 +2013,20 @@ function loadNextQuestion(q) {
   if (!input) return;
   resetArena();
   input.value = q;
-  input.dispatchEvent(new Event('input')); // triggers auto-resize + type detection
+  input.dispatchEvent(new Event('input'));
   input.focus();
   setTimeout(() => input.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+}
+
+function fightWithChip(btn) {
+  const chip = btn.closest('.nq-chip');
+  if (!chip) return;
+  const q = (chip.querySelector('.nq-question')?.innerText || '').trim();
+  if (!q) return;
+  const input = document.getElementById('question-input');
+  if (input) { input.value = q; input.dispatchEvent(new Event('input')); }
+  resetArena();
+  startFight();
 }
 
 // Update more options tier label whenever tier changes
