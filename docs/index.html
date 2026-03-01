@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deliberate — Multi-Agent Deliberation System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter+Tight:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: #F7F4EF; color: #131210; font-family: 'Inter', sans-serif; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: #131210; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 80px; border-bottom: 1px solid #2A2825;
+    }
+    .nav-left { display: flex; align-items: center; gap: 16px; }
+    .wordmark { font-family: 'Archivo Black', sans-serif; font-size: 20px; color: #F7F4EF; letter-spacing: -0.02em; text-decoration: none; }
+    .badge { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 500; color: #C85C1A; background: rgba(200,92,26,0.15); border: 1px solid rgba(200,92,26,0.3); border-radius: 4px; padding: 2px 8px; letter-spacing: 0.06em; text-transform: uppercase; }
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+    .nav-links a { font-family: 'Inter Tight', sans-serif; font-size: 14px; color: #8A8278; text-decoration: none; }
+    .nav-links a:hover { color: #F7F4EF; }
+    .nav-cta { background: #C85C1A; border-radius: 6px; padding: 8px 20px; font-family: 'Inter Tight', sans-serif; font-size: 14px; font-weight: 600; color: #F7F4EF; text-decoration: none; }
+
+    /* HERO */
+    .hero {
+      background: #131210; padding: 100px 80px 120px;
+    }
+    .hero-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 64px; gap: 40px; }
+    .hero-left { max-width: 720px; }
+    .eyebrow { font-family: 'Inter Tight', sans-serif; font-size: 12px; font-weight: 500; color: #C85C1A; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 24px; }
+    h1 { font-family: 'Archivo Black', sans-serif; font-size: clamp(56px, 5.5vw, 80px); line-height: 1.02; color: #F7F4EF; letter-spacing: -0.03em; }
+    .hero-right { max-width: 360px; padding-top: 48px; }
+    .hero-right p { font-family: 'Inter', sans-serif; font-size: 17px; line-height: 28px; color: #7A7268; }
+    .input-box { background: #1E1C19; border: 1px solid #353330; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+    .type-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+    .pill-active { background: rgba(200,92,26,0.12); border: 1px solid rgba(200,92,26,0.25); border-radius: 6px; padding: 6px 14px; font-family: 'Inter Tight', sans-serif; font-size: 12px; font-weight: 600; color: #C85C1A; letter-spacing: 0.04em; }
+    .pill { background: #262420; border: 1px solid #2E2C28; border-radius: 6px; padding: 6px 14px; font-family: 'Inter Tight', sans-serif; font-size: 12px; font-weight: 500; color: #5A5650; letter-spacing: 0.04em; }
+    .input-row { display: flex; gap: 12px; align-items: flex-end; }
+    .fake-input { flex: 1; background: #262420; border: 1px solid #353330; border-radius: 8px; padding: 18px 20px; font-family: 'Inter', sans-serif; font-size: 16px; color: #B8B2A8; line-height: 26px; }
+    .submit-btn { background: #C85C1A; border-radius: 8px; padding: 18px 32px; font-family: 'Inter Tight', sans-serif; font-size: 15px; font-weight: 700; color: #F7F4EF; border: none; cursor: pointer; white-space: nowrap; }
+    .input-meta { display: flex; gap: 24px; align-items: center; padding-top: 4px; }
+    .input-meta span { font-family: 'Inter', sans-serif; font-size: 12px; color: #4A4844; }
+    .input-meta strong { font-family: 'Inter Tight', sans-serif; font-size: 12px; font-weight: 600; color: #8A8278; border-bottom: 1px solid #353330; }
+
+    /* SECTIONS */
+    section { padding: 100px 80px; }
+    .section-eyebrow { font-family: 'Inter Tight', sans-serif; font-size: 12px; font-weight: 500; color: #C85C1A; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; }
+    h2 { font-family: 'Archivo Black', sans-serif; font-size: clamp(36px, 3.3vw, 48px); line-height: 1.04; letter-spacing: -0.025em; }
+    .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 56px; gap: 40px; }
+    .section-header p { font-family: 'Inter', sans-serif; font-size: 15px; line-height: 24px; color: #7A7268; max-width: 340px; }
+
+    /* PIPELINE */
+    .pipeline-section { background: #F7F4EF; }
+    .pipeline-section h2 { color: #131210; }
+    .pipeline-cards { display: flex; align-items: stretch; gap: 0; }
+    .pipeline-card { flex: 1; border-radius: 12px; padding: 32px; display: flex; flex-direction: column; gap: 12px; }
+    .pipeline-card.dark { background: #131210; }
+    .pipeline-card.muted { background: #EDEAE3; }
+    .pipeline-card.accent { background: #C85C1A; }
+    .role-label { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+    .dark .role-label, .accent .role-label { color: #C85C1A; }
+    .muted .role-label { color: #C85C1A; }
+    .accent .role-label { color: rgba(247,244,239,0.6); }
+    .card-title { font-family: 'Archivo Black', sans-serif; font-size: 22px; letter-spacing: -0.02em; line-height: 1.2; }
+    .dark .card-title { color: #F7F4EF; }
+    .muted .card-title { color: #131210; }
+    .accent .card-title { color: #F7F4EF; }
+    .card-desc { font-family: 'Inter', sans-serif; font-size: 13px; line-height: 20px; color: #7A7268; }
+    .accent .card-desc { color: rgba(247,244,239,0.7); }
+    .arrow { width: 48px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #C85C1A; font-size: 20px; }
+
+    /* WORKFLOWS */
+    .workflows-section { background: #131210; }
+    .workflows-section h2 { color: #F7F4EF; }
+    .workflows-section .section-header p { color: #5A5650; }
+    .workflow-cards { display: flex; gap: 16px; }
+    .workflow-card { flex: 1; border: 1px solid #2A2825; border-radius: 12px; padding: 32px; display: flex; flex-direction: column; gap: 20px; }
+    .wf-header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .wf-type { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 600; color: #C85C1A; letter-spacing: 0.1em; text-transform: uppercase; }
+    .wf-rounds { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 500; color: #3A3835; letter-spacing: 0.04em; }
+    .wf-title { font-family: 'Archivo Black', sans-serif; font-size: 20px; color: #F7F4EF; letter-spacing: -0.02em; line-height: 1.3; }
+    .wf-desc { font-family: 'Inter', sans-serif; font-size: 13px; line-height: 21px; color: #5A5650; }
+    .wf-example { border-top: 1px solid #2A2825; padding-top: 16px; font-family: 'Inter', sans-serif; font-size: 12px; color: #3A3835; font-style: italic; }
+
+    /* OUTPUT */
+    .output-section { background: #F7F4EF; }
+    .output-section h2 { color: #131210; }
+    .output-layout { display: flex; gap: 80px; align-items: flex-start; }
+    .output-left { flex: 1; display: flex; flex-direction: column; gap: 24px; }
+    .output-left p { font-family: 'Inter', sans-serif; font-size: 15px; line-height: 24px; color: #7A7268; }
+    .output-bullets { display: flex; flex-direction: column; gap: 12px; padding-top: 12px; }
+    .bullet { display: flex; gap: 12px; align-items: flex-start; }
+    .bullet-dot { width: 6px; height: 6px; border-radius: 50%; background: #C85C1A; margin-top: 8px; flex-shrink: 0; }
+    .bullet p { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 22px; color: #4A4642; }
+    .terminal { flex: 1.4; background: #1E1C19; border-radius: 16px; padding: 32px; display: flex; flex-direction: column; gap: 0; }
+    .terminal-header { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+    .terminal-dot { width: 10px; height: 10px; border-radius: 50%; background: #3A3835; }
+    .terminal-label { font-family: 'Inter Tight', sans-serif; font-size: 12px; color: #4A4844; margin-left: 8px; letter-spacing: 0.04em; }
+    .t-meta { display: flex; gap: 8px; margin-bottom: 20px; align-items: center; }
+    .t-label { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 600; color: #5A5650; letter-spacing: 0.08em; text-transform: uppercase; }
+    .t-type { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 600; color: #C85C1A; background: rgba(200,92,26,0.12); border: 1px solid rgba(200,92,26,0.2); border-radius: 4px; padding: 2px 8px; letter-spacing: 0.06em; text-transform: uppercase; }
+    .t-rounds { font-family: 'Inter Tight', sans-serif; font-size: 11px; color: #3A3835; margin-left: 8px; }
+    .t-answer { border-left: 2px solid #C85C1A; padding-left: 16px; margin-bottom: 20px; }
+    .t-answer p { font-family: 'Inter', sans-serif; font-size: 15px; line-height: 24px; color: #D4CFC8; }
+    .confidence-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.25); border-radius: 6px; padding: 5px 12px; margin-bottom: 24px; }
+    .confidence-badge span { font-family: 'Inter Tight', sans-serif; font-size: 12px; font-weight: 600; color: #4ADE80; letter-spacing: 0.06em; }
+    .confidence-note { font-family: 'Inter', sans-serif; font-size: 12px; color: #4A4844; margin-left: 8px; }
+    .trace-header { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 600; color: #4A4844; letter-spacing: 0.08em; text-transform: uppercase; border-top: 1px solid #2A2825; padding-top: 20px; margin-bottom: 12px; }
+    .trace-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px; }
+    .trace-round { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 600; color: #C85C1A; min-width: 56px; padding-top: 2px; }
+    .trace-round.ch { color: #8A7A6A; }
+    .trace-round.sc { color: #6A7A8A; }
+    .trace-text { font-family: 'Inter', sans-serif; font-size: 12px; line-height: 18px; color: #5A5650; }
+
+    /* MODELS */
+    .models-section { background: #EDEAE3; }
+    .models-section h2 { color: #131210; }
+    .model-cards { display: flex; gap: 24px; }
+    .model-card { flex: 1; border-radius: 12px; padding: 36px; display: flex; flex-direction: column; gap: 24px; }
+    .model-card.light { background: #F7F4EF; }
+    .model-card.dark { background: #131210; }
+    .model-card-header { display: flex; justify-content: space-between; align-items: center; }
+    .model-card-title { font-family: 'Archivo Black', sans-serif; font-size: 22px; letter-spacing: -0.02em; }
+    .light .model-card-title { color: #131210; }
+    .dark .model-card-title { color: #F7F4EF; }
+    .tier-badge { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 600; border-radius: 4px; padding: 3px 10px; letter-spacing: 0.06em; text-transform: uppercase; }
+    .tier-free { color: #5A7A5A; background: rgba(90,122,90,0.1); border: 1px solid rgba(90,122,90,0.2); }
+    .tier-paid { color: #C85C1A; background: rgba(200,92,26,0.12); border: 1px solid rgba(200,92,26,0.25); }
+    .model-rows { display: flex; flex-direction: column; }
+    .model-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; }
+    .light .model-row { border-bottom: 1px solid #E4E0D8; }
+    .dark .model-row { border-bottom: 1px solid #2A2825; }
+    .light .model-row:last-child, .dark .model-row:last-child { border-bottom: none; }
+    .model-name { font-family: 'Inter Tight', sans-serif; font-size: 14px; font-weight: 600; }
+    .light .model-name { color: #131210; }
+    .dark .model-name { color: #F7F4EF; }
+    .model-role { font-family: 'Inter', sans-serif; font-size: 12px; margin-top: 2px; }
+    .light .model-role { color: #8A8278; }
+    .dark .model-role { color: #5A5650; }
+    .model-provider { font-family: 'Inter Tight', sans-serif; font-size: 11px; }
+    .light .model-provider { color: #8A8278; }
+    .dark .model-provider { color: #5A5650; }
+    .code-block { border-radius: 8px; padding: 14px 16px; }
+    .light .code-block { background: #EDEAE3; }
+    .dark .code-block { background: #1E1C19; }
+    .code-block code { font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+    .light .code-block code { color: #5A5650; }
+    .dark .code-block code { color: #7A7268; }
+
+    /* CTA */
+    .cta-section { background: #C85C1A; padding: 100px 80px; display: flex; justify-content: space-between; align-items: center; gap: 40px; }
+    .cta-section h2 { font-family: 'Archivo Black', sans-serif; font-size: clamp(40px, 4vw, 56px); line-height: 1.04; color: #F7F4EF; letter-spacing: -0.03em; margin-bottom: 16px; }
+    .cta-section p { font-family: 'Inter', sans-serif; font-size: 16px; line-height: 26px; color: rgba(247,244,239,0.7); }
+    .cta-buttons { display: flex; gap: 16px; align-items: center; flex-shrink: 0; }
+    .cta-primary { background: #F7F4EF; border-radius: 8px; padding: 16px 32px; font-family: 'Inter Tight', sans-serif; font-size: 16px; font-weight: 700; color: #C85C1A; text-decoration: none; }
+    .cta-secondary { border: 1px solid rgba(247,244,239,0.3); border-radius: 8px; padding: 16px 32px; font-family: 'Inter Tight', sans-serif; font-size: 16px; font-weight: 500; color: rgba(247,244,239,0.8); text-decoration: none; }
+
+    @media (max-width: 900px) {
+      nav, section, .hero, .cta-section { padding-left: 24px; padding-right: 24px; }
+      .hero-top, .section-header, .output-layout, .cta-section { flex-direction: column; }
+      .pipeline-cards { flex-direction: column; }
+      .arrow { transform: rotate(90deg); }
+      .workflow-cards, .model-cards { flex-direction: column; }
+      .cta-buttons { flex-direction: column; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a href="#" class="wordmark">Deliberate</a>
+    <span class="badge">Multi-Agent</span>
+  </div>
+  <div class="nav-links">
+    <a href="#how-it-works">How it works</a>
+    <a href="#models">Models</a>
+    <a href="https://github.com/shikhar127/multi-agent-system" target="_blank">Docs</a>
+    <a href="https://github.com/shikhar127/multi-agent-system" class="nav-cta">Run a query →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-top">
+    <div class="hero-left">
+      <div class="eyebrow">Three minds. One answer.</div>
+      <h1>Ask anything.<br/>Get a verdict.</h1>
+    </div>
+    <div class="hero-right">
+      <p>Every question runs through three AI models — Solver, Challenger, and Scout — debating in structured rounds before a final answer is synthesized.</p>
+    </div>
+  </div>
+  <div class="input-box">
+    <div class="type-pills">
+      <span class="pill-active">ANALYTICAL</span>
+      <span class="pill">FACTUAL</span>
+      <span class="pill">CREATIVE</span>
+      <span class="pill">JUDGMENT</span>
+    </div>
+    <div class="input-row">
+      <div class="fake-input">Should we rewrite the legacy payments service in Go, or incrementally migrate it from Python?</div>
+      <button class="submit-btn">Deliberate →</button>
+    </div>
+    <div class="input-meta">
+      <span>Model preset:</span>
+      <strong>paid — Claude Sonnet 4.6 ×3</strong>
+      <span>Change →</span>
+    </div>
+  </div>
+</div>
+
+<!-- PIPELINE -->
+<section class="pipeline-section" id="how-it-works">
+  <div class="section-header">
+    <div>
+      <div class="section-eyebrow">How it works</div>
+      <h2>Three roles.<br/>Structured debate.</h2>
+    </div>
+    <p>The classifier routes each question to the right workflow — 2 to 4 rounds of debate — then synthesizes a final answer with confidence and dissent.</p>
+  </div>
+  <div class="pipeline-cards">
+    <div class="pipeline-card dark">
+      <span class="role-label">Solver</span>
+      <div class="card-title">Builds &amp; proposes</div>
+      <p class="card-desc">Constructs the primary answer or solution. Takes a definitive position and explains its reasoning step by step.</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="pipeline-card muted">
+      <span class="role-label">Challenger</span>
+      <div class="card-title">Attacks &amp; stress-tests</div>
+      <p class="card-desc">Finds flaws, edge cases, and faulty assumptions. Plays devil's advocate to force a stronger answer.</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="pipeline-card muted">
+      <span class="role-label">Scout</span>
+      <div class="card-title">Finds alternatives</div>
+      <p class="card-desc">Explores reframings, alternative approaches, and perspectives the Solver missed. Prevents tunnel vision.</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="pipeline-card accent">
+      <span class="role-label">Synthesizer</span>
+      <div class="card-title">Final verdict</div>
+      <p class="card-desc">Integrates all rounds into a confident final answer with confidence rating, dissent, and full trace.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WORKFLOWS -->
+<section class="workflows-section">
+  <div class="section-header">
+    <div>
+      <div class="section-eyebrow">Workflows</div>
+      <h2>Four question types.<br/>Four debate strategies.</h2>
+    </div>
+    <p>The classifier detects question type automatically and routes it to the optimal deliberation workflow.</p>
+  </div>
+  <div class="workflow-cards">
+    <div class="workflow-card">
+      <div class="wf-header"><span class="wf-type">A — Factual</span><span class="wf-rounds">2–3 rounds</span></div>
+      <div class="wf-title">Multi-Agent Debate + Cross-Verification</div>
+      <p class="wf-desc">All three models answer independently, then compare and argue. Arbitration fires only if Round 2 doesn't converge.</p>
+      <div class="wf-example">e.g. "What is the capital of France?"</div>
+    </div>
+    <div class="workflow-card">
+      <div class="wf-header"><span class="wf-type">B — Analytical</span><span class="wf-rounds">3–4 rounds</span></div>
+      <div class="wf-title">Dialectical Debate + Devil's Advocate</div>
+      <p class="wf-desc">Solver builds a full solution; Challenger and Scout attack it; Solver revises; then all converge on a final answer.</p>
+      <div class="wf-example">e.g. "Rewrite in Go or migrate from Python?"</div>
+    </div>
+    <div class="workflow-card">
+      <div class="wf-header"><span class="wf-type">C — Creative</span><span class="wf-rounds">4 rounds</span></div>
+      <div class="wf-title">Nominal Group + Adversarial Collaboration</div>
+      <p class="wf-desc">Each model takes a different persona — Pragmatic, Contrarian, Ambitious — then cross-pollinates into a hybrid recommendation.</p>
+      <div class="wf-example">e.g. "Design a rate-limiting strategy"</div>
+    </div>
+    <div class="workflow-card">
+      <div class="wf-header"><span class="wf-type">D — Judgment</span><span class="wf-rounds">4 rounds</span></div>
+      <div class="wf-title">ACH Evidence Matrix + Crux Analysis</div>
+      <p class="wf-desc">Models take distinct positions, build an evidence matrix, identify crux disagreements, then issue a final judgment with reversal conditions.</p>
+      <div class="wf-example">e.g. "Microservices vs monolith?"</div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTPUT -->
+<section class="output-section">
+  <div class="output-layout">
+    <div class="output-left">
+      <div>
+        <div class="section-eyebrow">Output</div>
+        <h2>Answer with evidence,<br/>not just confidence.</h2>
+      </div>
+      <p>Every response includes a confidence rating, any unresolved dissent, and the full reasoning trace — round by round.</p>
+      <div class="output-bullets">
+        <div class="bullet"><div class="bullet-dot"></div><p>Final answer synthesized from all debate rounds</p></div>
+        <div class="bullet"><div class="bullet-dot"></div><p>HIGH / MEDIUM / LOW confidence rating</p></div>
+        <div class="bullet"><div class="bullet-dot"></div><p>Minority position shown when unresolved</p></div>
+        <div class="bullet"><div class="bullet-dot"></div><p>Per-round trace: what each model said and why it changed</p></div>
+      </div>
+    </div>
+    <div class="terminal">
+      <div class="terminal-header">
+        <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+        <span class="terminal-label">deliberation output</span>
+      </div>
+      <div class="t-meta">
+        <span class="t-label">Question type</span>
+        <span class="t-type">Analytical</span>
+        <span class="t-rounds">Workflow B · 3 rounds</span>
+      </div>
+      <div class="t-answer">
+        <p>Incremental migration is the stronger choice. A full rewrite carries high delivery risk with no user-facing upside. Migrate the most performance-sensitive endpoints to Go first — payment processing and reconciliation — while keeping the Python API gateway stable. Validate Go performance gains before committing to further migration.</p>
+      </div>
+      <div style="margin-bottom: 24px;">
+        <span class="confidence-badge"><span>HIGH CONFIDENCE</span></span>
+        <span class="confidence-note">All three models converged in Round 3</span>
+      </div>
+      <div class="trace-header">Reasoning trace</div>
+      <div class="trace-row"><span class="trace-round">R1 · S</span><span class="trace-text">Proposed full Go rewrite for maximum performance gains and clean architecture.</span></div>
+      <div class="trace-row"><span class="trace-round ch">R2 · C</span><span class="trace-text">Challenged delivery risk — rewrites routinely take 3× longer than estimated.</span></div>
+      <div class="trace-row"><span class="trace-round sc">R2 · Sc</span><span class="trace-text">Proposed selective migration of hot paths only — validated by Shopify's approach.</span></div>
+      <div class="trace-row"><span class="trace-round">R3 · S</span><span class="trace-text">Revised to incremental migration. Accepted Challenger's risk argument.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- MODELS -->
+<section class="models-section" id="models">
+  <div class="section-header">
+    <div>
+      <div class="section-eyebrow">Models</div>
+      <h2>Free or paid.<br/>Your choice.</h2>
+    </div>
+    <p>Mix and match any model across the three roles. Run entirely free via Groq, or use proprietary models for maximum quality.</p>
+  </div>
+  <div class="model-cards">
+    <div class="model-card light">
+      <div class="model-card-header">
+        <span class="model-card-title">Free</span>
+        <span class="tier-badge tier-free">Groq API</span>
+      </div>
+      <div class="model-rows">
+        <div class="model-row"><div><div class="model-name">Llama 3.3 70B</div><div class="model-role">Solver — best open-source general</div></div><span class="model-provider">Meta</span></div>
+        <div class="model-row"><div><div class="model-name">Mixtral 8x7B</div><div class="model-role">Challenger — structured reasoning</div></div><span class="model-provider">Mistral</span></div>
+        <div class="model-row"><div><div class="model-name">Gemma 2 9B</div><div class="model-role">Scout — distinct architecture</div></div><span class="model-provider">Google</span></div>
+      </div>
+      <div class="code-block"><code>MODEL_PRESET=free</code></div>
+    </div>
+    <div class="model-card dark">
+      <div class="model-card-header">
+        <span class="model-card-title">Paid</span>
+        <span class="tier-badge tier-paid">Recommended</span>
+      </div>
+      <div class="model-rows">
+        <div class="model-row"><div><div class="model-name">Claude Sonnet 4.6 ×3</div><div class="model-role">All roles — balanced quality + speed</div></div><span class="model-provider">Anthropic</span></div>
+        <div class="model-row"><div><div class="model-name">Claude Opus 4.6 + Sonnet 4.6</div><div class="model-role">Premium — Opus as Solver</div></div><span class="model-provider">Anthropic</span></div>
+        <div class="model-row"><div><div class="model-name">GPT-4o + Groq mix</div><div class="model-role">Custom — any combination</div></div><span class="model-provider">OpenAI</span></div>
+      </div>
+      <div class="code-block"><code>MODEL_PRESET=paid</code></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div>
+    <h2>Ready to deliberate?</h2>
+    <p>pip install and run in 60 seconds. Free models included.</p>
+  </div>
+  <div class="cta-buttons">
+    <a href="https://github.com/shikhar127/multi-agent-system" class="cta-primary">Get started →</a>
+    <a href="https://github.com/shikhar127/multi-agent-system" class="cta-secondary">View on GitHub</a>
+  </div>
+</div>
+
+</body>
+</html>
