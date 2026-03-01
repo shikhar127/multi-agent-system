@@ -71,13 +71,13 @@ def run_deliberation(
 
     # ── Phase 0: Classify ──────────────────────────────────────────
     print("\n[Phase 0] Classifying question...")
-    q_type = classify_question(question)
+    q_type = classify_question(question, model=config.solver)
     print(f"          → Workflow {_WORKFLOW_LABELS.get(q_type, q_type)}")
 
     # ── Phase 0.5: Ambiguity detection (interactive only) ──────────
     if interactive:
         print("[Phase 0.5] Checking for ambiguities...")
-        clarification_q = detect_ambiguities(question, q_type)
+        clarification_q = detect_ambiguities(question, q_type, model=config.solver)
         if clarification_q:
             print(f"\n  Clarification needed: {clarification_q}")
             user_input = input("  Your answer (or press Enter to skip): ").strip()
