@@ -607,9 +607,12 @@
           <div class="robot-model-row">
             <span class="robot-model-label" style="color:#F5C800;">SOLVER</span>
             <select id="solver-model" class="model-select">
-              <option value="anthropic/claude-sonnet-4-5" selected>CLAUDE SONNET 4.5</option>
+              <option value="anthropic/claude-opus-4-5" selected>CLAUDE OPUS 4.5</option>
+              <option value="anthropic/claude-sonnet-4-5">CLAUDE SONNET 4.5</option>
+              <option value="openai/o1">O1</option>
               <option value="openai/gpt-4o">GPT-4O</option>
-              <option value="google/gemini-flash-1.5">GEMINI FLASH 1.5</option>
+              <option value="google/gemini-2.0-flash">GEMINI 2.0 FLASH</option>
+              <option value="google/gemini-1.5-pro">GEMINI 1.5 PRO</option>
               <option value="meta-llama/llama-3.3-70b-instruct:free">LLAMA 3.3 70B (FREE)</option>
               <option value="qwen/qwen-2.5-72b-instruct:free">QWEN 2.5 72B (FREE)</option>
               <option value="google/gemma-2-9b-it:free">GEMMA 2 9B (FREE)</option>
@@ -618,9 +621,12 @@
           <div class="robot-model-row">
             <span class="robot-model-label" style="color:#CC1A1A;">CHALLENGER</span>
             <select id="challenger-model" class="model-select">
-              <option value="openai/gpt-4o" selected>GPT-4O</option>
+              <option value="openai/o1" selected>O1</option>
+              <option value="anthropic/claude-opus-4-5">CLAUDE OPUS 4.5</option>
               <option value="anthropic/claude-sonnet-4-5">CLAUDE SONNET 4.5</option>
-              <option value="google/gemini-flash-1.5">GEMINI FLASH 1.5</option>
+              <option value="openai/gpt-4o">GPT-4O</option>
+              <option value="google/gemini-2.0-flash">GEMINI 2.0 FLASH</option>
+              <option value="google/gemini-1.5-pro">GEMINI 1.5 PRO</option>
               <option value="meta-llama/llama-3.3-70b-instruct:free">LLAMA 3.3 70B (FREE)</option>
               <option value="qwen/qwen-2.5-72b-instruct:free">QWEN 2.5 72B (FREE)</option>
               <option value="google/gemma-2-9b-it:free">GEMMA 2 9B (FREE)</option>
@@ -629,8 +635,11 @@
           <div class="robot-model-row">
             <span class="robot-model-label" style="color:#4A6FD4;">SCOUT</span>
             <select id="scout-model" class="model-select">
-              <option value="google/gemini-flash-1.5" selected>GEMINI FLASH 1.5</option>
+              <option value="google/gemini-2.0-flash" selected>GEMINI 2.0 FLASH</option>
+              <option value="google/gemini-1.5-pro">GEMINI 1.5 PRO</option>
+              <option value="anthropic/claude-opus-4-5">CLAUDE OPUS 4.5</option>
               <option value="anthropic/claude-sonnet-4-5">CLAUDE SONNET 4.5</option>
+              <option value="openai/o1">O1</option>
               <option value="openai/gpt-4o">GPT-4O</option>
               <option value="meta-llama/llama-3.3-70b-instruct:free">LLAMA 3.3 70B (FREE)</option>
               <option value="qwen/qwen-2.5-72b-instruct:free">QWEN 2.5 72B (FREE)</option>
@@ -1061,9 +1070,9 @@ const FREE_MODELS = {
   scout: 'google/gemma-2-9b-it:free',
 };
 const PAID_MODELS = {
-  solver: 'anthropic/claude-sonnet-4-5',
-  challenger: 'openai/gpt-4o',
-  scout: 'google/gemini-flash-1.5',
+  solver: 'anthropic/claude-opus-4-5',
+  challenger: 'openai/o1',
+  scout: 'google/gemini-2.0-flash',
 };
 
 function setTier(tier) {
@@ -1127,10 +1136,12 @@ const FREE_FALLBACKS = [
   'mistralai/mistral-7b-instruct:free',
 ];
 const PAID_FALLBACKS = [
+  'anthropic/claude-opus-4-5',
+  'openai/o1',
+  'google/gemini-2.0-flash',
   'anthropic/claude-sonnet-4-5',
   'openai/gpt-4o',
-  'google/gemini-flash-1.5',
-  'openai/gpt-4o-mini',
+  'google/gemini-1.5-pro',
 ];
 
 async function callWithFallback(apiKey, primaryModel, systemPrompt, userMessage) {
