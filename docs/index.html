@@ -1295,6 +1295,7 @@
 <!-- ════════════════════════════════════════
   MANGA EXPLAINER
 ════════════════════════════════════════ -->
+<div id="manga-explainer">
 
 <div style="background:#1A1A18;padding:20px 60px;border-bottom:5px solid #2A2A25;display:flex;align-items:center;gap:16px;margin-top:64px;">
   <span style="font-family:'Bebas Neue',sans-serif;font-size:11px;color:#5A5A55;letter-spacing:0.25em;">HOW IT WORKS — THE MANGA VERSION</span>
@@ -1558,6 +1559,8 @@
     <a href="https://github.com/shikhar127/multi-agent-system" class="btn-out" target="_blank">VIEW ON GITHUB</a>
   </div>
 </div>
+
+</div><!-- /#manga-explainer -->
 
 <!-- ════════════════════════════════════════
   JAVASCRIPT — BATTLE ENGINE
@@ -1889,6 +1892,9 @@ function resetArena() {
   originalQuestion = '';
   activeQuestion = '';
   pendingFightConfig = null;
+  // Restore user education section
+  const explainer = document.getElementById('manga-explainer');
+  if (explainer) explainer.style.display = '';
   // Intentionally NOT clearing question so user can refine and retry
   document.getElementById('question-input')?.focus();
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2016,6 +2022,8 @@ async function startFight() {
   // Show loading panel immediately during key check so it doesn't feel frozen
   showEl('battle-results', true);
   showEl('loading-panel', true);
+  const explainer = document.getElementById('manga-explainer');
+  if (explainer) explainer.style.display = 'none';
   if (cancelBtn) cancelBtn.style.display = 'block';
   setStatus('VALIDATING KEY…', 'CONNECTING TO OPENROUTER');
   setTimeout(() => document.getElementById('battle-results')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
