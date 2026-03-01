@@ -164,6 +164,18 @@ def get_info(model_id: str) -> ModelInfo | None:
     return _BY_MODEL_ID.get(model_id) or AVAILABLE_MODELS.get(model_id)
 
 
+def resolve_model_id(model: str) -> str:
+    """
+    Resolve a user-supplied string to the exact model ID that litellm expects.
+
+    If ``model`` matches a catalogue key (e.g. "claude-haiku-4-5"), return
+    the corresponding ModelInfo.model_id (e.g. "claude-haiku-4-5-20251001").
+    If it is already a raw model ID or an unknown string, return it unchanged.
+    """
+    entry = AVAILABLE_MODELS.get(model)
+    return entry.model_id if entry else model
+
+
 # ════════════════════════════════════════════════════════════
 # Presets
 # ════════════════════════════════════════════════════════════
@@ -210,9 +222,9 @@ def load_config() -> ModelConfig:
     base = PRESETS.get(preset_name, PAID_PRESET)
 
     return ModelConfig(
-        solver=os.environ.get("SOLVER_MODEL", base.solver),
-        challenger=os.environ.get("CHALLENGER_MODEL", base.challenger),
-        scout=os.environ.get("SCOUT_MODEL", base.scout),
+        solver=resolve_model_id(os.environ.get("SOLVER_MODEL", base.solver)),
+        challenger=resolve_model_id(os.environ.get("CHALLENGER_MODEL", base.challenger)),
+        scout=resolve_model_id(os.environ.get("SCOUT_MODEL", base.scout)),
     )
 
 

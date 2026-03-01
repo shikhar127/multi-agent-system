@@ -113,7 +113,7 @@ Groq offers a generous free tier with no credit card required.
 |---|---|---|---|
 | `claude-opus-4-6` | Claude Opus 4.6 | Anthropic | Deep complex reasoning |
 | `claude-sonnet-4-6` | Claude Sonnet 4.6 | Anthropic | Balanced (default paid preset) |
-| `claude-haiku-4-5-20251001` | Claude Haiku 4.5 | Anthropic | Fast, cost-efficient |
+| `claude-haiku-4-5` | Claude Haiku 4.5 | Anthropic | Fast, cost-efficient |
 | `gpt-4o` | GPT-4o | OpenAI | Strong reasoning |
 | `gpt-4o-mini` | GPT-4o Mini | OpenAI | Efficient, cost-effective |
 
