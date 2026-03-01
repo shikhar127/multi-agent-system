@@ -234,15 +234,15 @@
       color: #F5F5F0; letter-spacing: 0.05em;
       writing-mode: vertical-rl; transform: rotate(180deg);
     }
-    .round-cards { flex: 1; display: flex; }
+    .round-cards { flex: 1; display: flex; flex-direction: column; }
 
     .arg-card {
-      flex: 1; padding: 32px 36px;
+      padding: 32px 36px;
       display: flex; flex-direction: column; gap: 14px;
-      border-right: 4px solid #0A0A0A; position: relative; overflow: hidden;
-      min-height: 280px; max-height: 520px; overflow-y: auto;
+      border-bottom: 4px solid #0A0A0A; position: relative; overflow: hidden;
+      max-height: 520px; overflow-y: auto;
     }
-    .arg-card:last-child { border-right: none; }
+    .arg-card:last-child { border-bottom: none; }
     .arg-role-line {
       font-family: 'Bebas Neue', sans-serif; font-size: 11px;
       letter-spacing: 0.2em; display: flex; align-items: center; gap: 8px;
@@ -778,7 +778,7 @@
         <div class="round-num-text" style="color:#F5F5F0;">ROUND 02</div>
       </div>
       <div class="round-cards" id="round2-cards">
-        <div class="arg-card" style="background:#FAFAF5;opacity:0.75;flex:0.7;">
+        <div class="arg-card" style="background:#FAFAF5;opacity:0.75;">
           <div class="arg-role-line" style="color:#8A6A00;"><div class="role-pip solver-pip"></div>SOLVER — UNDER ATTACK</div>
           <div class="arg-headline-text" id="r2-solver-ref" style="font-size:20px;color:#5A5A50;"></div>
           <div class="arg-tag solver-tag" style="color:#B0A070;border-color:#D0C080;">R1 POSITION</div>
@@ -813,7 +813,7 @@
         <div class="round-num-text" style="color:#0A0A0A;">ROUND 03</div>
       </div>
       <div class="round-cards" id="round3-cards">
-        <div class="arg-card" style="background:#FFFDF0;flex:1.4;">
+        <div class="arg-card" style="background:#FFFDF0;">
           <div class="arg-role-line" style="color:#8A6A00;"><div class="role-pip solver-pip"></div>SOLVER — REVISED POSITION</div>
           <div class="arg-headline-text" id="r3-solver-hl">Incorporating the battle…</div>
           <div class="arg-body-text" id="r3-solver-body"></div>
