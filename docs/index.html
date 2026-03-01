@@ -1074,12 +1074,8 @@
 ════════════════════════════════════════ -->
 <script>
 // ── TIER / MORE OPTIONS ──────────────────────────
-// Placeholder — overwritten dynamically after key validation fetches live models
-const FREE_MODELS = {
-  solver: 'auto',
-  challenger: 'auto',
-  scout: 'auto',
-};
+let currentTier = 'paid';
+
 const PAID_MODELS = {
   solver: 'anthropic/claude-opus-4-6',
   challenger: 'openai/gpt-5',
@@ -1087,12 +1083,17 @@ const PAID_MODELS = {
 };
 
 function setTier(tier) {
+  currentTier = tier;
   document.getElementById('tier-free').classList.toggle('active', tier === 'free');
   document.getElementById('tier-paid').classList.toggle('active', tier === 'paid');
-  const models = tier === 'free' ? FREE_MODELS : PAID_MODELS;
-  setSelectValue('solver-model', models.solver);
-  setSelectValue('challenger-model', models.challenger);
-  setSelectValue('scout-model', models.scout);
+  if (tier === 'paid') {
+    setSelectValue('solver-model', PAID_MODELS.solver);
+    setSelectValue('challenger-model', PAID_MODELS.challenger);
+    setSelectValue('scout-model', PAID_MODELS.scout);
+  } else {
+    // Free: populate selects if we already have live models, otherwise just mark tier
+    if (liveFreeModels.length > 0) populateFreeSelects(liveFreeModels);
+  }
 }
 
 function setSelectValue(id, value) {
@@ -1183,18 +1184,13 @@ async function validateKeyAndFetchModels(apiKey) {
 function populateFreeSelects(models) {
   ['solver-model', 'challenger-model', 'scout-model'].forEach((selId, i) => {
     const sel = document.getElementById(selId);
-    // Only replace if currently showing a free model
-    const currentVal = sel.value;
-    if (!currentVal.endsWith(':free') && liveFreeModels.indexOf(currentVal) === -1) return;
-    // Clear existing free options and add live ones
-    Array.from(sel.options).forEach(opt => {
-      if (opt.value.endsWith(':free') || liveFreeModels.includes(opt.value)) opt.remove();
-    });
-    models.slice(0, 8).forEach((id, idx) => {
+    // Replace all options with live free models
+    sel.innerHTML = '';
+    models.slice(0, 10).forEach((id, idx) => {
       const opt = document.createElement('option');
       opt.value = id;
       opt.textContent = id.split('/')[1].toUpperCase().replace(/-/g, ' ');
-      if (idx === i) opt.selected = true; // assign different defaults per robot
+      if (idx === i % models.length) opt.selected = true;
       sel.appendChild(opt);
     });
   });
@@ -1286,9 +1282,6 @@ function resetArena() {
 async function startFight() {
   const question = document.getElementById('question-input').value.trim();
   const apiKey = document.getElementById('api-key-input').value.trim();
-  const solverModel = document.getElementById('solver-model').value;
-  const challengerModel = document.getElementById('challenger-model').value;
-  const scoutModel = document.getElementById('scout-model').value;
 
   document.getElementById('form-error').style.display = 'none';
 
@@ -1300,6 +1293,20 @@ async function startFight() {
 
   try { await validateKeyAndFetchModels(apiKey); }
   catch (err) { showError(err.message); return; }
+
+  // Determine models — if free tier, use live free models; otherwise use selects
+  let solverModel, challengerModel, scoutModel;
+  if (currentTier === 'free' && liveFreeModels.length >= 3) {
+    solverModel = liveFreeModels[0];
+    challengerModel = liveFreeModels[1];
+    scoutModel = liveFreeModels[2];
+  } else if (currentTier === 'free' && liveFreeModels.length > 0) {
+    solverModel = challengerModel = scoutModel = liveFreeModels[0];
+  } else {
+    solverModel = document.getElementById('solver-model').value;
+    challengerModel = document.getElementById('challenger-model').value;
+    scoutModel = document.getElementById('scout-model').value;
+  }
 
   document.getElementById('fight-btn').textContent = 'THE BATTLE IS ON…';
 
