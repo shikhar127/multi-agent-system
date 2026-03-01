@@ -757,6 +757,88 @@
       .round-cards, .ex-cards { flex-direction: column; }
       .arg-card, .ex-card { border-right: none; border-bottom: 4px solid #0A0A0A; }
     }
+
+    /* ── MOBILE (phone) ───────────────────────────
+       Cleaner, business-ready layout for small screens.
+    ─────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      /* Nav — hide full wordmark subtitle, keep logo */
+      .nav-sub { display: none; }
+
+      /* Hero title column */
+      .arena-title-col { padding: 28px 20px 24px; gap: 14px; }
+      .arena-h1 { font-size: 46px; }
+      .arena-desc { font-size: 13px; line-height: 20px; }
+      .arena-robots { gap: 6px; flex-wrap: wrap; }
+      .use-case-chips { display: flex; }
+
+      /* Hero form column */
+      .arena-form-col { padding: 24px 20px 28px; gap: 16px; }
+      .question-input { min-height: 90px; font-size: 14px; }
+
+      /* Tier buttons — more compact */
+      .tier-btn { padding: 12px 14px; }
+      .tier-btn-label { font-size: 13px; }
+      .tier-btn-note { font-size: 10px; }
+
+      /* Fight button — full width, slightly smaller */
+      .fight-btn { font-size: 24px; padding: 16px 24px; width: 100%; box-sizing: border-box; }
+      .cancel-btn { font-size: 13px; padding: 16px 14px; }
+
+      /* Hide decorative robot character panels — too heavy for mobile */
+      .char-intro, .char-intro.rev { display: none !important; }
+
+      /* Battle results padding */
+      .round-num-col { width: 52px; border-right: 3px solid #0A0A0A; }
+      .round-num-text { font-size: 24px; writing-mode: vertical-rl; transform: rotate(180deg); }
+      .arg-card { padding: 20px 16px; gap: 10px; }
+      .arg-headline-text { font-size: 16px; }
+      .arg-body-text { font-size: 13px; line-height: 20px; }
+
+      /* Loading panel */
+      #loading-panel { padding: 48px 24px; }
+      .loading-title { font-size: 44px; }
+
+      /* Verdict */
+      .verdict-inner { padding: 36px 20px; gap: 28px; }
+      .verdict-big { font-size: 56px; }
+      .verdict-summary { font-size: 15px; }
+      .verdict-reasoning { font-size: 13px; }
+      .verdict-war-cry { font-size: 22px; }
+      .trace-panel { padding: 20px; }
+
+      /* Battle example section */
+      .battle-header { padding: 28px 20px; flex-direction: column; gap: 6px; }
+      .bh-title { font-size: 52px; }
+      .rounds-wrap { padding: 0; }
+      .ex-round { flex-direction: column; }
+      .ex-num-col { padding: 10px 20px; min-height: auto; border-right: none; border-bottom: 3px solid rgba(255,255,255,0.1); }
+      .ex-num { font-size: 14px; writing-mode: horizontal-tb; transform: none; }
+      .ex-cards { padding: 0 0 0 0; }
+      .ex-card { padding: 20px; }
+      .ex-hl { font-size: 16px; }
+      .ex-body { font-size: 13px; }
+
+      /* Example verdict */
+      .example-verdict { padding: 36px 20px; }
+      .ev-title { font-size: 52px; }
+      .ev-text p { font-size: 14px; line-height: 22px; }
+
+      /* CTA */
+      .final-cta { padding: 44px 20px; gap: 28px; }
+      .cta-hl { font-size: 52px; }
+      .cta-sub { font-size: 11px; }
+      .cta-btns { flex-direction: column; width: 100%; }
+      .btn-blk, .btn-out { text-align: center; width: 100%; box-sizing: border-box; }
+
+      /* Next questions */
+      #next-questions { padding: 24px 20px 32px; }
+      .nq-fight-btn { font-size: 12px; padding: 7px 10px; }
+
+      /* More options panel */
+      .robot-model-row { flex-direction: column; gap: 6px; }
+      .model-select { width: 100%; }
+    }
   </style>
 </head>
 <body>
@@ -781,13 +863,19 @@
     <div class="arena-title-col">
       <div class="arena-chapter">ENTER THE ARENA</div>
       <div class="arena-h1">ASK YOUR <span>QUES-<br/>TION.</span></div>
-      <p class="arena-desc">Three robots will fight for the right answer. No ego. No surrender. Only the force of argument.</p>
+      <p class="arena-desc">Three AI models debate your question from opposing positions. The strongest argument wins — no consensus bias, no single model's blind spots.</p>
       <div class="arena-robots">
         <span class="robot-chip chip-solver">SOLVER</span>
         <span class="chip-vs">VS</span>
         <span class="robot-chip chip-challenger">CHALLENGER</span>
         <span class="chip-vs">VS</span>
         <span class="robot-chip chip-scout">SCOUT</span>
+      </div>
+      <div class="use-case-chips" style="display:none; gap:6px; flex-wrap:wrap; margin-top:4px;">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:0.12em;color:#5A5A50;border:1px solid #2A2A25;padding:3px 8px;">STRATEGY</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:0.12em;color:#5A5A50;border:1px solid #2A2A25;padding:3px 8px;">PRODUCT</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:0.12em;color:#5A5A50;border:1px solid #2A2A25;padding:3px 8px;">TECHNICAL</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:0.12em;color:#5A5A50;border:1px solid #2A2A25;padding:3px 8px;">RESEARCH</span>
       </div>
     </div>
 
