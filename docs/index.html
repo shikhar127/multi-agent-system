@@ -11,11 +11,6 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #F5F5F0; font-family: 'Inter Tight', sans-serif; overflow-x: hidden; }
 
-    /* PANEL BORDERS */
-    .panel { border-bottom: 5px solid #0A0A0A; position: relative; overflow: hidden; }
-    .panel-inner-border { border: 5px solid #0A0A0A; }
-
-    /* HALFTONE */
     .halftone {
       background-image: radial-gradient(circle, #0A0A0A 1.5px, transparent 1.5px);
       background-size: 14px 14px;
@@ -25,970 +20,1183 @@
       background-size: 12px 12px;
       background-color: #F5C800;
     }
-
-    /* ─────────────────────────────────────────
-       TITLE SPLASH
-    ───────────────────────────────────────── */
-    .title-splash {
-      width: 100%; height: 100vh; min-height: 680px;
-      background: #0A0A0A;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      position: relative; overflow: hidden;
-      border-bottom: 5px solid #F5C800;
-    }
     .speed-lines {
-      position: absolute; inset: 0;
+      position: absolute; inset: 0; pointer-events: none;
       background: conic-gradient(from 0deg at 50% 50%,
         transparent 0deg, rgba(245,245,240,0.07) 1deg, transparent 2deg,
         transparent 12deg, rgba(245,245,240,0.05) 13deg, transparent 14deg,
         transparent 26deg, rgba(245,245,240,0.07) 27deg, transparent 28deg,
         transparent 37deg, rgba(245,245,240,0.04) 38deg, transparent 39deg,
         transparent 50deg, rgba(245,245,240,0.06) 51deg, transparent 52deg,
-        transparent 63deg, rgba(245,245,240,0.07) 64deg, transparent 65deg,
+        transparent 65deg, rgba(245,245,240,0.07) 66deg, transparent 67deg,
         transparent 78deg, rgba(245,245,240,0.05) 79deg, transparent 80deg,
         transparent 91deg, rgba(245,245,240,0.07) 92deg, transparent 93deg,
-        transparent 104deg, rgba(245,245,240,0.04) 105deg, transparent 106deg,
-        transparent 117deg, rgba(245,245,240,0.06) 118deg, transparent 119deg,
-        transparent 130deg, rgba(245,245,240,0.07) 131deg, transparent 132deg,
-        transparent 145deg, rgba(245,245,240,0.05) 146deg, transparent 147deg,
-        transparent 157deg, rgba(245,245,240,0.07) 158deg, transparent 159deg,
-        transparent 170deg, rgba(245,245,240,0.04) 171deg, transparent 172deg,
-        transparent 183deg, rgba(245,245,240,0.06) 184deg, transparent 185deg,
-        transparent 197deg, rgba(245,245,240,0.07) 198deg, transparent 199deg,
-        transparent 211deg, rgba(245,245,240,0.05) 212deg, transparent 213deg,
-        transparent 224deg, rgba(245,245,240,0.07) 225deg, transparent 226deg,
-        transparent 238deg, rgba(245,245,240,0.04) 239deg, transparent 240deg,
-        transparent 252deg, rgba(245,245,240,0.06) 253deg, transparent 254deg,
-        transparent 265deg, rgba(245,245,240,0.07) 266deg, transparent 267deg,
-        transparent 279deg, rgba(245,245,240,0.05) 280deg, transparent 281deg,
-        transparent 292deg, rgba(245,245,240,0.07) 293deg, transparent 294deg,
-        transparent 305deg, rgba(245,245,240,0.04) 306deg, transparent 307deg,
-        transparent 318deg, rgba(245,245,240,0.06) 319deg, transparent 320deg,
-        transparent 332deg, rgba(245,245,240,0.07) 333deg, transparent 334deg,
-        transparent 347deg, rgba(245,245,240,0.05) 348deg, transparent 349deg,
-        transparent 360deg
+        transparent 107deg, rgba(245,245,240,0.04) 108deg, transparent 109deg,
+        transparent 120deg, rgba(245,245,240,0.06) 121deg, transparent 122deg,
+        transparent 133deg, rgba(245,245,240,0.07) 134deg, transparent 135deg,
+        transparent 148deg, rgba(245,245,240,0.05) 149deg, transparent 150deg,
+        transparent 163deg, rgba(245,245,240,0.07) 164deg, transparent 165deg,
+        transparent 178deg, rgba(245,245,240,0.04) 179deg, transparent 180deg,
+        transparent 193deg, rgba(245,245,240,0.06) 194deg, transparent 195deg,
+        transparent 208deg, rgba(245,245,240,0.07) 209deg, transparent 210deg,
+        transparent 223deg, rgba(245,245,240,0.05) 224deg, transparent 225deg,
+        transparent 238deg, rgba(245,245,240,0.07) 239deg, transparent 240deg,
+        transparent 253deg, rgba(245,245,240,0.04) 254deg, transparent 255deg,
+        transparent 268deg, rgba(245,245,240,0.06) 269deg, transparent 270deg,
+        transparent 283deg, rgba(245,245,240,0.07) 284deg, transparent 285deg,
+        transparent 298deg, rgba(245,245,240,0.05) 299deg, transparent 300deg,
+        transparent 313deg, rgba(245,245,240,0.07) 314deg, transparent 315deg,
+        transparent 328deg, rgba(245,245,240,0.04) 329deg, transparent 330deg,
+        transparent 343deg, rgba(245,245,240,0.06) 344deg, transparent 345deg,
+        transparent 358deg, rgba(245,245,240,0.07) 359deg, transparent 360deg
       );
     }
-    .chapter-label {
-      position: absolute; top: 36px; left: 52px;
+
+    /* ── NAV ── */
+    nav {
+      background: #0A0A0A; height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 60px; border-bottom: 4px solid #F5C800; position: sticky; top: 0; z-index: 100;
+    }
+    .nav-wordmark { font-family: 'Bangers', cursive; font-size: 28px; color: #F5F5F0; letter-spacing: 0.04em; text-decoration: none; }
+    .nav-sub { font-family: 'Bebas Neue', sans-serif; font-size: 11px; color: #5A5A55; letter-spacing: 0.2em; margin-left: 16px; }
+    nav a.gh { font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: #F5C800; letter-spacing: 0.15em; text-decoration: none; border: 2px solid #F5C800; padding: 5px 14px; }
+
+    /* ════════════════════════════════
+       ENTER THE ARENA — FORM
+    ════════════════════════════════ */
+    #enter-arena {
+      background: #0A0A0A; position: relative; overflow: hidden;
+      border-bottom: 5px solid #F5C800;
+    }
+    .arena-form-inner {
+      position: relative; z-index: 2;
+      display: flex; gap: 0;
+    }
+
+    /* Left: title column */
+    .arena-title-col {
+      width: 380px; flex-shrink: 0;
+      border-right: 5px solid #F5C800;
+      padding: 56px 44px;
+      display: flex; flex-direction: column; gap: 20px; justify-content: center;
+    }
+    .arena-chapter {
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
+      color: #5A5A55; letter-spacing: 0.25em;
+    }
+    .arena-h1 {
+      font-family: 'Bangers', cursive; font-size: 80px; line-height: 0.88;
+      color: #F5F5F0; letter-spacing: 0.03em;
+    }
+    .arena-h1 span { color: #F5C800; }
+    .arena-desc {
+      font-family: 'Inter Tight', sans-serif; font-size: 14px; line-height: 22px;
+      color: #5A5A55;
+    }
+    .arena-robots {
+      display: flex; gap: 10px; align-items: center; margin-top: 8px;
+    }
+    .robot-chip {
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 0.15em;
+      padding: 4px 10px; border: 1.5px solid;
+    }
+    .chip-solver { color: #F5C800; border-color: #F5C800; }
+    .chip-challenger { color: #CC1A1A; border-color: #CC1A1A; }
+    .chip-scout { color: #7B8FF5; border-color: #7B8FF5; }
+    .chip-vs { font-family: 'Bangers', cursive; font-size: 18px; color: #3A3A35; }
+
+    /* Right: form */
+    .arena-form-col {
+      flex: 1; padding: 48px 56px;
+      display: flex; flex-direction: column; gap: 20px;
+    }
+
+    .form-field { display: flex; flex-direction: column; gap: 8px; }
+    .field-label {
+      font-family: 'Bebas Neue', sans-serif; font-size: 12px;
+      color: #F5C800; letter-spacing: 0.2em;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .field-label::after {
+      content: ''; flex: 1; height: 1px; background: #2A2A25;
+    }
+
+    .question-input {
+      width: 100%; background: #1A1A18; border: 3px solid #2A2A25;
+      border-radius: 0; padding: 20px 24px;
+      font-family: 'Inter Tight', sans-serif; font-size: 18px; line-height: 28px;
+      color: #F5F5F0; resize: none; min-height: 120px; outline: none;
+      transition: border-color 0.15s;
+    }
+    .question-input::placeholder { color: #3A3A35; }
+    .question-input:focus { border-color: #F5C800; }
+
+    .key-row { display: flex; gap: 12px; }
+    .key-input {
+      flex: 1; background: #1A1A18; border: 3px solid #2A2A25;
+      border-radius: 0; padding: 14px 20px;
+      font-family: 'JetBrains Mono', monospace; font-size: 13px;
+      color: #8A8A80; outline: none; transition: border-color 0.15s;
+    }
+    .key-input::placeholder { color: #3A3A35; }
+    .key-input:focus { border-color: #7B8FF5; }
+
+    .model-select {
+      background: #1A1A18; border: 3px solid #2A2A25;
+      border-radius: 0; padding: 14px 16px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 13px;
+      color: #6A6A65; letter-spacing: 0.1em; outline: none;
+      cursor: pointer; min-width: 200px; flex-shrink: 0;
+    }
+    .model-select option { background: #1A1A18; }
+
+    .fight-btn {
+      background: #F5C800; border: 4px solid #F5C800;
+      padding: 18px 48px; cursor: pointer;
+      font-family: 'Bangers', cursive; font-size: 32px; letter-spacing: 0.08em;
+      color: #0A0A0A; transition: all 0.1s; box-shadow: 6px 6px 0 rgba(245,200,0,0.3);
+      align-self: flex-start;
+    }
+    .fight-btn:hover { background: #FFD700; box-shadow: 8px 8px 0 rgba(245,200,0,0.4); }
+    .fight-btn:active { transform: translate(3px,3px); box-shadow: 3px 3px 0 rgba(245,200,0,0.3); }
+    .fight-btn:disabled { background: #3A3A35; border-color: #3A3A35; color: #5A5A55; cursor: not-allowed; box-shadow: none; transform: none; }
+
+    .form-note {
+      font-family: 'Inter Tight', sans-serif; font-size: 12px; color: #3A3A35;
+      line-height: 18px;
+    }
+
+    /* ════════════════════════════════
+       BATTLE RESULTS
+    ════════════════════════════════ */
+    #battle-results { display: none; }
+
+    /* Loading */
+    #loading-panel {
+      background: #0A0A0A; padding: 80px 60px;
+      display: flex; flex-direction: column; align-items: center; gap: 24px;
+      border-bottom: 5px solid #F5C800;
+      position: relative; overflow: hidden;
+    }
+    .loading-title {
+      font-family: 'Bangers', cursive; font-size: 72px;
+      color: #F5F5F0; letter-spacing: 0.06em; z-index: 2;
+    }
+    .loading-dots {
+      display: flex; gap: 12px; z-index: 2;
+    }
+    .dot {
+      width: 14px; height: 14px; background: #F5C800;
+      animation: blink 1.2s infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; background: #CC1A1A; }
+    .dot:nth-child(3) { animation-delay: 0.4s; background: #7B8FF5; }
+    @keyframes blink { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+
+    .loading-status {
+      font-family: 'Bebas Neue', sans-serif; font-size: 16px;
+      color: #5A5A55; letter-spacing: 0.2em; z-index: 2;
+    }
+
+    /* Result rounds */
+    .result-round {
+      display: none; border-bottom: 5px solid #0A0A0A;
+      animation: slideIn 0.4s ease-out;
+    }
+    @keyframes slideIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+    .result-clash {
+      display: none;
+      background: #F5C800; padding: 14px;
+      display: none; align-items: center; justify-content: center; gap: 32px;
+      border-bottom: 5px solid #0A0A0A;
+      animation: slideIn 0.3s ease-out;
+    }
+    .clash-word {
+      font-family: 'Bangers', cursive; font-size: 56px;
+      color: #0A0A0A; letter-spacing: 0.08em;
+    }
+    .clash-label {
+      font-family: 'Bebas Neue', sans-serif; font-size: 15px;
+      color: #5A4A00; letter-spacing: 0.2em;
+    }
+
+    /* Round panels */
+    .round-shell { display: flex; }
+    .round-num-col {
+      width: 88px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      border-right: 5px solid #0A0A0A;
+    }
+    .round-num-text {
+      font-family: 'Bangers', cursive; font-size: 40px;
+      color: #F5F5F0; letter-spacing: 0.05em;
+      writing-mode: vertical-rl; transform: rotate(180deg);
+    }
+    .round-cards { flex: 1; display: flex; }
+
+    .arg-card {
+      flex: 1; padding: 32px 36px;
+      display: flex; flex-direction: column; gap: 14px;
+      border-right: 4px solid #0A0A0A; position: relative; overflow: hidden;
+      min-height: 280px;
+    }
+    .arg-card:last-child { border-right: none; }
+    .arg-role-line {
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
+      letter-spacing: 0.2em; display: flex; align-items: center; gap: 8px;
+    }
+    .role-pip { width: 10px; height: 10px; flex-shrink: 0; }
+    .solver-pip { background: #F5C800; }
+    .challenger-pip { background: #CC1A1A; }
+    .scout-pip { background: #4A6FD4; }
+
+    .arg-headline-text {
+      font-family: 'Bangers', cursive; font-size: 28px;
+      line-height: 1.1; color: #0A0A0A; letter-spacing: 0.02em;
+    }
+    .arg-body-text {
+      font-family: 'Inter Tight', sans-serif; font-size: 14px;
+      line-height: 23px; color: #3A3A35; flex: 1;
+    }
+    .arg-tag {
+      font-family: 'Bebas Neue', sans-serif; font-size: 12px;
+      letter-spacing: 0.12em; padding: 6px 0;
+      border-top: 3px solid; margin-top: auto;
+    }
+    .solver-tag { color: #8A6A00; border-color: #F5C800; }
+    .challenger-tag { color: #CC1A1A; border-color: #CC1A1A; }
+    .scout-tag { color: #4A6FD4; border-color: #4A6FD4; }
+
+    /* skeleton loader for cards */
+    .skeleton { background: linear-gradient(90deg, #2A2A25 25%, #3A3A35 50%, #2A2A25 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 2px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    /* Verdict result */
+    #result-verdict {
+      display: none;
+      background: #0A0A0A; position: relative; overflow: hidden;
+      border-bottom: 5px solid #F5C800;
+      animation: slideIn 0.5s ease-out;
+    }
+    .verdict-inner {
+      padding: 72px 80px; display: flex; gap: 72px;
+      position: relative; z-index: 2;
+    }
+    .verdict-left { flex: 1; display: flex; flex-direction: column; gap: 24px; }
+    .verdict-chapter-label {
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
+      color: #5A5A55; letter-spacing: 0.25em;
+    }
+    .verdict-big {
+      font-family: 'Bangers', cursive; font-size: 88px;
+      line-height: 0.88; color: #F5F5F0; letter-spacing: 0.04em;
+    }
+    .verdict-confidence-badge {
+      display: inline-flex; align-items: center; gap: 10px;
+      border: 2px solid #F5C800; padding: 10px 18px; align-self: flex-start;
+    }
+    .vc-label {
+      font-family: 'Bebas Neue', sans-serif; font-size: 20px;
+      color: #F5C800; letter-spacing: 0.15em;
+    }
+    .vc-note {
+      font-family: 'Inter Tight', sans-serif; font-size: 12px; color: #5A5A55;
+    }
+    .verdict-answer-text {
+      border-left: 4px solid #F5C800; padding-left: 20px;
+    }
+    .verdict-answer-text p {
+      font-family: 'Inter Tight', sans-serif; font-size: 17px;
+      line-height: 28px; color: #C8C8C0;
+    }
+    .verdict-war-cry {
+      font-family: 'Bangers', cursive; font-size: 32px;
+      color: #F5C800; letter-spacing: 0.05em; margin-top: 8px;
+    }
+    .verdict-right { width: 400px; flex-shrink: 0; }
+    .trace-panel {
+      background: #1A1A18; border: 3px solid #2A2A25;
+      padding: 28px; display: flex; flex-direction: column; gap: 16px;
+    }
+    .trace-panel-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
+      color: #5A5A55; letter-spacing: 0.2em; border-bottom: 1px solid #2A2A25; padding-bottom: 10px;
+    }
+    .trace-entry { display: flex; flex-direction: column; gap: 4px; }
+    .trace-role {
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
+      letter-spacing: 0.12em;
+    }
+    .trace-summary-text {
+      font-family: 'Inter Tight', sans-serif; font-size: 12px;
+      line-height: 18px; color: #5A5A55;
+    }
+    .trace-hr { border: none; border-top: 1px solid #2A2A25; }
+
+    /* Try again button */
+    #try-again-bar {
+      display: none;
+      background: #1A1A18; padding: 24px 60px;
+      border-bottom: 5px solid #F5C800;
+      justify-content: space-between; align-items: center;
+    }
+    .try-again-text {
+      font-family: 'Bebas Neue', sans-serif; font-size: 14px;
+      color: #5A5A55; letter-spacing: 0.15em;
+    }
+    .try-again-btn {
+      background: transparent; border: 3px solid #F5C800;
+      padding: 10px 28px; cursor: pointer;
+      font-family: 'Bebas Neue', sans-serif; font-size: 18px;
+      color: #F5C800; letter-spacing: 0.12em;
+    }
+    .try-again-btn:hover { background: #F5C800; color: #0A0A0A; }
+
+    /* error */
+    .error-panel {
+      background: #2A0000; border: 3px solid #CC1A1A; padding: 20px 24px; margin-top: 8px;
+    }
+    .error-text {
+      font-family: 'Inter Tight', sans-serif; font-size: 14px; color: #FF6B6B; line-height: 22px;
+    }
+    .error-label {
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px; color: #CC1A1A; letter-spacing: 0.2em; margin-bottom: 6px;
+    }
+
+    /* ════════════════════════════════
+       MANGA EXPLAINER (below fold)
+    ════════════════════════════════ */
+    .title-splash {
+      width: 100%; min-height: 600px;
+      background: #0A0A0A;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+      border-bottom: 5px solid #F5C800; margin-top: 64px;
+    }
+    .title-splash .speed-lines { opacity: 0.35; }
+    .chapter-label-bar {
+      position: absolute; top: 32px; left: 52px;
       background: #F5C800; padding: 6px 18px;
       font-family: 'Bebas Neue', sans-serif; font-size: 13px;
       color: #0A0A0A; letter-spacing: 0.2em;
     }
-    .title-main {
-      display: flex; flex-direction: column; align-items: center;
-      gap: 0; position: relative; z-index: 2;
-    }
-    .title-word {
-      font-family: 'Bangers', cursive;
-      font-size: clamp(120px, 14vw, 200px);
-      line-height: 0.9;
-      color: #F5F5F0;
-      letter-spacing: 0.04em;
-    }
-    .versus-row {
-      display: flex; align-items: center; gap: 28px; margin: 12px 0;
-    }
-    .versus-line { height: 4px; width: 200px; background: #F5C800; }
-    .versus-text {
-      font-family: 'Bangers', cursive; font-size: 60px;
-      color: #CC1A1A; letter-spacing: 0.12em;
-    }
-    .splash-tagline {
-      position: absolute; bottom: 36px; left: 0; right: 0;
-      display: flex; justify-content: center;
-    }
-    .tagline-inner {
-      background: #CC1A1A; padding: 11px 48px;
-      transform: skewX(-3deg);
-      font-family: 'Bebas Neue', sans-serif; font-size: 16px;
-      color: #F5F5F0; letter-spacing: 0.22em;
-    }
+    .big-title { font-family: 'Bangers', cursive; font-size: clamp(100px,12vw,180px); line-height: 0.9; color: #F5F5F0; letter-spacing: 0.04em; text-align: center; position: relative; z-index: 2; }
+    .versus-row { display: flex; align-items: center; gap: 24px; margin: 10px 0; position: relative; z-index: 2; }
+    .vs-line { height: 4px; width: 160px; background: #F5C800; }
+    .vs-word { font-family: 'Bangers', cursive; font-size: 56px; color: #CC1A1A; letter-spacing: 0.1em; }
+    .splash-tagline-bar { position: absolute; bottom: 32px; left: 0; right: 0; display: flex; justify-content: center; }
+    .tagline-pill { background: #CC1A1A; padding: 10px 40px; transform: skewX(-3deg); font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: #F5F5F0; letter-spacing: 0.2em; }
 
-    /* ─────────────────────────────────────────
-       ARENA SETUP
-    ───────────────────────────────────────── */
-    .arena-setup {
-      display: flex; border-bottom: 5px solid #0A0A0A;
-    }
-    .arena-caption {
-      width: 400px; flex-shrink: 0;
-      background: #F5C800;
-      border-right: 5px solid #0A0A0A;
-      padding: 56px 48px;
-      display: flex; flex-direction: column; gap: 20px;
-    }
-    .narration-label {
-      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
-      color: #0A0A0A; letter-spacing: 0.25em; border-bottom: 2px solid #0A0A0A; padding-bottom: 8px;
-    }
-    .narration-text {
-      font-family: 'Bangers', cursive; font-size: 48px;
-      line-height: 1.0; color: #0A0A0A; letter-spacing: 0.02em;
-    }
-    .narration-body {
-      font-family: 'Inter Tight', sans-serif; font-size: 15px;
-      line-height: 24px; color: #2A2A2A; font-weight: 500;
-    }
-    .arena-panel {
-      flex: 1; padding: 56px 60px;
-      display: flex; flex-direction: column; gap: 28px;
-      position: relative;
-    }
-    .question-bubble {
-      background: #F5F5F0; border: 4px solid #0A0A0A;
-      border-radius: 4px; padding: 32px 36px;
-      box-shadow: 8px 8px 0 #0A0A0A; position: relative;
-    }
-    .bubble-label {
-      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
-      color: #CC1A1A; letter-spacing: 0.2em; margin-bottom: 10px;
-    }
-    .bubble-text {
-      font-family: 'Bangers', cursive; font-size: 38px;
-      line-height: 1.1; color: #0A0A0A; letter-spacing: 0.02em;
-    }
+    /* Arena setup */
+    .arena-setup { display: flex; border-bottom: 5px solid #0A0A0A; }
+    .arena-caption { width: 380px; flex-shrink: 0; background: #F5C800; border-right: 5px solid #0A0A0A; padding: 52px 44px; display: flex; flex-direction: column; gap: 18px; }
+    .narr-label { font-family: 'Bebas Neue', sans-serif; font-size: 11px; color: #0A0A0A; letter-spacing: 0.25em; border-bottom: 2px solid #0A0A0A; padding-bottom: 8px; }
+    .narr-text { font-family: 'Bangers', cursive; font-size: 44px; line-height: 1.0; color: #0A0A0A; }
+    .narr-body { font-family: 'Inter Tight', sans-serif; font-size: 15px; line-height: 24px; color: #2A2A1A; font-weight: 500; }
+    .arena-right { flex: 1; padding: 52px 56px; display: flex; flex-direction: column; gap: 24px; position: relative; }
+    .question-bubble { background: #F5F5F0; border: 4px solid #0A0A0A; padding: 28px 32px; box-shadow: 8px 8px 0 #0A0A0A; }
+    .qb-label { font-family: 'Bebas Neue', sans-serif; font-size: 11px; color: #CC1A1A; letter-spacing: 0.2em; margin-bottom: 8px; }
+    .qb-text { font-family: 'Bangers', cursive; font-size: 34px; line-height: 1.1; color: #0A0A0A; }
     .arena-tags { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-    .tag-black {
-      background: #0A0A0A; padding: 8px 20px; transform: skewX(-3deg);
-      font-family: 'Bebas Neue', sans-serif; font-size: 13px;
-      color: #F5C800; letter-spacing: 0.15em;
-    }
-    .tag-red {
-      background: #CC1A1A; padding: 8px 20px; transform: skewX(-3deg);
-      font-family: 'Bebas Neue', sans-serif; font-size: 13px;
-      color: #F5F5F0; letter-spacing: 0.15em;
-    }
-    .impact-word {
-      font-family: 'Bangers', cursive; font-size: 52px;
-      color: #0A0A0A; letter-spacing: 0.05em; margin-left: 8px;
-    }
+    .tag-b { background: #0A0A0A; padding: 7px 18px; transform: skewX(-3deg); font-family: 'Bebas Neue', sans-serif; font-size: 12px; color: #F5C800; letter-spacing: 0.15em; }
+    .tag-r { background: #CC1A1A; padding: 7px 18px; transform: skewX(-3deg); font-family: 'Bebas Neue', sans-serif; font-size: 12px; color: #F5F5F0; letter-spacing: 0.15em; }
+    .engage-word { font-family: 'Bangers', cursive; font-size: 48px; color: #0A0A0A; }
 
-    /* ─────────────────────────────────────────
-       ROBOT CHARACTER PANELS
-    ───────────────────────────────────────── */
-    .character-intro {
-      display: flex; border-bottom: 5px solid #0A0A0A; min-height: 560px;
-    }
-    .character-intro.reverse { flex-direction: row-reverse; }
+    /* Character panels */
+    .char-intro { display: flex; border-bottom: 5px solid #0A0A0A; }
+    .char-intro.rev { flex-direction: row-reverse; }
+    .robot-panel { width: 440px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; min-height: 500px; }
+    .rp-solver { background: #0A0A0A; border-right: 5px solid #0A0A0A; }
+    .rp-challenger { background: #CC1A1A; border-left: 5px solid #0A0A0A; }
+    .rp-scout { background: #1A1A2E; border-right: 5px solid #0A0A0A; }
+    .unit-label { position: absolute; top: 20px; left: 20px; font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 0.2em; }
+    .char-info { flex: 1; padding: 52px 52px; display: flex; flex-direction: column; gap: 20px; justify-content: center; }
+    .ci-enter { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 0.25em; border-bottom: 2px solid #0A0A0A; padding-bottom: 8px; }
+    .ci-name { font-family: 'Bangers', cursive; font-size: 72px; line-height: 0.9; color: #0A0A0A; letter-spacing: 0.02em; }
+    .ci-title { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 0.18em; }
+    .ci-quote { font-family: 'Bangers', cursive; font-size: 23px; line-height: 1.2; color: #0A0A0A; border-left: 5px solid; padding-left: 14px; }
+    .ci-stats { border: 3px solid #0A0A0A; padding: 18px 22px; background: #F5F5F0; box-shadow: 5px 5px 0 #0A0A0A; }
+    .stats-hd { font-family: 'Bebas Neue', sans-serif; font-size: 11px; color: #CC1A1A; letter-spacing: 0.2em; margin-bottom: 10px; }
+    .srow { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #D0D0CB; }
+    .srow:last-child { border-bottom: none; }
+    .slabel { font-family: 'Bebas Neue', sans-serif; font-size: 12px; color: #5A5A55; letter-spacing: 0.1em; }
+    .sbar { display: flex; gap: 3px; }
+    .sp { width: 14px; height: 7px; background: #0A0A0A; }
+    .sp.e { background: #D0D0CB; }
+    .ci-flavor { font-family: 'Inter Tight', sans-serif; font-size: 13px; line-height: 21px; color: #5A5A55; }
 
-    .robot-panel {
-      width: 480px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      position: relative; overflow: hidden;
-    }
-    .robot-panel.solver-bg { background: #0A0A0A; border-right: 5px solid #0A0A0A; }
-    .robot-panel.challenger-bg { background: #CC1A1A; border-left: 5px solid #0A0A0A; }
-    .robot-panel.scout-bg { background: #1A1A2E; border-right: 5px solid #0A0A0A; }
+    /* Battle header */
+    .battle-header { background: #CC1A1A; padding: 36px 56px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid #0A0A0A; }
+    .bh-title { font-family: 'Bangers', cursive; font-size: 84px; line-height: 0.9; color: #F5F5F0; letter-spacing: 0.04em; }
+    .bh-sub { font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: rgba(245,245,240,0.6); letter-spacing: 0.2em; margin-top: 6px; }
+    .bh-count { font-family: 'Bangers', cursive; font-size: 56px; color: #F5C800; letter-spacing: 0.04em; text-align: right; line-height: 1; }
+    .bh-count-sub { font-family: 'Bebas Neue', sans-serif; font-size: 12px; color: rgba(245,245,240,0.4); letter-spacing: 0.15em; margin-top: 6px; }
 
-    .robot-number {
-      position: absolute; top: 20px; left: 24px;
-      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
-      letter-spacing: 0.2em;
-    }
-    .solver-bg .robot-number { color: #F5C800; }
-    .challenger-bg .robot-number { color: #F5F5F0; }
-    .scout-bg .robot-number { color: #7B8FF5; }
+    /* Example rounds */
+    .rounds-wrap { border-bottom: 5px solid #0A0A0A; }
+    .ex-round { display: flex; border-bottom: 5px solid #0A0A0A; min-height: 360px; }
+    .ex-round:last-child { border-bottom: none; }
+    .ex-num-col { width: 88px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-right: 5px solid #0A0A0A; }
+    .ex-num { font-family: 'Bangers', cursive; font-size: 36px; color: #F5F5F0; letter-spacing: 0.05em; writing-mode: vertical-rl; transform: rotate(180deg); }
+    .ex-cards { flex: 1; display: flex; }
+    .ex-card { flex: 1; padding: 28px 32px; display: flex; flex-direction: column; gap: 12px; border-right: 4px solid #0A0A0A; }
+    .ex-card:last-child { border-right: none; }
+    .ex-role { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 0.2em; display: flex; align-items: center; gap: 8px; }
+    .ex-hl { font-family: 'Bangers', cursive; font-size: 26px; line-height: 1.1; color: #0A0A0A; }
+    .ex-body { font-family: 'Inter Tight', sans-serif; font-size: 13px; line-height: 21px; color: #3A3A35; flex: 1; }
+    .ex-tag { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 0.12em; padding: 5px 0; border-top: 3px solid; margin-top: auto; }
 
-    .character-info {
-      flex: 1; padding: 56px 56px;
-      display: flex; flex-direction: column; gap: 24px;
-      justify-content: center; position: relative;
-    }
-    .char-enter {
-      font-family: 'Bebas Neue', sans-serif; font-size: 12px;
-      color: #CC1A1A; letter-spacing: 0.25em; border-bottom: 2px solid #0A0A0A; padding-bottom: 10px;
-    }
-    .char-name {
-      font-family: 'Bangers', cursive; font-size: 80px;
-      line-height: 0.92; color: #0A0A0A; letter-spacing: 0.03em;
-    }
-    .char-title {
-      font-family: 'Bebas Neue', sans-serif; font-size: 18px;
-      letter-spacing: 0.18em; padding: 6px 0;
-    }
-    .char-quote {
-      font-family: 'Bangers', cursive; font-size: 26px;
-      line-height: 1.2; color: #0A0A0A; letter-spacing: 0.02em;
-      border-left: 5px solid #F5C800; padding-left: 16px;
-    }
-    .char-stats {
-      display: flex; flex-direction: column; gap: 10px;
-      border: 3px solid #0A0A0A; padding: 20px 24px;
-      background: #F5F5F0; box-shadow: 5px 5px 0 #0A0A0A;
-    }
-    .stats-title {
-      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
-      color: #CC1A1A; letter-spacing: 0.2em; margin-bottom: 4px;
-    }
-    .stat-row {
-      display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 1px solid #D0D0CB; padding-bottom: 8px;
-    }
-    .stat-row:last-child { border-bottom: none; padding-bottom: 0; }
-    .stat-label {
-      font-family: 'Bebas Neue', sans-serif; font-size: 13px;
-      color: #5A5A55; letter-spacing: 0.1em;
-    }
-    .stat-bar { display: flex; gap: 3px; }
-    .stat-pip {
-      width: 16px; height: 8px; background: #0A0A0A;
-    }
-    .stat-pip.empty { background: #D0D0CB; }
-    .char-flavor {
-      font-family: 'Inter Tight', sans-serif; font-size: 14px;
-      line-height: 22px; color: #5A5A55;
-    }
+    .clash-bar { background: #F5C800; display: flex; align-items: center; justify-content: center; gap: 28px; padding: 12px; border-bottom: 5px solid #0A0A0A; border-top: 5px solid #0A0A0A; }
+    .clash-w { font-family: 'Bangers', cursive; font-size: 52px; color: #0A0A0A; letter-spacing: 0.08em; }
+    .clash-mid { font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: #5A4A00; letter-spacing: 0.2em; }
+    .clash-bar.dark { background: #0A0A0A; }
+    .clash-bar.dark .clash-w { color: #F5C800; }
+    .clash-bar.dark .clash-mid { color: #5A5A55; }
 
-    /* ─────────────────────────────────────────
-       BATTLE SEQUENCE
-    ───────────────────────────────────────── */
-    .battle-header {
-      background: #CC1A1A; padding: 40px 60px;
-      display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 5px solid #0A0A0A;
-    }
-    .battle-title {
-      font-family: 'Bangers', cursive; font-size: 96px;
-      line-height: 0.9; color: #F5F5F0; letter-spacing: 0.04em;
-    }
-    .battle-subtitle {
-      font-family: 'Bebas Neue', sans-serif; font-size: 14px;
-      color: rgba(245,245,240,0.7); letter-spacing: 0.2em;
-      margin-top: 8px;
-    }
-    .battle-round-count {
-      font-family: 'Bangers', cursive; font-size: 64px;
-      color: #F5C800; letter-spacing: 0.05em; text-align: right; line-height: 1;
-    }
+    /* Static verdict example */
+    .example-verdict { background: #0A0A0A; padding: 72px 80px; display: flex; gap: 64px; border-bottom: 5px solid #F5C800; position: relative; overflow: hidden; }
+    .ev-left { flex: 1; display: flex; flex-direction: column; gap: 22px; }
+    .ev-chapter { font-family: 'Bebas Neue', sans-serif; font-size: 11px; color: #5A5A55; letter-spacing: 0.25em; }
+    .ev-title { font-family: 'Bangers', cursive; font-size: 84px; line-height: 0.88; color: #F5F5F0; }
+    .ev-badge { display: inline-flex; align-items: center; gap: 10px; border: 2px solid #F5C800; padding: 8px 16px; align-self: flex-start; }
+    .ev-badge-label { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: #F5C800; letter-spacing: 0.15em; }
+    .ev-text { border-left: 4px solid #F5C800; padding-left: 18px; }
+    .ev-text p { font-family: 'Inter Tight', sans-serif; font-size: 16px; line-height: 27px; color: #C8C8C0; }
+    .ev-cry { font-family: 'Bangers', cursive; font-size: 30px; color: #F5C800; letter-spacing: 0.05em; margin-top: 4px; }
+    .ev-right { width: 380px; flex-shrink: 0; }
+    .ev-trace { background: #1A1A18; border: 3px solid #2A2A25; padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+    .ev-trace-title { font-family: 'Bebas Neue', sans-serif; font-size: 11px; color: #5A5A55; letter-spacing: 0.2em; border-bottom: 1px solid #2A2A25; padding-bottom: 10px; }
+    .tr { display: flex; flex-direction: column; gap: 4px; }
+    .tr-role { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 0.12em; }
+    .tr-text { font-family: 'Inter Tight', sans-serif; font-size: 12px; line-height: 18px; color: #5A5A55; }
+    .tr-hr { border: none; border-top: 1px solid #2A2A25; }
 
-    .rounds-container {
-      display: flex; flex-direction: column;
-      border-bottom: 5px solid #0A0A0A;
-    }
+    /* CTA */
+    .final-cta { background: #F5C800; padding: 72px 80px; display: flex; justify-content: space-between; align-items: center; border-top: 5px solid #0A0A0A; gap: 40px; }
+    .cta-hl { font-family: 'Bangers', cursive; font-size: 88px; line-height: 0.9; color: #0A0A0A; letter-spacing: 0.04em; }
+    .cta-sub { font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: #5A4A00; letter-spacing: 0.2em; margin-top: 10px; }
+    .cta-btns { display: flex; gap: 14px; flex-shrink: 0; }
+    .btn-blk { background: #0A0A0A; border: 4px solid #0A0A0A; padding: 14px 32px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: #F5C800; letter-spacing: 0.15em; text-decoration: none; box-shadow: 5px 5px 0 rgba(0,0,0,0.2); }
+    .btn-out { background: transparent; border: 4px solid #0A0A0A; padding: 14px 32px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: #0A0A0A; letter-spacing: 0.15em; text-decoration: none; }
 
-    .round-panel {
-      display: flex; border-bottom: 5px solid #0A0A0A; min-height: 400px;
-    }
-    .round-panel:last-child { border-bottom: none; }
-
-    .round-label-col {
-      width: 100px; flex-shrink: 0;
-      background: #0A0A0A; display: flex; align-items: center;
-      justify-content: center; border-right: 5px solid #0A0A0A;
-    }
-    .round-label-text {
-      font-family: 'Bangers', cursive; font-size: 48px;
-      color: #F5C800; letter-spacing: 0.05em;
-      writing-mode: vertical-rl; text-orientation: mixed;
-      transform: rotate(180deg);
-    }
-
-    .round-content { flex: 1; display: flex; }
-
-    .argument-card {
-      flex: 1; padding: 36px 40px; display: flex; flex-direction: column;
-      gap: 16px; border-right: 4px solid #0A0A0A; position: relative;
-      overflow: hidden;
-    }
-    .argument-card:last-child { border-right: none; }
-
-    .arg-role {
-      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
-      letter-spacing: 0.2em; display: flex; align-items: center; gap: 10px;
-    }
-    .role-dot { width: 10px; height: 10px; flex-shrink: 0; }
-    .solver-dot { background: #F5C800; }
-    .challenger-dot { background: #CC1A1A; }
-    .scout-dot { background: #4A6FD4; }
-
-    .arg-headline {
-      font-family: 'Bangers', cursive; font-size: 32px;
-      line-height: 1.1; color: #0A0A0A; letter-spacing: 0.02em;
-    }
-    .arg-body {
-      font-family: 'Inter Tight', sans-serif; font-size: 14px;
-      line-height: 22px; color: #3A3A35; flex: 1;
-    }
-    .arg-impact {
-      font-family: 'Bangers', cursive; font-size: 22px;
-      letter-spacing: 0.05em; padding: 6px 0;
-      border-top: 3px solid currentColor;
-    }
-    .solver-impact { color: #8A6A00; border-color: #F5C800; }
-    .challenger-impact { color: #CC1A1A; border-color: #CC1A1A; }
-    .scout-impact { color: #4A6FD4; border-color: #4A6FD4; }
-
-    /* clash bar between rounds */
-    .clash-bar {
-      background: #F5C800; display: flex; align-items: center;
-      justify-content: center; padding: 16px;
-      border-bottom: 5px solid #0A0A0A;
-    }
-    .clash-text {
-      font-family: 'Bangers', cursive; font-size: 64px;
-      color: #0A0A0A; letter-spacing: 0.1em;
-      text-shadow: 4px 4px 0 rgba(0,0,0,0.15);
-    }
-
-    /* ─────────────────────────────────────────
-       VERDICT
-    ───────────────────────────────────────── */
-    .verdict-section {
-      background: #0A0A0A; position: relative; overflow: hidden;
-    }
-    .verdict-inner {
-      padding: 80px 80px; display: flex; gap: 80px; position: relative; z-index: 2;
-    }
-    .verdict-left { flex: 1; display: flex; flex-direction: column; gap: 28px; }
-    .verdict-chapter {
-      font-family: 'Bebas Neue', sans-serif; font-size: 12px;
-      color: #5A5A55; letter-spacing: 0.25em;
-    }
-    .verdict-title {
-      font-family: 'Bangers', cursive; font-size: 96px;
-      line-height: 0.88; color: #F5F5F0; letter-spacing: 0.04em;
-    }
-    .verdict-confidence {
-      display: inline-flex; align-items: center; gap: 12px;
-      background: rgba(245,200,0,0.12); border: 2px solid #F5C800;
-      border-radius: 2px; padding: 10px 20px;
-    }
-    .confidence-label {
-      font-family: 'Bebas Neue', sans-serif; font-size: 22px;
-      color: #F5C800; letter-spacing: 0.15em;
-    }
-    .confidence-note {
-      font-family: 'Inter Tight', sans-serif; font-size: 13px;
-      color: #6A6A65; margin-left: 8px;
-    }
-    .verdict-text {
-      border-left: 4px solid #F5C800; padding-left: 24px;
-    }
-    .verdict-text p {
-      font-family: 'Inter Tight', sans-serif; font-size: 18px;
-      line-height: 30px; color: #C8C8C0;
-    }
-    .verdict-right { width: 440px; flex-shrink: 0; }
-    .trace-box {
-      background: #1A1A18; border: 3px solid #2A2A25;
-      padding: 32px; display: flex; flex-direction: column; gap: 20px;
-    }
-    .trace-box-title {
-      font-family: 'Bebas Neue', sans-serif; font-size: 12px;
-      color: #5A5A55; letter-spacing: 0.2em; border-bottom: 1px solid #2A2A25; padding-bottom: 12px;
-    }
-    .trace-item { display: flex; flex-direction: column; gap: 6px; }
-    .trace-round-label {
-      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
-      letter-spacing: 0.15em;
-    }
-    .trace-summary {
-      font-family: 'Inter Tight', sans-serif; font-size: 13px;
-      line-height: 20px; color: #6A6A65;
-    }
-    .trace-divider { border: none; border-top: 1px solid #2A2A25; }
-
-    /* ─────────────────────────────────────────
-       FINAL CTA
-    ───────────────────────────────────────── */
-    .final-cta {
-      background: #F5C800; padding: 80px;
-      display: flex; justify-content: space-between; align-items: center;
-      border-top: 5px solid #0A0A0A; gap: 40px;
-    }
-    .cta-title {
-      font-family: 'Bangers', cursive; font-size: 96px;
-      line-height: 0.9; color: #0A0A0A; letter-spacing: 0.04em;
-    }
-    .cta-sub {
-      font-family: 'Bebas Neue', sans-serif; font-size: 14px;
-      color: #5A4A00; letter-spacing: 0.2em; margin-top: 12px;
-    }
-    .cta-buttons { display: flex; gap: 16px; flex-shrink: 0; }
-    .btn-black {
-      background: #0A0A0A; border: 4px solid #0A0A0A;
-      padding: 16px 36px; text-decoration: none;
-      font-family: 'Bebas Neue', sans-serif; font-size: 20px;
-      color: #F5C800; letter-spacing: 0.15em;
-      box-shadow: 6px 6px 0 rgba(0,0,0,0.25);
-    }
-    .btn-outline {
-      background: transparent; border: 4px solid #0A0A0A;
-      padding: 16px 36px; text-decoration: none;
-      font-family: 'Bebas Neue', sans-serif; font-size: 20px;
-      color: #0A0A0A; letter-spacing: 0.15em;
+    @media (max-width: 900px) {
+      .arena-form-inner, .arena-setup, .char-intro, .char-intro.rev, .example-verdict, .final-cta { flex-direction: column; }
+      .arena-title-col { width: 100%; border-right: none; border-bottom: 5px solid #F5C800; }
+      .robot-panel { width: 100%; min-height: 320px; }
+      .rp-challenger { border-left: none; border-bottom: 5px solid #0A0A0A; }
+      .rp-solver, .rp-scout { border-right: none; border-bottom: 5px solid #0A0A0A; }
+      .verdict-inner { flex-direction: column; }
+      .verdict-right, .ev-right { width: 100%; }
+      .round-cards, .ex-cards { flex-direction: column; }
+      .arg-card, .ex-card { border-right: none; border-bottom: 4px solid #0A0A0A; }
     }
   </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════
-  TITLE SPLASH
-══════════════════════════════════════ -->
-<div class="title-splash panel">
+<!-- ── NAV ── -->
+<nav>
+  <div style="display:flex;align-items:center;">
+    <a href="#" class="nav-wordmark">RvR</a>
+    <span class="nav-sub">ROBOTS VERSUS ROBOTS</span>
+  </div>
+  <a href="https://github.com/shikhar127/multi-agent-system" class="gh" target="_blank">GITHUB →</a>
+</nav>
+
+<!-- ════════════════════════════════════════
+  ENTER THE ARENA
+════════════════════════════════════════ -->
+<section id="enter-arena">
   <div class="speed-lines"></div>
-  <div class="chapter-label">CHAPTER 01 — THE ARENA</div>
-  <div class="title-main">
-    <div class="title-word">ROBOTS</div>
-    <div class="versus-row">
-      <div class="versus-line"></div>
-      <span class="versus-text">VERSUS</span>
-      <div class="versus-line"></div>
+  <div class="arena-form-inner">
+
+    <!-- Title col -->
+    <div class="arena-title-col">
+      <div class="arena-chapter">ENTER THE ARENA</div>
+      <div class="arena-h1">ASK YOUR <span>QUES-<br/>TION.</span></div>
+      <p class="arena-desc">Three robots will fight for the right answer. No ego. No surrender. Only the force of argument.</p>
+      <div class="arena-robots">
+        <span class="robot-chip chip-solver">SOLVER</span>
+        <span class="chip-vs">VS</span>
+        <span class="robot-chip chip-challenger">CHALLENGER</span>
+        <span class="chip-vs">VS</span>
+        <span class="robot-chip chip-scout">SCOUT</span>
+      </div>
     </div>
-    <div class="title-word">ROBOTS</div>
+
+    <!-- Form col -->
+    <div class="arena-form-col">
+      <div class="form-field">
+        <div class="field-label">THE QUESTION</div>
+        <textarea id="question-input" class="question-input" rows="4" placeholder="Ask something hard. Something that deserves a fight…"></textarea>
+      </div>
+
+      <div class="form-field">
+        <div class="field-label">BATTLE KEY (ANTHROPIC API KEY)</div>
+        <div class="key-row">
+          <input id="api-key-input" type="password" class="key-input" placeholder="sk-ant-…" autocomplete="off" />
+          <select id="model-select" class="model-select">
+            <option value="claude-haiku-4-5-20251001">HAIKU 4.5 — FAST</option>
+            <option value="claude-sonnet-4-6" selected>SONNET 4.6 — BALANCED</option>
+            <option value="claude-opus-4-6">OPUS 4.6 — MAX POWER</option>
+          </select>
+        </div>
+        <div class="form-note">Your key is used directly from your browser. It is never stored or sent to any server other than Anthropic's API.</div>
+      </div>
+
+      <div id="form-error" style="display:none;">
+        <div class="error-panel">
+          <div class="error-label">ERROR</div>
+          <div class="error-text" id="error-text"></div>
+        </div>
+      </div>
+
+      <button class="fight-btn" id="fight-btn" onclick="startFight()">START THE FIGHT →</button>
+    </div>
   </div>
-  <div class="splash-tagline">
-    <div class="tagline-inner">THE GREATEST INTELLECTUAL COMBAT EVER WITNESSED</div>
+</section>
+
+<!-- ════════════════════════════════════════
+  BATTLE RESULTS (injected by JS)
+════════════════════════════════════════ -->
+<section id="battle-results">
+
+  <!-- Loading -->
+  <div id="loading-panel" style="display:none;">
+    <div class="speed-lines"></div>
+    <div class="loading-title" id="loading-title">THE ROBOTS ARE ASSEMBLING…</div>
+    <div class="loading-dots">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+    <div class="loading-status" id="loading-status">INITIATING DELIBERATION PROTOCOL</div>
   </div>
+
+  <!-- Round 1 -->
+  <div id="result-round1" class="result-round" style="background:#FEFDF8;">
+    <div class="round-shell">
+      <div class="round-num-col" style="background:#0A0A0A;">
+        <div class="round-num-text" style="color:#F5C800;">ROUND 01</div>
+      </div>
+      <div class="round-cards" id="round1-cards">
+        <!-- Solver card -->
+        <div class="arg-card" style="background:#FEFDF8;">
+          <div class="arg-role-line" style="color:#8A6A00;"><div class="role-pip solver-pip"></div>SOLVER — UNIT 01</div>
+          <div class="arg-headline-text" id="r1-solver-hl">Building the case…</div>
+          <div class="arg-body-text" id="r1-solver-body"></div>
+          <div class="arg-tag solver-tag" id="r1-solver-tag">POSITION: FORMING</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clash 1→2 -->
+  <div id="clash-1" class="result-clash" style="display:none;">
+    <span class="clash-word">CLASH!!</span>
+    <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#0A0A0A;letter-spacing:0.2em;">ROUND 02 — CHALLENGE &amp; COUNTER</span>
+    <span class="clash-word">CLASH!!</span>
+  </div>
+
+  <!-- Round 2 -->
+  <div id="result-round2" class="result-round" style="background:#FFF5F5;">
+    <div class="round-shell">
+      <div class="round-num-col" style="background:#CC1A1A;">
+        <div class="round-num-text" style="color:#F5F5F0;">ROUND 02</div>
+      </div>
+      <div class="round-cards" id="round2-cards">
+        <div class="arg-card" style="background:#FFF0F0;">
+          <div class="arg-role-line" style="color:#CC1A1A;"><div class="role-pip challenger-pip"></div>CHALLENGER — UNIT 02</div>
+          <div class="arg-headline-text" id="r2-challenger-hl">Locating weaknesses…</div>
+          <div class="arg-body-text" id="r2-challenger-body"></div>
+          <div class="arg-tag challenger-tag" id="r2-challenger-tag">ATTACK: INCOMING</div>
+        </div>
+        <div class="arg-card" style="background:#F0F0FF;">
+          <div class="arg-role-line" style="color:#4A6FD4;"><div class="role-pip scout-pip"></div>SCOUT — UNIT 03</div>
+          <div class="arg-headline-text" id="r2-scout-hl">Scanning for alternatives…</div>
+          <div class="arg-body-text" id="r2-scout-body"></div>
+          <div class="arg-tag scout-tag" id="r2-scout-tag">SCAN: IN PROGRESS</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clash 2→3 -->
+  <div id="clash-2" class="result-clash" style="display:none;background:#0A0A0A;">
+    <span class="clash-word" style="color:#F5C800;">CONVERGENCE!!</span>
+    <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#5A5A55;letter-spacing:0.2em;">ROUND 03 — FINAL POSITION</span>
+    <span class="clash-word" style="color:#F5C800;">CONVERGENCE!!</span>
+  </div>
+
+  <!-- Round 3 -->
+  <div id="result-round3" class="result-round" style="background:#FFFDF0;">
+    <div class="round-shell">
+      <div class="round-num-col" style="background:#F5C800;">
+        <div class="round-num-text" style="color:#0A0A0A;">ROUND 03</div>
+      </div>
+      <div class="round-cards" id="round3-cards">
+        <div class="arg-card" style="background:#FFFDF0;flex:1.4;">
+          <div class="arg-role-line" style="color:#8A6A00;"><div class="role-pip solver-pip"></div>SOLVER — REVISED POSITION</div>
+          <div class="arg-headline-text" id="r3-solver-hl">Incorporating the battle…</div>
+          <div class="arg-body-text" id="r3-solver-body"></div>
+          <div class="arg-tag solver-tag" id="r3-solver-tag">FINAL POSITION</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VERDICT -->
+  <div id="result-verdict">
+    <div class="speed-lines" style="opacity:0.08;position:absolute;inset:0;"></div>
+    <div class="verdict-inner">
+      <div class="verdict-left">
+        <div class="verdict-chapter-label">— FINAL JUDGMENT —</div>
+        <div class="verdict-big">THE<br/>VERDICT</div>
+        <div class="verdict-confidence-badge">
+          <span class="vc-label" id="verdict-confidence">⬡ HIGH CONFIDENCE</span>
+          <span class="vc-note" id="verdict-conf-note">All 3 robots converged</span>
+        </div>
+        <div class="verdict-answer-text">
+          <p id="verdict-answer">The robots have reached their verdict.</p>
+        </div>
+        <div class="verdict-war-cry">THE DEBATE IS OVER. THE TRUTH REMAINS.</div>
+      </div>
+      <div class="verdict-right">
+        <div class="trace-panel">
+          <div class="trace-panel-title">BATTLE LOG</div>
+          <div class="trace-entry"><div class="trace-role" style="color:#F5C800;">R1 · SOLVER</div><div class="trace-summary-text" id="trace-r1">Proposed initial position.</div></div>
+          <hr class="trace-hr"/>
+          <div class="trace-entry"><div class="trace-role" style="color:#CC1A1A;">R2 · CHALLENGER</div><div class="trace-summary-text" id="trace-r2c">Attacked key assumptions.</div></div>
+          <hr class="trace-hr"/>
+          <div class="trace-entry"><div class="trace-role" style="color:#4A6FD4;">R2 · SCOUT</div><div class="trace-summary-text" id="trace-r2s">Found alternative angle.</div></div>
+          <hr class="trace-hr"/>
+          <div class="trace-entry"><div class="trace-role" style="color:#F5C800;">R3 · SOLVER</div><div class="trace-summary-text" id="trace-r3">Revised and converged.</div></div>
+          <hr class="trace-hr"/>
+          <div class="trace-entry" style="background:rgba(245,200,0,0.06);margin:0 -28px -28px;padding:16px 28px;">
+            <div class="trace-role" style="color:#F5C800;font-size:13px;">VERDICT</div>
+            <div class="trace-summary-text" id="trace-verdict">Final judgment delivered.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Try Again -->
+  <div id="try-again-bar">
+    <span class="try-again-text">THE ARENA IS READY FOR ANOTHER BATTLE</span>
+    <button class="try-again-btn" onclick="resetArena()">FIGHT AGAIN →</button>
+  </div>
+
+</section>
+
+<!-- ════════════════════════════════════════
+  MANGA EXPLAINER
+════════════════════════════════════════ -->
+
+<div style="background:#1A1A18;padding:20px 60px;border-bottom:5px solid #2A2A25;display:flex;align-items:center;gap:16px;margin-top:64px;">
+  <span style="font-family:'Bebas Neue',sans-serif;font-size:11px;color:#5A5A55;letter-spacing:0.25em;">HOW IT WORKS — THE MANGA VERSION</span>
+  <div style="flex:1;height:1px;background:#2A2A25;"></div>
+  <span style="font-family:'Bebas Neue',sans-serif;font-size:11px;color:#3A3A35;letter-spacing:0.2em;">SCROLL TO LEARN THE SYSTEM</span>
 </div>
 
-<!-- ══════════════════════════════════════
-  ARENA SETUP
-══════════════════════════════════════ -->
-<div class="arena-setup panel">
+<div class="title-splash">
+  <div class="speed-lines"></div>
+  <div class="chapter-label-bar">CHAPTER 01 — THE ARENA</div>
+  <div class="big-title">ROBOTS</div>
+  <div class="versus-row"><div class="vs-line"></div><span class="vs-word">VERSUS</span><div class="vs-line"></div></div>
+  <div class="big-title">ROBOTS</div>
+  <div class="splash-tagline-bar"><div class="tagline-pill">THE GREATEST INTELLECTUAL COMBAT EVER WITNESSED</div></div>
+</div>
+
+<div class="arena-setup">
   <div class="arena-caption halftone-yellow">
-    <div class="narration-label">NARRATION</div>
-    <div class="narration-text">A QUESTION ENTERS THE ARENA.</div>
-    <p class="narration-body">Somewhere in the digital expanse, a question too complex for any single mind — one that demands the highest form of combat: intellectual war.</p>
-    <p class="narration-body" style="margin-top: 8px;">Three robots. Three minds. One truth to uncover.</p>
+    <div class="narr-label">NARRATION</div>
+    <div class="narr-text">A QUESTION ENTERS THE ARENA.</div>
+    <p class="narr-body">Three robots. Three minds. One truth to uncover. No ego — only the raw force of argument.</p>
   </div>
-  <div class="arena-panel" style="background: #F5F5F0;">
-    <div style="position: absolute; inset: 0; opacity: 0.05;" class="halftone"></div>
+  <div class="arena-right" style="background:#F5F5F0;">
+    <div style="position:absolute;inset:0;opacity:0.05;" class="halftone"></div>
     <div class="question-bubble">
-      <div class="bubble-label">THE QUESTION</div>
-      <div class="bubble-text">"Should we rewrite the legacy payments service in Go, or incrementally migrate it from Python?"</div>
+      <div class="qb-label">THE QUESTION</div>
+      <div class="qb-text">"Should we rewrite the legacy payments service in Go, or incrementally migrate it from Python?"</div>
     </div>
     <div class="arena-tags">
-      <div class="tag-black">TYPE: ANALYTICAL</div>
-      <div class="tag-red">WORKFLOW B — 3 ROUNDS</div>
-      <span class="impact-word">ENGAGE!!</span>
+      <div class="tag-b">TYPE: ANALYTICAL</div>
+      <div class="tag-r">WORKFLOW B — 3 ROUNDS</div>
+      <span class="engage-word">ENGAGE!!</span>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-  ROBOT 01 — THE SOLVER
-══════════════════════════════════════ -->
-<div class="character-intro panel">
-  <!-- Robot illustration -->
-  <div class="robot-panel solver-bg">
-    <div class="robot-number">UNIT 01</div>
-    <!-- Speed lines behind robot -->
-    <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.15;" viewBox="0 0 480 560">
-      <line x1="240" y1="280" x2="0" y2="0" stroke="#F5C800" stroke-width="2"/>
-      <line x1="240" y1="280" x2="120" y2="0" stroke="#F5C800" stroke-width="1"/>
-      <line x1="240" y1="280" x2="240" y2="0" stroke="#F5C800" stroke-width="2"/>
-      <line x1="240" y1="280" x2="360" y2="0" stroke="#F5C800" stroke-width="1"/>
-      <line x1="240" y1="280" x2="480" y2="0" stroke="#F5C800" stroke-width="2"/>
-      <line x1="240" y1="280" x2="480" y2="140" stroke="#F5C800" stroke-width="1"/>
-      <line x1="240" y1="280" x2="480" y2="280" stroke="#F5C800" stroke-width="2"/>
-      <line x1="240" y1="280" x2="480" y2="420" stroke="#F5C800" stroke-width="1"/>
-      <line x1="240" y1="280" x2="480" y2="560" stroke="#F5C800" stroke-width="2"/>
-      <line x1="240" y1="280" x2="360" y2="560" stroke="#F5C800" stroke-width="1"/>
-      <line x1="240" y1="280" x2="240" y2="560" stroke="#F5C800" stroke-width="2"/>
-      <line x1="240" y1="280" x2="120" y2="560" stroke="#F5C800" stroke-width="1"/>
-      <line x1="240" y1="280" x2="0" y2="560" stroke="#F5C800" stroke-width="2"/>
-      <line x1="240" y1="280" x2="0" y2="420" stroke="#F5C800" stroke-width="1"/>
-      <line x1="240" y1="280" x2="0" y2="280" stroke="#F5C800" stroke-width="2"/>
-      <line x1="240" y1="280" x2="0" y2="140" stroke="#F5C800" stroke-width="1"/>
-    </svg>
-    <!-- Solver Robot SVG -->
-    <svg width="280" height="340" viewBox="0 0 280 340" style="position:relative;z-index:2;">
-      <!-- Head -->
+<!-- SOLVER -->
+<div class="char-intro">
+  <div class="robot-panel rp-solver">
+    <div class="unit-label" style="color:#F5C800;">UNIT 01</div>
+    <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.12;" viewBox="0 0 440 500"><line x1="220" y1="250" x2="0" y2="0" stroke="#F5C800" stroke-width="2"/><line x1="220" y1="250" x2="110" y2="0" stroke="#F5C800" stroke-width="1"/><line x1="220" y1="250" x2="220" y2="0" stroke="#F5C800" stroke-width="2"/><line x1="220" y1="250" x2="330" y2="0" stroke="#F5C800" stroke-width="1"/><line x1="220" y1="250" x2="440" y2="0" stroke="#F5C800" stroke-width="2"/><line x1="220" y1="250" x2="440" y2="250" stroke="#F5C800" stroke-width="2"/><line x1="220" y1="250" x2="440" y2="500" stroke="#F5C800" stroke-width="2"/><line x1="220" y1="250" x2="220" y2="500" stroke="#F5C800" stroke-width="2"/><line x1="220" y1="250" x2="0" y2="500" stroke="#F5C800" stroke-width="2"/><line x1="220" y1="250" x2="0" y2="250" stroke="#F5C800" stroke-width="2"/></svg>
+    <svg width="240" height="300" viewBox="0 0 280 340" style="position:relative;z-index:2;">
       <rect x="60" y="20" width="160" height="140" rx="8" fill="#F5F5F0" stroke="#F5C800" stroke-width="3"/>
-      <!-- Antenna -->
-      <line x1="140" y1="20" x2="140" y2="0" stroke="#F5C800" stroke-width="3"/>
-      <circle cx="140" cy="0" r="6" fill="#F5C800"/>
-      <!-- Eyes — determined, focused -->
-      <rect x="82" y="52" width="40" height="28" rx="4" fill="#0A0A0A"/>
-      <rect x="158" y="52" width="40" height="28" rx="4" fill="#0A0A0A"/>
-      <rect x="88" y="58" width="28" height="16" rx="2" fill="#F5C800"/>
-      <rect x="164" y="58" width="28" height="16" rx="2" fill="#F5C800"/>
-      <!-- Pupils -->
-      <rect x="96" y="62" width="12" height="8" rx="1" fill="#0A0A0A"/>
-      <rect x="172" y="62" width="12" height="8" rx="1" fill="#0A0A0A"/>
-      <!-- Mouth — straight, confident line -->
+      <line x1="140" y1="20" x2="140" y2="0" stroke="#F5C800" stroke-width="3"/><circle cx="140" cy="0" r="6" fill="#F5C800"/>
+      <rect x="82" y="52" width="40" height="28" rx="4" fill="#0A0A0A"/><rect x="158" y="52" width="40" height="28" rx="4" fill="#0A0A0A"/>
+      <rect x="88" y="58" width="28" height="16" rx="2" fill="#F5C800"/><rect x="164" y="58" width="28" height="16" rx="2" fill="#F5C800"/>
+      <rect x="96" y="62" width="12" height="8" rx="1" fill="#0A0A0A"/><rect x="172" y="62" width="12" height="8" rx="1" fill="#0A0A0A"/>
       <rect x="90" y="116" width="100" height="6" rx="3" fill="#0A0A0A"/>
-      <rect x="104" y="128" width="72" height="4" rx="2" fill="#3A3A35"/>
-      <!-- Face details -->
-      <rect x="68" y="88" width="12" height="2" fill="#F5C800"/>
-      <rect x="200" y="88" width="12" height="2" fill="#F5C800"/>
-      <!-- Neck -->
       <rect x="116" y="160" width="48" height="20" rx="4" fill="#D0D0CB" stroke="#0A0A0A" stroke-width="2"/>
-      <!-- Body / shoulders -->
       <rect x="40" y="180" width="200" height="120" rx="8" fill="#2A2A2A" stroke="#F5C800" stroke-width="3"/>
-      <!-- Chest plate -->
       <rect x="70" y="196" width="140" height="80" rx="4" fill="#1A1A18"/>
-      <!-- Chest details — circuit lines -->
-      <line x1="90" y1="220" x2="130" y2="220" stroke="#F5C800" stroke-width="1.5"/>
-      <line x1="150" y1="220" x2="190" y2="220" stroke="#F5C800" stroke-width="1.5"/>
-      <line x1="90" y1="236" x2="110" y2="236" stroke="#F5C800" stroke-width="1.5"/>
-      <rect x="122" y="228" width="36" height="20" rx="2" fill="#F5C800" opacity="0.9"/>
-      <text x="140" y="243" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="11" fill="#0A0A0A" letter-spacing="1">SOLVE</text>
-      <!-- Arms -->
-      <rect x="0" y="186" width="36" height="80" rx="6" fill="#2A2A2A" stroke="#F5C800" stroke-width="2"/>
-      <rect x="244" y="186" width="36" height="80" rx="6" fill="#2A2A2A" stroke="#F5C800" stroke-width="2"/>
-      <!-- Fist left — extended forward (argumentative) -->
-      <rect x="0" y="256" width="36" height="30" rx="4" fill="#3A3A35" stroke="#F5C800" stroke-width="2"/>
-      <rect x="244" y="256" width="36" height="30" rx="4" fill="#3A3A35" stroke="#F5C800" stroke-width="2"/>
-      <!-- Legs -->
-      <rect x="80" y="300" width="44" height="36" rx="4" fill="#2A2A2A" stroke="#F5C800" stroke-width="2"/>
-      <rect x="156" y="300" width="44" height="36" rx="4" fill="#2A2A2A" stroke="#F5C800" stroke-width="2"/>
+      <rect x="122" y="224" width="36" height="22" rx="2" fill="#F5C800"/><text x="140" y="239" text-anchor="middle" font-family="Bebas Neue" font-size="11" fill="#0A0A0A" letter-spacing="1">SOLVE</text>
+      <rect x="0" y="186" width="36" height="80" rx="6" fill="#2A2A2A" stroke="#F5C800" stroke-width="2"/><rect x="244" y="186" width="36" height="80" rx="6" fill="#2A2A2A" stroke="#F5C800" stroke-width="2"/>
+      <rect x="80" y="300" width="44" height="36" rx="4" fill="#2A2A2A" stroke="#F5C800" stroke-width="2"/><rect x="156" y="300" width="44" height="36" rx="4" fill="#2A2A2A" stroke="#F5C800" stroke-width="2"/>
     </svg>
   </div>
-
-  <!-- Character info -->
-  <div class="character-info">
-    <div class="char-enter">— ENTER THE ARENA —</div>
-    <div class="char-name">THE<br/>SOLVER</div>
-    <div class="char-title" style="color: #8A6A00;">THE ARCHITECT OF ANSWERS</div>
-    <div class="char-quote">"I do not guess. I construct. Every argument I make is a fortress built on logic — and I invite you to find the cracks."</div>
-    <div class="char-stats">
-      <div class="stats-title">COMBAT STATS</div>
-      <div class="stat-row">
-        <span class="stat-label">LOGIC</span>
-        <div class="stat-bar">
-          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div>
-        </div>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">PRECISION</span>
-        <div class="stat-bar">
-          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div>
-        </div>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">ADAPTABILITY</span>
-        <div class="stat-bar">
-          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip empty"></div><div class="stat-pip empty"></div>
-        </div>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">AGGRESSION</span>
-        <div class="stat-bar">
-          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip empty"></div><div class="stat-pip empty"></div><div class="stat-pip empty"></div>
-        </div>
-      </div>
+  <div class="char-info">
+    <div class="ci-enter" style="color:#8A6A00;">— ENTER THE ARENA —</div>
+    <div class="ci-name">THE<br/>SOLVER</div>
+    <div class="ci-title" style="color:#8A6A00;">THE ARCHITECT OF ANSWERS</div>
+    <div class="ci-quote" style="border-color:#F5C800;">"I do not guess. I construct. Every argument I make is a fortress built on logic — and I invite you to find the cracks."</div>
+    <div class="ci-stats">
+      <div class="stats-hd">COMBAT STATS</div>
+      <div class="srow"><span class="slabel">LOGIC</span><div class="sbar"><div class="sp"></div><div class="sp"></div><div class="sp"></div><div class="sp"></div><div class="sp"></div></div></div>
+      <div class="srow"><span class="slabel">PRECISION</span><div class="sbar"><div class="sp"></div><div class="sp"></div><div class="sp"></div><div class="sp"></div><div class="sp"></div></div></div>
+      <div class="srow"><span class="slabel">ADAPTABILITY</span><div class="sbar"><div class="sp"></div><div class="sp"></div><div class="sp"></div><div class="sp e"></div><div class="sp e"></div></div></div>
+      <div class="srow"><span class="slabel">AGGRESSION</span><div class="sbar"><div class="sp"></div><div class="sp"></div><div class="sp e"></div><div class="sp e"></div><div class="sp e"></div></div></div>
     </div>
-    <p class="char-flavor">Assigns itself to build the first complete answer. Methodical. Comprehensive. A debater who has never left a question unanswered — until the Challenger showed up.</p>
+    <p class="ci-flavor">Methodical. Comprehensive. A debater who has never left a question unanswered — until the Challenger arrived.</p>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-  ROBOT 02 — THE CHALLENGER
-══════════════════════════════════════ -->
-<div class="character-intro reverse panel">
-  <!-- Character info -->
-  <div class="character-info" style="background: #F5F5F0;">
-    <div class="char-enter" style="color: #CC1A1A;">— ENTER THE ARENA —</div>
-    <div class="char-name">THE<br/>CHAL-<br/>LENGER</div>
-    <div class="char-title" style="color: #CC1A1A;">THE DESTROYER OF WEAK LOGIC</div>
-    <div class="char-quote" style="border-left-color: #CC1A1A;">"Every argument has a flaw. Every assumption has a crack. I am the force that finds them — because only by breaking an idea do we know if it can survive."</div>
-    <div class="char-stats">
-      <div class="stats-title">COMBAT STATS</div>
-      <div class="stat-row">
-        <span class="stat-label">LOGIC</span>
-        <div class="stat-bar">
-          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip empty"></div>
-        </div>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">PRECISION</span>
-        <div class="stat-bar">
-          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip empty"></div><div class="stat-pip empty"></div>
-        </div>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">ADAPTABILITY</span>
-        <div class="stat-bar">
-          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip empty"></div>
-        </div>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">AGGRESSION</span>
-        <div class="stat-bar">
-          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div>
-        </div>
-      </div>
+<!-- CHALLENGER -->
+<div class="char-intro rev">
+  <div class="char-info" style="background:#F5F5F0;">
+    <div class="ci-enter" style="color:#CC1A1A;">— ENTER THE ARENA —</div>
+    <div class="ci-name">THE<br/>CHAL-<br/>LENGER</div>
+    <div class="ci-title" style="color:#CC1A1A;">THE DESTROYER OF WEAK LOGIC</div>
+    <div class="ci-quote" style="border-color:#CC1A1A;">"Every argument has a flaw. Every assumption has a crack. I am the force that finds them — because only by breaking an idea do we know if it can survive."</div>
+    <div class="ci-stats">
+      <div class="stats-hd">COMBAT STATS</div>
+      <div class="srow"><span class="slabel">LOGIC</span><div class="sbar"><div class="sp"></div><div class="sp"></div><div class="sp"></div><div class="sp"></div><div class="sp e"></div></div></div>
+      <div class="srow"><span class="slabel">PRECISION</span><div class="sbar"><div class="sp"></div><div class="sp"></div><div class="sp"></div><div class="sp e"></div><div class="sp e"></div></div></div>
+      <div class="srow"><span class="slabel">ADAPTABILITY</span><div class="sbar"><div class="sp"></div><div class="sp"></div><div class="sp"></div><div class="sp"></div><div class="sp e"></div></div></div>
+      <div class="srow"><span class="slabel">AGGRESSION</span><div class="sbar"><div class="sp"></div><div class="sp"></div><div class="sp"></div><div class="sp"></div><div class="sp"></div></div></div>
     </div>
-    <p class="char-flavor">Its purpose: attack every claim the Solver makes. Not out of ego — but because an idea that survives the Challenger's assault is an idea that deserves to stand.</p>
+    <p class="ci-flavor">Its purpose: attack every claim the Solver makes. Not out of ego — because an idea that survives the Challenger deserves to stand.</p>
   </div>
-
-  <!-- Robot panel -->
-  <div class="robot-panel challenger-bg">
-    <div class="robot-number">UNIT 02</div>
-    <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.15;" viewBox="0 0 480 560">
-      <line x1="240" y1="280" x2="0" y2="0" stroke="#F5F5F0" stroke-width="2"/>
-      <line x1="240" y1="280" x2="120" y2="0" stroke="#F5F5F0" stroke-width="1.5"/>
-      <line x1="240" y1="280" x2="240" y2="0" stroke="#F5F5F0" stroke-width="2"/>
-      <line x1="240" y1="280" x2="360" y2="0" stroke="#F5F5F0" stroke-width="1.5"/>
-      <line x1="240" y1="280" x2="480" y2="0" stroke="#F5F5F0" stroke-width="2"/>
-      <line x1="240" y1="280" x2="480" y2="280" stroke="#F5F5F0" stroke-width="2"/>
-      <line x1="240" y1="280" x2="480" y2="560" stroke="#F5F5F0" stroke-width="2"/>
-      <line x1="240" y1="280" x2="240" y2="560" stroke="#F5F5F0" stroke-width="2"/>
-      <line x1="240" y1="280" x2="0" y2="560" stroke="#F5F5F0" stroke-width="2"/>
-      <line x1="240" y1="280" x2="0" y2="280" stroke="#F5F5F0" stroke-width="2"/>
-    </svg>
-    <!-- Challenger Robot SVG — sharp, angular, intense -->
-    <svg width="280" height="340" viewBox="0 0 280 340" style="position:relative;z-index:2;">
-      <!-- Head — angular -->
+  <div class="robot-panel rp-challenger">
+    <div class="unit-label" style="color:#F5F5F0;">UNIT 02</div>
+    <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.12;" viewBox="0 0 440 500"><line x1="220" y1="250" x2="0" y2="0" stroke="#F5F5F0" stroke-width="2"/><line x1="220" y1="250" x2="220" y2="0" stroke="#F5F5F0" stroke-width="2"/><line x1="220" y1="250" x2="440" y2="0" stroke="#F5F5F0" stroke-width="2"/><line x1="220" y1="250" x2="440" y2="250" stroke="#F5F5F0" stroke-width="2"/><line x1="220" y1="250" x2="440" y2="500" stroke="#F5F5F0" stroke-width="2"/><line x1="220" y1="250" x2="220" y2="500" stroke="#F5F5F0" stroke-width="2"/><line x1="220" y1="250" x2="0" y2="500" stroke="#F5F5F0" stroke-width="2"/><line x1="220" y1="250" x2="0" y2="250" stroke="#F5F5F0" stroke-width="2"/></svg>
+    <svg width="240" height="300" viewBox="0 0 280 340" style="position:relative;z-index:2;">
       <polygon points="60,20 220,20 240,60 240,155 60,155 40,60" fill="#F5F5F0" stroke="#0A0A0A" stroke-width="3"/>
-      <!-- Antenna — jagged -->
-      <polyline points="140,20 130,0 150,8 140,0" stroke="#CC1A1A" stroke-width="3" fill="none"/>
-      <circle cx="140" cy="0" r="5" fill="#CC1A1A"/>
-      <!-- Eyes — sharp, angry slant -->
-      <polygon points="82,50 122,50 128,80 76,80" fill="#0A0A0A"/>
-      <polygon points="158,50 198,50 204,80 152,80" fill="#0A0A0A"/>
-      <polygon points="86,56 116,56 120,74 82,74" fill="#CC1A1A"/>
-      <polygon points="162,56 192,56 196,74 158,74" fill="#CC1A1A"/>
-      <!-- Pupils — menacing -->
-      <rect x="94" y="60" width="16" height="10" rx="0" fill="#0A0A0A"/>
-      <rect x="166" y="60" width="16" height="10" rx="0" fill="#0A0A0A"/>
-      <!-- Mouth — jagged grin -->
-      <polyline points="88,120 100,112 114,124 128,112 142,124 156,112 170,124 184,120" stroke="#0A0A0A" stroke-width="3" fill="none" stroke-linejoin="round"/>
-      <!-- Steam from head — intensity -->
-      <line x1="80" y1="30" x2="70" y2="10" stroke="#CC1A1A" stroke-width="2" stroke-dasharray="3,2"/>
-      <line x1="200" y1="30" x2="210" y2="10" stroke="#CC1A1A" stroke-width="2" stroke-dasharray="3,2"/>
-      <!-- Neck -->
-      <rect x="112" y="155" width="56" height="22" rx="0" fill="#D0D0CB" stroke="#0A0A0A" stroke-width="2"/>
-      <!-- Body — aggressive stance -->
-      <rect x="32" y="177" width="216" height="120" rx="0" fill="#2A0000" stroke="#CC1A1A" stroke-width="3"/>
-      <!-- Chest plate -->
-      <rect x="62" y="193" width="156" height="84" rx="0" fill="#1A0000"/>
-      <!-- Chest — CHALLENGE text -->
-      <rect x="88" y="224" width="104" height="28" rx="0" fill="#CC1A1A"/>
-      <text x="140" y="243" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="13" fill="#F5F5F0" letter-spacing="2">CHALLENGE</text>
-      <!-- Circuit lines -->
-      <line x1="72" y1="208" x2="96" y2="208" stroke="#CC1A1A" stroke-width="1.5"/>
-      <line x1="184" y1="208" x2="208" y2="208" stroke="#CC1A1A" stroke-width="1.5"/>
-      <!-- Arms — raised, aggressive -->
-      <rect x="0" y="160" width="30" height="96" rx="0" fill="#2A0000" stroke="#CC1A1A" stroke-width="2"/>
-      <rect x="250" y="160" width="30" height="96" rx="0" fill="#2A0000" stroke="#CC1A1A" stroke-width="2"/>
-      <!-- Fists -->
-      <rect x="0" y="250" width="30" height="28" rx="0" fill="#3A0000" stroke="#CC1A1A" stroke-width="2"/>
-      <rect x="250" y="250" width="30" height="28" rx="0" fill="#3A0000" stroke="#CC1A1A" stroke-width="2"/>
-      <!-- Legs -->
-      <rect x="72" y="297" width="48" height="40" rx="0" fill="#2A0000" stroke="#CC1A1A" stroke-width="2"/>
-      <rect x="160" y="297" width="48" height="40" rx="0" fill="#2A0000" stroke="#CC1A1A" stroke-width="2"/>
+      <polyline points="140,20 130,0 150,8 140,0" stroke="#CC1A1A" stroke-width="3" fill="none"/><circle cx="140" cy="0" r="5" fill="#CC1A1A"/>
+      <polygon points="82,50 122,50 128,80 76,80" fill="#0A0A0A"/><polygon points="158,50 198,50 204,80 152,80" fill="#0A0A0A"/>
+      <polygon points="86,56 116,56 120,74 82,74" fill="#CC1A1A"/><polygon points="162,56 192,56 196,74 158,74" fill="#CC1A1A"/>
+      <rect x="94" y="60" width="16" height="10" fill="#0A0A0A"/><rect x="166" y="60" width="16" height="10" fill="#0A0A0A"/>
+      <polyline points="88,120 100,112 114,124 128,112 142,124 156,112 170,124 184,120" stroke="#0A0A0A" stroke-width="3" fill="none"/>
+      <line x1="80" y1="30" x2="70" y2="10" stroke="#CC1A1A" stroke-width="2" stroke-dasharray="3,2"/><line x1="200" y1="30" x2="210" y2="10" stroke="#CC1A1A" stroke-width="2" stroke-dasharray="3,2"/>
+      <rect x="112" y="155" width="56" height="22" fill="#D0D0CB" stroke="#0A0A0A" stroke-width="2"/>
+      <rect x="32" y="177" width="216" height="120" fill="#2A0000" stroke="#CC1A1A" stroke-width="3"/>
+      <rect x="62" y="193" width="156" height="84" fill="#1A0000"/>
+      <rect x="88" y="224" width="104" height="28" fill="#CC1A1A"/><text x="140" y="243" text-anchor="middle" font-family="Bebas Neue" font-size="13" fill="#F5F5F0" letter-spacing="2">CHALLENGE</text>
+      <rect x="0" y="160" width="30" height="96" fill="#2A0000" stroke="#CC1A1A" stroke-width="2"/><rect x="250" y="160" width="30" height="96" fill="#2A0000" stroke="#CC1A1A" stroke-width="2"/>
+      <rect x="72" y="297" width="48" height="40" fill="#2A0000" stroke="#CC1A1A" stroke-width="2"/><rect x="160" y="297" width="48" height="40" fill="#2A0000" stroke="#CC1A1A" stroke-width="2"/>
     </svg>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-  ROBOT 03 — THE SCOUT
-══════════════════════════════════════ -->
-<div class="character-intro panel">
-  <!-- Robot panel -->
-  <div class="robot-panel scout-bg">
-    <div class="robot-number" style="color: #7B8FF5;">UNIT 03</div>
-    <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.1;" viewBox="0 0 480 560">
-      <circle cx="240" cy="280" r="60" stroke="#7B8FF5" stroke-width="1" fill="none"/>
-      <circle cx="240" cy="280" r="120" stroke="#7B8FF5" stroke-width="1" fill="none"/>
-      <circle cx="240" cy="280" r="190" stroke="#7B8FF5" stroke-width="1" fill="none"/>
-      <circle cx="240" cy="280" r="260" stroke="#7B8FF5" stroke-width="1" fill="none"/>
-      <line x1="240" y1="0" x2="240" y2="560" stroke="#7B8FF5" stroke-width="0.5"/>
-      <line x1="0" y1="280" x2="480" y2="280" stroke="#7B8FF5" stroke-width="0.5"/>
-      <line x1="0" y1="0" x2="480" y2="560" stroke="#7B8FF5" stroke-width="0.5"/>
-      <line x1="480" y1="0" x2="0" y2="560" stroke="#7B8FF5" stroke-width="0.5"/>
-    </svg>
-    <!-- Scout Robot SVG — rounded, curious, many eyes -->
-    <svg width="260" height="340" viewBox="0 0 260 340" style="position:relative;z-index:2;">
-      <!-- Head — round, curious -->
+<!-- SCOUT -->
+<div class="char-intro">
+  <div class="robot-panel rp-scout">
+    <div class="unit-label" style="color:#7B8FF5;">UNIT 03</div>
+    <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.1;" viewBox="0 0 440 500"><circle cx="220" cy="250" r="60" stroke="#7B8FF5" stroke-width="1" fill="none"/><circle cx="220" cy="250" r="120" stroke="#7B8FF5" stroke-width="1" fill="none"/><circle cx="220" cy="250" r="190" stroke="#7B8FF5" stroke-width="1" fill="none"/><line x1="220" y1="0" x2="220" y2="500" stroke="#7B8FF5" stroke-width="0.5"/><line x1="0" y1="250" x2="440" y2="250" stroke="#7B8FF5" stroke-width="0.5"/></svg>
+    <svg width="240" height="300" viewBox="0 0 260 340" style="position:relative;z-index:2;">
       <ellipse cx="130" cy="110" rx="90" ry="92" fill="#F5F5F0" stroke="#7B8FF5" stroke-width="3"/>
-      <!-- Antenna — multiple -->
-      <line x1="100" y1="22" x2="88" y2="0" stroke="#7B8FF5" stroke-width="2.5"/>
-      <circle cx="86" cy="0" r="5" fill="#7B8FF5"/>
-      <line x1="130" y1="18" x2="130" y2="0" stroke="#7B8FF5" stroke-width="2.5"/>
-      <circle cx="130" cy="0" r="5" fill="#4A6FD4"/>
-      <line x1="160" y1="22" x2="172" y2="0" stroke="#7B8FF5" stroke-width="2.5"/>
-      <circle cx="174" cy="0" r="5" fill="#7B8FF5"/>
-      <!-- Eyes — multiple scanning eyes -->
-      <circle cx="100" cy="95" r="22" fill="#0A0A0A"/>
-      <circle cx="160" cy="95" r="22" fill="#0A0A0A"/>
-      <circle cx="100" cy="95" r="14" fill="#4A6FD4"/>
-      <circle cx="160" cy="95" r="14" fill="#4A6FD4"/>
-      <circle cx="100" cy="95" r="7" fill="#0A0A0A"/>
-      <circle cx="160" cy="95" r="7" fill="#0A0A0A"/>
-      <circle cx="97" cy="92" r="3" fill="#7B8FF5"/>
-      <circle cx="157" cy="92" r="3" fill="#7B8FF5"/>
-      <!-- Small third eye — scanner -->
-      <circle cx="130" cy="140" r="10" fill="#0A0A0A"/>
-      <circle cx="130" cy="140" r="6" fill="#F5C800"/>
-      <circle cx="130" cy="140" r="2" fill="#0A0A0A"/>
-      <!-- Mouth — gentle curve -->
+      <line x1="100" y1="22" x2="88" y2="0" stroke="#7B8FF5" stroke-width="2.5"/><circle cx="86" cy="0" r="5" fill="#7B8FF5"/>
+      <line x1="130" y1="18" x2="130" y2="0" stroke="#7B8FF5" stroke-width="2.5"/><circle cx="130" cy="0" r="5" fill="#4A6FD4"/>
+      <line x1="160" y1="22" x2="172" y2="0" stroke="#7B8FF5" stroke-width="2.5"/><circle cx="174" cy="0" r="5" fill="#7B8FF5"/>
+      <circle cx="100" cy="95" r="22" fill="#0A0A0A"/><circle cx="160" cy="95" r="22" fill="#0A0A0A"/>
+      <circle cx="100" cy="95" r="14" fill="#4A6FD4"/><circle cx="160" cy="95" r="14" fill="#4A6FD4"/>
+      <circle cx="100" cy="95" r="7" fill="#0A0A0A"/><circle cx="160" cy="95" r="7" fill="#0A0A0A"/>
+      <circle cx="97" cy="92" r="3" fill="#7B8FF5"/><circle cx="157" cy="92" r="3" fill="#7B8FF5"/>
+      <circle cx="130" cy="140" r="10" fill="#0A0A0A"/><circle cx="130" cy="140" r="6" fill="#F5C800"/><circle cx="130" cy="140" r="2" fill="#0A0A0A"/>
       <path d="M 100 158 Q 130 172 160 158" stroke="#0A0A0A" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <!-- Neck -->
       <rect x="108" y="200" width="44" height="18" rx="8" fill="#D0D0CB" stroke="#7B8FF5" stroke-width="2"/>
-      <!-- Body — compact, agile -->
       <rect x="50" y="218" width="160" height="100" rx="12" fill="#1A1A2E" stroke="#7B8FF5" stroke-width="3"/>
-      <!-- Chest display — scanning radar -->
       <rect x="74" y="232" width="112" height="68" rx="8" fill="#0D0D1A"/>
-      <circle cx="130" cy="266" r="26" stroke="#4A6FD4" stroke-width="1.5" fill="none"/>
-      <circle cx="130" cy="266" r="16" stroke="#7B8FF5" stroke-width="1" fill="none"/>
-      <line x1="130" y1="266" x2="148" y2="252" stroke="#7B8FF5" stroke-width="2"/>
-      <circle cx="130" cy="266" r="3" fill="#7B8FF5"/>
-      <text x="130" y="312" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="10" fill="#4A6FD4" letter-spacing="2">SCOUT</text>
-      <!-- Arms — nimble -->
-      <rect x="8" y="224" width="38" height="70" rx="10" fill="#1A1A2E" stroke="#7B8FF5" stroke-width="2"/>
-      <rect x="214" y="224" width="38" height="70" rx="10" fill="#1A1A2E" stroke="#7B8FF5" stroke-width="2"/>
-      <ellipse cx="27" cy="298" rx="18" ry="12" fill="#252535" stroke="#7B8FF5" stroke-width="2"/>
-      <ellipse cx="233" cy="298" rx="18" ry="12" fill="#252535" stroke="#7B8FF5" stroke-width="2"/>
-      <!-- Legs -->
-      <rect x="74" y="318" width="40" height="20" rx="6" fill="#1A1A2E" stroke="#7B8FF5" stroke-width="2"/>
-      <rect x="146" y="318" width="40" height="20" rx="6" fill="#1A1A2E" stroke="#7B8FF5" stroke-width="2"/>
+      <circle cx="130" cy="266" r="26" stroke="#4A6FD4" stroke-width="1.5" fill="none"/><circle cx="130" cy="266" r="16" stroke="#7B8FF5" stroke-width="1" fill="none"/>
+      <line x1="130" y1="266" x2="148" y2="252" stroke="#7B8FF5" stroke-width="2"/><circle cx="130" cy="266" r="3" fill="#7B8FF5"/>
+      <rect x="8" y="224" width="38" height="70" rx="10" fill="#1A1A2E" stroke="#7B8FF5" stroke-width="2"/><rect x="214" y="224" width="38" height="70" rx="10" fill="#1A1A2E" stroke="#7B8FF5" stroke-width="2"/>
+      <rect x="74" y="318" width="40" height="20" rx="6" fill="#1A1A2E" stroke="#7B8FF5" stroke-width="2"/><rect x="146" y="318" width="40" height="20" rx="6" fill="#1A1A2E" stroke="#7B8FF5" stroke-width="2"/>
     </svg>
   </div>
-
-  <!-- Character info -->
-  <div class="character-info" style="background: #F5F5F0;">
-    <div class="char-enter" style="color: #4A6FD4;">— ENTER THE ARENA —</div>
-    <div class="char-name" style="color: #0A0A0A;">THE<br/>SCOUT</div>
-    <div class="char-title" style="color: #4A6FD4;">THE SEEKER OF HIDDEN PATHS</div>
-    <div class="char-quote" style="border-left-color: #4A6FD4;">"While they fight over what is in front of them, I search for what neither of them can see. The answer is rarely in the middle — it's off the map entirely."</div>
-    <div class="char-stats">
-      <div class="stats-title">COMBAT STATS</div>
-      <div class="stat-row">
-        <span class="stat-label">LOGIC</span>
-        <div class="stat-bar">
-          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip empty"></div><div class="stat-pip empty"></div>
-        </div>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">PRECISION</span>
-        <div class="stat-bar">
-          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip empty"></div><div class="stat-pip empty"></div><div class="stat-pip empty"></div>
-        </div>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">ADAPTABILITY</span>
-        <div class="stat-bar">
-          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div>
-        </div>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">LATERAL THINKING</span>
-        <div class="stat-bar">
-          <div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div><div class="stat-pip"></div>
-        </div>
-      </div>
+  <div class="char-info">
+    <div class="ci-enter" style="color:#4A6FD4;">— ENTER THE ARENA —</div>
+    <div class="ci-name">THE<br/>SCOUT</div>
+    <div class="ci-title" style="color:#4A6FD4;">THE SEEKER OF HIDDEN PATHS</div>
+    <div class="ci-quote" style="border-color:#4A6FD4;">"While they fight over what is in front of them, I search for what neither of them can see. The answer is rarely where they're looking."</div>
+    <div class="ci-stats">
+      <div class="stats-hd">COMBAT STATS</div>
+      <div class="srow"><span class="slabel">LOGIC</span><div class="sbar"><div class="sp"></div><div class="sp"></div><div class="sp"></div><div class="sp e"></div><div class="sp e"></div></div></div>
+      <div class="srow"><span class="slabel">PRECISION</span><div class="sbar"><div class="sp"></div><div class="sp"></div><div class="sp e"></div><div class="sp e"></div><div class="sp e"></div></div></div>
+      <div class="srow"><span class="slabel">ADAPTABILITY</span><div class="sbar"><div class="sp"></div><div class="sp"></div><div class="sp"></div><div class="sp"></div><div class="sp"></div></div></div>
+      <div class="srow"><span class="slabel">LATERAL THINKING</span><div class="sbar"><div class="sp"></div><div class="sp"></div><div class="sp"></div><div class="sp"></div><div class="sp"></div></div></div>
     </div>
-    <p class="char-flavor">Trained to find what no one is looking for. Its radar sweeps every domain, every case study, every precedent — surfacing the alternative no one considered.</p>
+    <p class="ci-flavor">Trained to find what no one is looking for. Its radar sweeps every domain, every case study, every precedent — surfacing alternatives no one considered.</p>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-  THE BATTLE
-══════════════════════════════════════ -->
+<!-- BATTLE EXAMPLE -->
 <div class="battle-header">
   <div>
-    <div class="battle-title">THE<br/>BATTLE</div>
-    <div class="battle-subtitle">3 ROUNDS OF INTELLECTUAL COMBAT — NO HOLDS BARRED</div>
+    <div class="bh-title">THE<br/>BATTLE</div>
+    <div class="bh-sub">3 ROUNDS OF INTELLECTUAL COMBAT — NO HOLDS BARRED</div>
   </div>
-  <div style="text-align: right;">
-    <div class="battle-round-count">ROUND<br/>01 / 03</div>
-    <div style="font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: rgba(245,245,240,0.5); letter-spacing: 0.15em; margin-top: 8px;">INDEPENDENT PROPOSALS</div>
+  <div style="text-align:right;">
+    <div class="bh-count">ROUND<br/>01/03</div>
+    <div class="bh-count-sub">INDEPENDENT PROPOSALS</div>
   </div>
 </div>
 
-<div class="rounds-container">
-  <!-- ROUND 1 -->
-  <div class="round-panel">
-    <div class="round-label-col">
-      <div class="round-label-text">ROUND 01</div>
-    </div>
-    <div class="round-content">
-      <!-- Solver -->
-      <div class="argument-card" style="background: #FEFDF8;">
-        <div style="position:absolute;inset:0;opacity:0.04;" class="halftone"></div>
-        <div class="arg-role" style="color: #8A6A00;">
-          <div class="role-dot solver-dot"></div>
-          SOLVER — UNIT 01
-        </div>
-        <div class="arg-headline">"A Full Rewrite. Go. Now. Clean Architecture From Day One."</div>
-        <p class="arg-body">The Python service is a liability. Go gives us concurrency primitives that Python simply cannot match for payment processing at scale. Our test suite validates the behaviour — port it, test it, ship it. A full rewrite is 6 months of pain followed by years of clarity.</p>
-        <div class="arg-impact solver-impact">POSITION: FULL REWRITE IN GO</div>
+<div class="rounds-wrap">
+  <div class="ex-round">
+    <div class="ex-num-col" style="background:#0A0A0A;"><div class="ex-num" style="color:#F5C800;">ROUND 01</div></div>
+    <div class="ex-cards">
+      <div class="ex-card" style="background:#FEFDF8;">
+        <div class="ex-role" style="color:#8A6A00;"><div class="role-pip solver-pip"></div>SOLVER</div>
+        <div class="ex-hl">"A Full Rewrite. Go. Now."</div>
+        <p class="ex-body">The Python service is a liability. Go gives us concurrency primitives Python cannot match. A full rewrite is 6 months of pain followed by years of clarity.</p>
+        <div class="ex-tag" style="color:#8A6A00;border-color:#F5C800;">POSITION: FULL REWRITE</div>
       </div>
-      <!-- Challenger -->
-      <div class="argument-card" style="background: #FFF5F5;">
-        <div style="position:absolute;inset:0;opacity:0.04;" class="halftone"></div>
-        <div class="arg-role" style="color: #CC1A1A;">
-          <div class="role-dot challenger-dot"></div>
-          CHALLENGER — UNIT 02
-        </div>
-        <div class="arg-headline">"Six Months? That's Optimistic. Try Eighteen."</div>
-        <p class="arg-body">Large-scale rewrites take 3–5× longer than estimated. It's empirical. Netscape, Knight Capital, Mox Bank — I have every case study memorised. The payments service handles ₹2,000 Cr/month. A regression here is not a bug — it is a catastrophe. The Solver underestimates the blast radius of its own proposal.</p>
-        <div class="arg-impact challenger-impact">POSITION: THE REWRITE IS RECKLESS</div>
+      <div class="ex-card" style="background:#FFF5F5;">
+        <div class="ex-role" style="color:#CC1A1A;"><div class="role-pip challenger-pip"></div>CHALLENGER</div>
+        <div class="ex-hl">"Six Months? Try Eighteen."</div>
+        <p class="ex-body">Large-scale rewrites take 3–5× longer. The payments service handles ₹2,000 Cr/month. A regression here is not a bug — it is a catastrophe.</p>
+        <div class="ex-tag" style="color:#CC1A1A;border-color:#CC1A1A;">POSITION: RECKLESS</div>
       </div>
-      <!-- Scout -->
-      <div class="argument-card" style="background: #F5F5FF;">
-        <div style="position:absolute;inset:0;opacity:0.04;" class="halftone"></div>
-        <div class="arg-role" style="color: #4A6FD4;">
-          <div class="role-dot scout-dot"></div>
-          SCOUT — UNIT 03
-        </div>
-        <div class="arg-headline">"There's a Third Option Neither of You Are Seeing."</div>
-        <p class="arg-body">Selective hot-path migration. Not a full rewrite — not status quo. Identify the 20% of endpoints responsible for 80% of load. Rewrite those in Go. Keep the Python gateway stable. I found the Shopify engineering post. 40% latency improvement. Zero downtime. This path exists.</p>
-        <div class="arg-impact scout-impact">POSITION: SELECTIVE HOT-PATH MIGRATION</div>
+      <div class="ex-card" style="background:#F5F5FF;">
+        <div class="ex-role" style="color:#4A6FD4;"><div class="role-pip scout-pip"></div>SCOUT</div>
+        <div class="ex-hl">"There's a Third Option."</div>
+        <p class="ex-body">Selective hot-path migration. I found the Shopify post — 40% latency improvement, zero downtime. Neither of you considered this path.</p>
+        <div class="ex-tag" style="color:#4A6FD4;border-color:#4A6FD4;">POSITION: SELECTIVE MIGRATION</div>
       </div>
     </div>
   </div>
-
-  <!-- CLASH BAR -->
-  <div class="clash-bar">
-    <span class="clash-text">CLASH!!</span>
-    <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#0A0A0A;margin:0 32px;letter-spacing:0.2em;">ROUND 02 — CHALLENGE &amp; COUNTER</span>
-    <span class="clash-text">CLASH!!</span>
-  </div>
-
-  <!-- ROUND 2 -->
-  <div class="round-panel">
-    <div class="round-label-col" style="background: #CC1A1A;">
-      <div class="round-label-text" style="color: #F5F5F0;">ROUND 02</div>
-    </div>
-    <div class="round-content">
-      <!-- Challenger attacks Solver -->
-      <div class="argument-card" style="background: #FFF0F0;">
-        <div class="arg-role" style="color: #CC1A1A;">
-          <div class="role-dot challenger-dot"></div>
-          CHALLENGER → SOLVER
-        </div>
-        <div class="arg-headline">"Your Test Suite Won't Save You From Concurrency Bugs."</div>
-        <p class="arg-body">The Solver claims the Python tests validate the Go implementation. They do not. Go's goroutine model surfaces race conditions that Python's GIL was silently suppressing. You will spend months debugging issues that your existing tests will never catch. This is not pessimism — this is physics.</p>
-        <div class="arg-impact challenger-impact">FLAW FOUND: TEST SUITE IS INSUFFICIENT</div>
+  <div class="clash-bar"><span class="clash-w">CLASH!!</span><span class="clash-mid">ROUND 02 — CHALLENGE &amp; COUNTER</span><span class="clash-w">CLASH!!</span></div>
+  <div class="ex-round">
+    <div class="ex-num-col" style="background:#CC1A1A;"><div class="ex-num" style="color:#F5F5F0;">ROUND 02</div></div>
+    <div class="ex-cards">
+      <div class="ex-card" style="background:#FFF0F0;">
+        <div class="ex-role" style="color:#CC1A1A;"><div class="role-pip challenger-pip"></div>CHALLENGER → SOLVER</div>
+        <div class="ex-hl">"Your Tests Won't Save You."</div>
+        <p class="ex-body">Go's goroutines surface race conditions that Python's GIL was silently suppressing. Your tests were never designed to catch this class of bug.</p>
+        <div class="ex-tag" style="color:#CC1A1A;border-color:#CC1A1A;">FLAW: TEST SUITE INVALID</div>
       </div>
-      <!-- Scout expands -->
-      <div class="argument-card" style="background: #F0F0FF;">
-        <div class="arg-role" style="color: #4A6FD4;">
-          <div class="role-dot scout-dot"></div>
-          SCOUT — EXPANDED EVIDENCE
-        </div>
-        <div class="arg-headline">"Here's Exactly Which Endpoints. I Ran the Analysis."</div>
-        <p class="arg-body">Payment processing: 340ms p99 in Python, 58ms in Go benchmark. Reconciliation batch: 4.2 minutes vs 42 seconds. These two endpoints. Everything else: Python performance is adequate. The incremental path has a clear, measurable definition — it isn't vague. The Solver's binary framing is a false dilemma.</p>
-        <div class="arg-impact scout-impact">EVIDENCE: 2 ENDPOINTS DRIVE ALL LATENCY</div>
-      </div>
-      <!-- Solver forced to respond -->
-      <div class="argument-card" style="background: #FFFDF0;">
-        <div class="arg-role" style="color: #8A6A00;">
-          <div class="role-dot solver-dot"></div>
-          SOLVER — UNDER PRESSURE
-        </div>
-        <div class="arg-headline">"The Challenger's Concurrency Point... Has Merit."</div>
-        <p class="arg-body">I must acknowledge: the GIL argument is structurally sound. My original test-suite confidence was misplaced. However — the Scout's selective migration still requires rewriting Go concurrency in the hottest paths. We face the concurrency problem regardless. The question is scope, not whether.</p>
-        <div class="arg-impact solver-impact">CONCEDES: TEST SUITE ARGUMENT IS VALID</div>
+      <div class="ex-card" style="background:#F0F0FF;">
+        <div class="ex-role" style="color:#4A6FD4;"><div class="role-pip scout-pip"></div>SCOUT — EVIDENCE</div>
+        <div class="ex-hl">"I Ran the Numbers."</div>
+        <p class="ex-body">Two endpoints drive all the latency. Payment processing: 340ms → 58ms. Reconciliation: 4.2 min → 42 sec. Everything else is fine in Python.</p>
+        <div class="ex-tag" style="color:#4A6FD4;border-color:#4A6FD4;">EVIDENCE: 2 ENDPOINTS ONLY</div>
       </div>
     </div>
   </div>
-
-  <!-- FINAL CLASH -->
-  <div class="clash-bar" style="background: #0A0A0A;">
-    <span class="clash-text" style="color: #F5C800;">CONVERGENCE!!</span>
-    <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#F5F5F0;margin:0 32px;letter-spacing:0.2em;">ROUND 03 — THE VERDICT</span>
-    <span class="clash-text" style="color: #F5C800;">CONVERGENCE!!</span>
-  </div>
-
-  <!-- ROUND 3 -->
-  <div class="round-panel">
-    <div class="round-label-col" style="background: #F5C800;">
-      <div class="round-label-text" style="color: #0A0A0A;">ROUND 03</div>
-    </div>
-    <div class="round-content">
-      <div class="argument-card" style="background: #FFFDF0; flex: 1.5;">
-        <div class="arg-role" style="color: #8A6A00;">
-          <div class="role-dot solver-dot"></div>
-          SOLVER — REVISED POSITION
-        </div>
-        <div class="arg-headline">"I Accept the Scout's Framing. Incremental Migration — With Conditions."</div>
-        <p class="arg-body">The Challenger's delivery-risk argument and the Scout's empirical data have shifted my position. A full rewrite introduces uncalculated risk at a scale of ₹2,000 Cr/month in transactions. I revise: migrate the payment processing and reconciliation endpoints to Go first. Set a 3-month checkpoint — if latency gains confirm the Scout's projections, continue migration. If not, stop and reassess the full-rewrite thesis.</p>
-        <div class="arg-impact solver-impact">REVISED: INCREMENTAL — MEASURE FIRST</div>
+  <div class="clash-bar dark"><span class="clash-w">CONVERGENCE!!</span><span class="clash-mid">ROUND 03 — FINAL POSITION</span><span class="clash-w">CONVERGENCE!!</span></div>
+  <div class="ex-round">
+    <div class="ex-num-col" style="background:#F5C800;"><div class="ex-num" style="color:#0A0A0A;">ROUND 03</div></div>
+    <div class="ex-cards">
+      <div class="ex-card" style="background:#FFFDF0;flex:1.4;">
+        <div class="ex-role" style="color:#8A6A00;"><div class="role-pip solver-pip"></div>SOLVER — REVISED</div>
+        <div class="ex-hl">"I Accept the Scout's Framing."</div>
+        <p class="ex-body">The Challenger's delivery risk argument and the Scout's empirical data have shifted my position. Incremental migration of the two hot-path endpoints, with a 3-month checkpoint to validate before committing further.</p>
+        <div class="ex-tag" style="color:#8A6A00;border-color:#F5C800;">REVISED: INCREMENTAL — MEASURE FIRST</div>
       </div>
-      <div class="argument-card" style="background: #FFF5F5;">
-        <div class="arg-role" style="color: #CC1A1A;">
-          <div class="role-dot challenger-dot"></div>
-          CHALLENGER — SATISFIED
-        </div>
-        <div class="arg-headline">"The 3-Month Checkpoint Is Exactly Right."</div>
-        <p class="arg-body">The Solver has incorporated the risk analysis. The Scout provided the evidence. The revised position is sound: validate the incremental approach with real production data before committing further. I concur. This is not surrender — this is what rigorous debate produces.</p>
-        <div class="arg-impact challenger-impact">CONVERGENCE ACHIEVED</div>
+      <div class="ex-card" style="background:#FFF5F5;">
+        <div class="ex-role" style="color:#CC1A1A;"><div class="role-pip challenger-pip"></div>CHALLENGER</div>
+        <div class="ex-hl">"The Checkpoint Is Right."</div>
+        <p class="ex-body">The Solver has incorporated the risk analysis. This is what rigorous debate produces. I concur.</p>
+        <div class="ex-tag" style="color:#CC1A1A;border-color:#CC1A1A;">CONVERGENCE ACHIEVED</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-  VERDICT
-══════════════════════════════════════ -->
-<div class="verdict-section panel">
-  <div class="speed-lines" style="opacity: 0.06; position: absolute; inset: 0;"></div>
-  <div class="verdict-inner">
-    <div class="verdict-left">
-      <div class="verdict-chapter">— FINAL JUDGMENT —</div>
-      <div class="verdict-title">THE<br/>VERDICT</div>
-      <div class="verdict-confidence">
-        <span class="confidence-label">⬡ HIGH CONFIDENCE</span>
-        <span class="confidence-note">All 3 robots converged in Round 3</span>
-      </div>
-      <div class="verdict-text">
-        <p>Incremental migration is the stronger choice. Migrate payment processing and reconciliation endpoints to Go first. Keep the Python API gateway stable. Set a hard checkpoint at 3 months: if Go endpoints show less than 20% latency improvement in production, reconsider the migration thesis entirely before committing further resources.</p>
-      </div>
-      <div style="font-family:'Bangers',cursive;font-size:36px;color:#F5C800;letter-spacing:0.05em;margin-top: 8px;">THE DEBATE IS OVER. THE TRUTH REMAINS.</div>
-    </div>
-    <div class="verdict-right">
-      <div class="trace-box">
-        <div class="trace-box-title">BATTLE LOG — 3 ROUNDS</div>
-        <div class="trace-item">
-          <div class="trace-round-label" style="color: #F5C800;">R1 · SOLVER</div>
-          <div class="trace-summary">Proposed full Go rewrite. Cited clean architecture and test suite validation.</div>
-        </div>
-        <hr class="trace-divider"/>
-        <div class="trace-item">
-          <div class="trace-round-label" style="color: #CC1A1A;">R1 · CHALLENGER</div>
-          <div class="trace-summary">Flagged delivery risk. Referenced historical rewrite failures at scale.</div>
-        </div>
-        <hr class="trace-divider"/>
-        <div class="trace-item">
-          <div class="trace-round-label" style="color: #4A6FD4;">R1 · SCOUT</div>
-          <div class="trace-summary">Introduced selective hot-path migration. Found Shopify case study.</div>
-        </div>
-        <hr class="trace-divider"/>
-        <div class="trace-item">
-          <div class="trace-round-label" style="color: #CC1A1A;">R2 · CHALLENGER</div>
-          <div class="trace-summary">Destroyed Solver's test-suite confidence. GIL concurrency argument.</div>
-        </div>
-        <hr class="trace-divider"/>
-        <div class="trace-item">
-          <div class="trace-round-label" style="color: #4A6FD4;">R2 · SCOUT</div>
-          <div class="trace-summary">Produced specific latency benchmarks for 2 target endpoints.</div>
-        </div>
-        <hr class="trace-divider"/>
-        <div class="trace-item">
-          <div class="trace-round-label" style="color: #F5C800;">R3 · SOLVER</div>
-          <div class="trace-summary">Revised position. Accepted risk argument. Proposed 3-month checkpoint.</div>
-        </div>
-        <hr class="trace-divider"/>
-        <div class="trace-item" style="background: rgba(245,200,0,0.06); margin: 0 -32px -32px; padding: 20px 32px;">
-          <div class="trace-round-label" style="color: #F5C800; font-size: 14px;">UNANIMOUS CONVERGENCE</div>
-          <div class="trace-summary">First time in recorded robot debate history. Three minds. One truth.</div>
-        </div>
-      </div>
+<!-- EXAMPLE VERDICT -->
+<div class="example-verdict">
+  <div class="speed-lines" style="opacity:0.06;"></div>
+  <div class="ev-left" style="position:relative;z-index:2;">
+    <div class="ev-chapter">— FINAL JUDGMENT —</div>
+    <div class="ev-title">THE<br/>VERDICT</div>
+    <div class="ev-badge"><span class="ev-badge-label">⬡ HIGH CONFIDENCE</span></div>
+    <div class="ev-text"><p>Incremental migration. Migrate payment processing and reconciliation endpoints to Go. Keep the Python API gateway stable. Hard checkpoint at 3 months — if gains fall below 20%, stop and reassess.</p></div>
+    <div class="ev-cry">THE DEBATE IS OVER. THE TRUTH REMAINS.</div>
+  </div>
+  <div class="ev-right" style="position:relative;z-index:2;">
+    <div class="ev-trace">
+      <div class="ev-trace-title">BATTLE LOG — 3 ROUNDS</div>
+      <div class="tr"><div class="tr-role" style="color:#F5C800;">R1 · SOLVER</div><div class="tr-text">Proposed full Go rewrite. Cited clean architecture.</div></div>
+      <hr class="tr-hr"/>
+      <div class="tr"><div class="tr-role" style="color:#CC1A1A;">R1 · CHALLENGER</div><div class="tr-text">Flagged delivery risk. Referenced historical failures.</div></div>
+      <hr class="tr-hr"/>
+      <div class="tr"><div class="tr-role" style="color:#4A6FD4;">R1 · SCOUT</div><div class="tr-text">Introduced selective hot-path migration with evidence.</div></div>
+      <hr class="tr-hr"/>
+      <div class="tr"><div class="tr-role" style="color:#CC1A1A;">R2 · CHALLENGER</div><div class="tr-text">Destroyed test-suite confidence. GIL concurrency argument.</div></div>
+      <hr class="tr-hr"/>
+      <div class="tr"><div class="tr-role" style="color:#4A6FD4;">R2 · SCOUT</div><div class="tr-text">Produced specific latency benchmarks for 2 endpoints.</div></div>
+      <hr class="tr-hr"/>
+      <div class="tr"><div class="tr-role" style="color:#F5C800;">R3 · SOLVER</div><div class="tr-text">Revised. Accepted risk argument. Proposed 3-month checkpoint.</div></div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-  FINAL CTA
-══════════════════════════════════════ -->
+<!-- CTA -->
 <div class="final-cta">
   <div>
-    <div class="cta-title">YOUR TURN<br/>TO FIGHT.</div>
-    <div class="cta-sub">PIP INSTALL. FREE MODELS INCLUDED. ENTER THE ARENA.</div>
+    <div class="cta-hl">YOUR TURN<br/>TO FIGHT.</div>
+    <div class="cta-sub">SCROLL UP · ENTER YOUR QUESTION · START THE BATTLE</div>
   </div>
-  <div class="cta-buttons">
-    <a href="https://github.com/shikhar127/multi-agent-system" class="btn-black">GET STARTED →</a>
-    <a href="https://github.com/shikhar127/multi-agent-system" class="btn-outline">VIEW ON GITHUB</a>
+  <div class="cta-btns">
+    <a href="#enter-arena" class="btn-blk" onclick="document.getElementById('question-input').focus()">ENTER THE ARENA →</a>
+    <a href="https://github.com/shikhar127/multi-agent-system" class="btn-out" target="_blank">VIEW ON GITHUB</a>
   </div>
 </div>
+
+<!-- ════════════════════════════════════════
+  JAVASCRIPT — BATTLE ENGINE
+════════════════════════════════════════ -->
+<script>
+const MODEL_MAP = {
+  'claude-haiku-4-5-20251001': 'claude-haiku-4-5-20251001',
+  'claude-sonnet-4-6': 'claude-sonnet-4-6',
+  'claude-opus-4-6': 'claude-opus-4-6',
+};
+
+async function callClaude(apiKey, model, systemPrompt, userMessage) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model,
+      max_tokens: 600,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMessage }],
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: { message: res.statusText } }));
+    throw new Error(err.error?.message || `API error ${res.status}`);
+  }
+  const data = await res.json();
+  return data.content[0].text;
+}
+
+function extractHeadline(text) {
+  const lines = text.trim().split('\n').filter(l => l.trim());
+  const first = lines[0].replace(/^["']|["']$/g, '').trim();
+  return first.length > 90 ? first.slice(0, 87) + '…' : first;
+}
+
+function extractBody(text) {
+  const lines = text.trim().split('\n').filter(l => l.trim());
+  return lines.slice(1).join(' ').trim() || lines[0];
+}
+
+function extractTag(text, role) {
+  const match = text.match(/(?:POSITION|STANCE|VERDICT|FINDING|ATTACK|FLAW|EVIDENCE):\s*([^\n.]+)/i);
+  if (match) return match[0].trim().toUpperCase();
+  const tagMap = { solver: 'POSITION: CONSTRUCTED', challenger: 'ATTACK: DELIVERED', scout: 'SCAN: COMPLETE', verdict: 'JUDGMENT: DELIVERED' };
+  return tagMap[role] || 'ARGUMENT: DELIVERED';
+}
+
+function showEl(id, flex) {
+  const el = document.getElementById(id);
+  el.style.display = flex ? 'flex' : 'block';
+}
+
+function setStatus(title, status) {
+  document.getElementById('loading-title').textContent = title;
+  document.getElementById('loading-status').textContent = status;
+}
+
+function showError(msg) {
+  document.getElementById('form-error').style.display = 'block';
+  document.getElementById('error-text').textContent = msg;
+  document.getElementById('fight-btn').disabled = false;
+  document.getElementById('fight-btn').textContent = 'START THE FIGHT →';
+}
+
+function resetArena() {
+  document.getElementById('battle-results').style.display = 'none';
+  document.getElementById('result-round1').style.display = 'none';
+  document.getElementById('result-round2').style.display = 'none';
+  document.getElementById('result-round3').style.display = 'none';
+  document.getElementById('result-verdict').style.display = 'none';
+  document.getElementById('clash-1').style.display = 'none';
+  document.getElementById('clash-2').style.display = 'none';
+  document.getElementById('loading-panel').style.display = 'none';
+  document.getElementById('try-again-bar').style.display = 'none';
+  document.getElementById('form-error').style.display = 'none';
+  document.getElementById('fight-btn').disabled = false;
+  document.getElementById('fight-btn').textContent = 'START THE FIGHT →';
+  document.getElementById('question-input').value = '';
+  document.getElementById('question-input').focus();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function startFight() {
+  const question = document.getElementById('question-input').value.trim();
+  const apiKey = document.getElementById('api-key-input').value.trim();
+  const model = document.getElementById('model-select').value;
+
+  document.getElementById('form-error').style.display = 'none';
+
+  if (!question) { showError('Enter a question for the robots to fight over.'); return; }
+  if (!apiKey || !apiKey.startsWith('sk-ant-')) { showError('Enter a valid Anthropic API key (starts with sk-ant-).'); return; }
+
+  document.getElementById('fight-btn').disabled = true;
+  document.getElementById('fight-btn').textContent = 'THE BATTLE IS ON…';
+
+  // Show results section, scroll to it
+  showEl('battle-results', false);
+  showEl('loading-panel', false);
+  setTimeout(() => document.getElementById('battle-results').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+
+  try {
+    // ── ROUND 1: SOLVER ──────────────────────────
+    setStatus('SOLVER IS BUILDING THE CASE…', 'ROUND 01 · INITIAL PROPOSAL');
+
+    const solverPrompt = `You are SOLVER, a debate robot in a system called "Robots versus Robots". Your role is to construct the best possible initial answer to a question. Be decisive, confident, and comprehensive. State your position clearly in the first sentence. Argue in flowing prose — no bullet points. Keep your response to 3 short paragraphs maximum. Start your response with a bold one-sentence position statement in quotes, then elaborate.`;
+
+    const solverRaw = await callClaude(apiKey, model, solverPrompt, question);
+    const solverHl = extractHeadline(solverRaw);
+    const solverBody = extractBody(solverRaw);
+    const solverTag = extractTag(solverRaw, 'solver');
+
+    document.getElementById('r1-solver-hl').textContent = solverHl;
+    document.getElementById('r1-solver-body').textContent = solverBody;
+    document.getElementById('r1-solver-tag').textContent = solverTag;
+    showEl('result-round1', false);
+    document.getElementById('result-round1').style.display = 'block';
+
+    // ── ROUND 2: CHALLENGER ──────────────────────
+    setStatus('CHALLENGER IS SHARPENING ITS ATTACK…', 'ROUND 02 · CHALLENGER ENGAGES');
+    showEl('clash-1', false);
+
+    const challengerPrompt = `You are CHALLENGER, a debate robot in "Robots versus Robots". SOLVER has just proposed an answer to a question. Your job is to attack it — find flaws, challenge assumptions, expose risks, and stress-test the logic. Be aggressive but rigorous. No ad hominem — only logical assault. Start with a provocative one-sentence counter-position in quotes, then deliver your attack in 2-3 paragraphs. No bullet points.`;
+
+    const challengerRaw = await callClaude(apiKey, model, challengerPrompt,
+      `The question: "${question}"\n\nSOLVER's position: ${solverRaw}\n\nNow attack it.`);
+    const challengerHl = extractHeadline(challengerRaw);
+    const challengerBody = extractBody(challengerRaw);
+    const challengerTag = extractTag(challengerRaw, 'challenger');
+
+    document.getElementById('r2-challenger-hl').textContent = challengerHl;
+    document.getElementById('r2-challenger-body').textContent = challengerBody;
+    document.getElementById('r2-challenger-tag').textContent = challengerTag;
+
+    // ── ROUND 2: SCOUT ───────────────────────────
+    setStatus('SCOUT IS SCANNING FOR HIDDEN PATHS…', 'ROUND 02 · SCOUT EXPLORES');
+
+    const scoutPrompt = `You are SCOUT, a debate robot in "Robots versus Robots". You've observed SOLVER's answer and CHALLENGER's attack. Your role is to find what neither of them considered — alternative framings, overlooked evidence, third options, analogies from other domains. You are the lateral thinker. Start with an intriguing one-sentence reframe in quotes, then explore your finding in 2-3 paragraphs. No bullet points.`;
+
+    const scoutRaw = await callClaude(apiKey, model, scoutPrompt,
+      `The question: "${question}"\n\nSOLVER said: ${solverRaw}\n\nCHALLENGER attacked: ${challengerRaw}\n\nFind what they both missed.`);
+    const scoutHl = extractHeadline(scoutRaw);
+    const scoutBody = extractBody(scoutRaw);
+    const scoutTag = extractTag(scoutRaw, 'scout');
+
+    document.getElementById('r2-scout-hl').textContent = scoutHl;
+    document.getElementById('r2-scout-body').textContent = scoutBody;
+    document.getElementById('r2-scout-tag').textContent = scoutTag;
+    showEl('result-round2', false);
+    document.getElementById('result-round2').style.display = 'block';
+
+    // ── ROUND 3: SOLVER REVISED ──────────────────
+    setStatus('SOLVER IS FORGING THE FINAL POSITION…', 'ROUND 03 · CONVERGENCE');
+    showEl('clash-2', false);
+
+    const r3Prompt = `You are SOLVER in "Robots versus Robots". You've now heard CHALLENGER's attack and SCOUT's alternative perspective. Revise your position to incorporate valid criticisms and insights. Show that you've genuinely updated your thinking. Be decisive about your final position. Start with a revised one-sentence position in quotes, then deliver your final argument in 2-3 paragraphs. No bullet points.`;
+
+    const r3Raw = await callClaude(apiKey, model, r3Prompt,
+      `The question: "${question}"\n\nYour original position: ${solverRaw}\n\nCHALLENGER's attack: ${challengerRaw}\n\nSCOUT's alternative: ${scoutRaw}\n\nRevise your position.`);
+    const r3Hl = extractHeadline(r3Raw);
+    const r3Body = extractBody(r3Raw);
+    const r3Tag = extractTag(r3Raw, 'solver');
+
+    document.getElementById('r3-solver-hl').textContent = r3Hl;
+    document.getElementById('r3-solver-body').textContent = r3Body;
+    document.getElementById('r3-solver-tag').textContent = r3Tag;
+    showEl('result-round3', false);
+    document.getElementById('result-round3').style.display = 'block';
+
+    // ── VERDICT ──────────────────────────────────
+    setStatus('THE SYNTHESIZER IS DELIVERING THE VERDICT…', 'FINAL JUDGMENT');
+
+    const verdictPrompt = `You are the SYNTHESIZER in "Robots versus Robots". Three robots have debated a question across 3 rounds. Your job is to deliver the final verdict — a clear, decisive answer that incorporates the best arguments from all three robots. Structure your response as JSON with these exact fields:
+{
+  "confidence": "HIGH" | "MEDIUM" | "LOW",
+  "confidence_note": "one sentence explaining the confidence level",
+  "verdict": "2-3 paragraph final answer in flowing prose",
+  "r1_trace": "one sentence summary of Solver's Round 1 position",
+  "r2c_trace": "one sentence summary of Challenger's key attack",
+  "r2s_trace": "one sentence summary of Scout's key finding",
+  "r3_trace": "one sentence summary of Solver's revised position",
+  "verdict_trace": "one sentence final judgment summary"
+}`;
+
+    const verdictRaw = await callClaude(apiKey, model, verdictPrompt,
+      `The question: "${question}"\n\nR1 SOLVER: ${solverRaw}\n\nR2 CHALLENGER: ${challengerRaw}\n\nR2 SCOUT: ${scoutRaw}\n\nR3 SOLVER (revised): ${r3Raw}\n\nDeliver the final verdict as JSON.`);
+
+    let vd;
+    try {
+      const jsonMatch = verdictRaw.match(/\{[\s\S]*\}/);
+      vd = JSON.parse(jsonMatch ? jsonMatch[0] : verdictRaw);
+    } catch {
+      vd = {
+        confidence: 'MEDIUM',
+        confidence_note: 'The robots reached a reasoned conclusion.',
+        verdict: verdictRaw,
+        r1_trace: 'Solver proposed initial position.',
+        r2c_trace: 'Challenger identified key flaws.',
+        r2s_trace: 'Scout found alternative perspective.',
+        r3_trace: 'Solver revised and converged.',
+        verdict_trace: 'Final judgment delivered.',
+      };
+    }
+
+    const confColors = { HIGH: '#4ADE80', MEDIUM: '#F5C800', LOW: '#CC1A1A' };
+    const vc = document.getElementById('verdict-confidence');
+    vc.textContent = `⬡ ${vd.confidence} CONFIDENCE`;
+    vc.style.color = confColors[vd.confidence] || '#F5C800';
+    document.getElementById('verdict-conf-note').textContent = vd.confidence_note;
+    document.getElementById('verdict-answer').textContent = vd.verdict;
+    document.getElementById('trace-r1').textContent = vd.r1_trace;
+    document.getElementById('trace-r2c').textContent = vd.r2c_trace;
+    document.getElementById('trace-r2s').textContent = vd.r2s_trace;
+    document.getElementById('trace-r3').textContent = vd.r3_trace;
+    document.getElementById('trace-verdict').textContent = vd.verdict_trace;
+
+    showEl('result-verdict', false);
+    document.getElementById('result-verdict').style.display = 'block';
+
+    // Done
+    showEl('loading-panel', false);
+    document.getElementById('loading-panel').style.display = 'none';
+    showEl('try-again-bar', true);
+    document.getElementById('result-verdict').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  } catch (err) {
+    document.getElementById('loading-panel').style.display = 'none';
+    showError(err.message || 'Something went wrong. Check your API key and try again.');
+  }
+}
+
+// Enter key submits
+document.getElementById('question-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) startFight();
+});
+</script>
 
 </body>
 </html>
