@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Bebas+Neue&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { overflow-x: hidden; }
     body { background: #F5F5F0; font-family: 'Inter Tight', sans-serif; overflow-x: hidden; }
 
     .halftone {
@@ -830,6 +831,17 @@
       .cta-sub { font-size: 11px; }
       .cta-btns { flex-direction: column; width: 100%; }
       .btn-blk, .btn-out { text-align: center; width: 100%; box-sizing: border-box; }
+
+      /* Clash bars — hide second repeat, shrink font */
+      .clash-bar { gap: 12px; padding: 10px 16px; overflow: hidden; }
+      .clash-w { font-size: 28px; }
+      .clash-w:last-child { display: none; }
+      .clash-mid { font-size: 11px; white-space: normal; text-align: left; line-height: 1.4; }
+
+      /* Live clash bars (battle results) */
+      .result-clash { gap: 12px; padding: 10px 16px; overflow: hidden; }
+      .clash-word { font-size: 28px !important; }
+      .clash-word:last-child { display: none; }
 
       /* Next questions */
       #next-questions { padding: 24px 20px 32px; }
