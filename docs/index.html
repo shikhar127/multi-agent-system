@@ -360,6 +360,7 @@
     }
     .error-text {
       font-family: 'Inter Tight', sans-serif; font-size: 14px; color: #FF6B6B; line-height: 22px;
+      white-space: pre-wrap;
     }
     .error-label {
       font-family: 'Bebas Neue', sans-serif; font-size: 11px; color: #CC1A1A; letter-spacing: 0.2em; margin-bottom: 6px;
@@ -1108,6 +1109,20 @@ function toggleMoreOptions() {
 }
 
 // ── OPENROUTER API ───────────────────────────────
+function parseOpenRouterError(data, status) {
+  if (!data.error) return null;
+  const e = data.error;
+  // Pull the most useful detail: raw provider message > code > generic message
+  const raw = e.metadata?.raw;
+  const provider = e.metadata?.provider_name;
+  let msg = e.message || `HTTP ${status}`;
+  if (raw) {
+    try { msg = JSON.parse(raw)?.error?.message || raw; } catch { msg = raw; }
+  }
+  if (provider) msg = `[${provider}] ${msg}`;
+  return msg;
+}
+
 async function callModel(apiKey, model, systemPrompt, userMessage) {
   const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
@@ -1127,12 +1142,25 @@ async function callModel(apiKey, model, systemPrompt, userMessage) {
     }),
   });
   const data = await res.json();
-  // OpenRouter sometimes returns 200 with an error body
-  if (data.error) throw new Error(data.error.message || `Provider error from ${model}`);
-  if (!res.ok) throw new Error(`API error ${res.status}`);
+  const errMsg = parseOpenRouterError(data, res.status);
+  if (errMsg) throw new Error(errMsg);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const content = data.choices?.[0]?.message?.content;
-  if (!content) throw new Error(`Empty response from ${model}`);
+  if (!content) throw new Error(`Empty response`);
   return content;
+}
+
+// Pre-flight: validate key with a minimal call before the full battle
+async function validateKey(apiKey) {
+  const res = await fetch('https://openrouter.ai/api/v1/auth/key', {
+    headers: { 'Authorization': `Bearer ${apiKey}` },
+  });
+  if (!res.ok) throw new Error('Invalid OpenRouter API key. Check your key at openrouter.ai/keys');
+  const data = await res.json();
+  // label is null for invalid keys
+  if (!data.data?.label && data.data?.label !== undefined) {
+    throw new Error('API key not recognized by OpenRouter.');
+  }
 }
 
 // Fallback chain: if primary model fails, try backups in order
@@ -1158,16 +1186,17 @@ async function callWithFallback(apiKey, primaryModel, systemPrompt, userMessage)
   const isFree = primaryModel.endsWith(':free');
   const pool = isFree ? FREE_FALLBACKS : PAID_FALLBACKS;
   const chain = [primaryModel, ...pool.filter(m => m !== primaryModel)];
-  let lastError;
+  const errors = [];
   for (const model of chain) {
     try {
       return await callModel(apiKey, model, systemPrompt, userMessage);
     } catch (err) {
-      console.warn(`Model ${model} failed: ${err.message}`);
-      lastError = err;
+      console.warn(`[RvR] ${model} failed: ${err.message}`);
+      errors.push(`${model}: ${err.message}`);
     }
   }
-  throw new Error(`All models failed. Last error: ${lastError?.message}`);
+  const summary = errors.slice(0, 3).join('\n');
+  throw new Error(`All models failed:\n${summary}\n\nCheck: key validity, credits, rate limits at openrouter.ai`);
 }
 
 function extractHeadline(text) {
@@ -1236,6 +1265,11 @@ async function startFight() {
   if (!apiKey) { showError('Enter your OpenRouter API key. Get one free at openrouter.ai'); return; }
 
   document.getElementById('fight-btn').disabled = true;
+  document.getElementById('fight-btn').textContent = 'CHECKING KEY…';
+
+  try { await validateKey(apiKey); }
+  catch (err) { showError(err.message); return; }
+
   document.getElementById('fight-btn').textContent = 'THE BATTLE IS ON…';
 
   // Show results section, scroll to it
