@@ -246,18 +246,18 @@
     }
 
     /* Round panels */
-    .round-shell { display: flex; }
-    .round-num-col {
-      width: 88px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      border-right: 5px solid #0A0A0A;
+    .round-header {
+      display: flex; align-items: baseline; gap: 16px;
+      padding: 12px 32px; border-bottom: 3px solid rgba(0,0,0,0.12);
     }
-    .round-num-text {
-      font-family: 'Bangers', cursive; font-size: 40px;
-      color: #F5F5F0; letter-spacing: 0.05em;
-      writing-mode: vertical-rl; transform: rotate(180deg);
+    .round-num-label {
+      font-family: 'Bangers', cursive; font-size: 32px; letter-spacing: 0.05em; line-height: 1;
     }
-    .round-cards { flex: 1; display: flex; flex-direction: column; }
+    .round-purpose {
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
+      letter-spacing: 0.22em; opacity: 0.5;
+    }
+    .round-cards { display: flex; flex-direction: column; }
 
     .arg-card {
       padding: 32px 36px;
@@ -861,8 +861,9 @@
       .char-intro, .char-intro.rev { display: none !important; }
 
       /* Battle results padding */
-      .round-num-col { width: 52px; border-right: 3px solid #0A0A0A; }
-      .round-num-text { font-size: 24px; writing-mode: vertical-rl; transform: rotate(180deg); }
+      .round-header { padding: 8px 16px; gap: 10px; }
+      .round-num-label { font-size: 24px; }
+      .round-purpose { font-size: 10px; }
       .arg-card { padding: 20px 16px; gap: 10px; }
       .arg-headline-text { font-size: 16px; }
       .arg-body-text { font-size: 13px; line-height: 20px; }
@@ -1135,11 +1136,11 @@
 
   <!-- Round 1 -->
   <div id="result-round1" class="result-round" style="background:#FEFDF8;">
-    <div class="round-shell">
-      <div class="round-num-col" style="background:#0A0A0A;">
-        <div class="round-num-text" style="color:#F5C800;">ROUND 01</div>
-      </div>
-      <div class="round-cards" id="round1-cards">
+    <div class="round-header" style="background:#0A0A0A;">
+      <span class="round-num-label" style="color:#F5C800;">ROUND 01</span>
+      <span class="round-purpose" style="color:#F5F5F0;">SOLVER BUILDS THE CASE</span>
+    </div>
+    <div class="round-cards" id="round1-cards">
         <!-- Solver card -->
         <div class="arg-card" style="background:#FEFDF8;">
           <div class="arg-role-line" style="color:#8A6A00;"><div class="role-pip solver-pip"></div>SOLVER — UNIT 01</div>
@@ -1150,7 +1151,6 @@
           <button class="read-more-btn" id="r1-solver-toggle" onclick="toggleExpander('r1-solver-overflow','r1-solver-toggle','READ FULL ARGUMENT')" style="display:none;color:#8A6A00;">▼ READ FULL ARGUMENT</button>
           <div class="arg-tag solver-tag" id="r1-solver-tag">POSITION: FORMING</div>
         </div>
-      </div>
     </div>
   </div>
 
@@ -1163,11 +1163,11 @@
 
   <!-- Round 2 -->
   <div id="result-round2" class="result-round" style="background:#FFF5F5;">
-    <div class="round-shell">
-      <div class="round-num-col" style="background:#CC1A1A;">
-        <div class="round-num-text" style="color:#F5F5F0;">ROUND 02</div>
-      </div>
-      <div class="round-cards" id="round2-cards">
+    <div class="round-header" style="background:#CC1A1A;">
+      <span class="round-num-label" style="color:#F5F5F0;">ROUND 02</span>
+      <span class="round-purpose" style="color:#F5F5F0;">CHALLENGER ATTACKS · SCOUT EXPLORES</span>
+    </div>
+    <div class="round-cards" id="round2-cards">
         <div class="arg-card" style="background:#FFF0F0;">
           <div class="arg-role-line" style="color:#CC1A1A;"><div class="role-pip challenger-pip"></div>CHALLENGER — ATTACKING</div>
           <div class="attack-target">
@@ -1188,7 +1188,6 @@
           <button class="read-more-btn" id="r2-scout-toggle" onclick="toggleExpander('r2-scout-overflow','r2-scout-toggle','READ FULL SCAN')" style="display:none;">▼ READ FULL SCAN</button>
           <div class="arg-tag scout-tag" id="r2-scout-tag">PENDING</div>
         </div>
-      </div>
     </div>
   </div>
 
@@ -1201,11 +1200,11 @@
 
   <!-- Round 3 -->
   <div id="result-round3" class="result-round" style="background:#FFFDF0;">
-    <div class="round-shell">
-      <div class="round-num-col" style="background:#F5C800;">
-        <div class="round-num-text" style="color:#0A0A0A;">ROUND 03</div>
-      </div>
-      <div class="round-cards" id="round3-cards">
+    <div class="round-header" style="background:#F5C800;">
+      <span class="round-num-label" style="color:#0A0A0A;">ROUND 03</span>
+      <span class="round-purpose" style="color:#0A0A0A;">SOLVER REVISES THE POSITION</span>
+    </div>
+    <div class="round-cards" id="round3-cards">
         <div class="arg-card" style="background:#FFFDF0;">
           <div class="arg-role-line" style="color:#8A6A00;"><div class="role-pip solver-pip"></div>SOLVER — REVISED POSITION</div>
           <div class="position-delta" id="r3-delta" style="display:none;">
@@ -1227,7 +1226,6 @@
           <button class="read-more-btn" id="r3-solver-toggle" onclick="toggleExpander('r3-solver-overflow','r3-solver-toggle','READ REVISED POSITION')" style="display:none;color:#8A6A00;">▼ READ REVISED POSITION</button>
           <div class="arg-tag solver-tag" id="r3-solver-tag">PENDING</div>
         </div>
-      </div>
     </div>
   </div>
 
