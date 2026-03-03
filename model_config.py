@@ -3,26 +3,33 @@ Model catalogue, preset configurations, and config loader.
 
 Tiers
 -----
-free   — Open-source models served through Groq's free API tier.
-         Requires a free Groq account: https://console.groq.com
-paid   — Proprietary models from Anthropic and OpenAI.
-         Requires a paid API key from the respective provider.
+openrouter — Open-source models routed via the host's OpenRouter key.
+             Users need NO account — the key is supplied server-side.
+             Set OPENROUTER_API_KEY in your server environment / secrets manager.
+             Never commit this key to version control.
+free       — Open-source models served through Groq's free API tier.
+             Each user needs their own free Groq account: https://console.groq.com
+paid       — Proprietary models from Anthropic and OpenAI.
+             Requires a paid API key from the respective provider.
 
 Presets
 -------
-free      Solver = Llama 3.3 70B  |  Challenger = Mixtral 8x7B  |  Scout = Gemma 2 9B
-paid      All roles → Claude Sonnet 4.6
-premium   Solver = Claude Opus 4.6  |  Challenger & Scout → Claude Sonnet 4.6
+openrouter  Solver = Llama 3.3 70B  |  Challenger = Mixtral 8x7B  |  Scout = Gemma 2 9B
+            (all via your OPENROUTER_API_KEY — no user sign-up required)
+free        Same open-source models but each user supplies their own GROQ_API_KEY
+paid        All roles → Claude Sonnet 4.6
+premium     Solver = Claude Opus 4.6  |  Challenger & Scout → Claude Sonnet 4.6
 
 Configuration (via .env or shell environment)
 ---------------------------------------------
-MODEL_PRESET     — "free" | "paid" | "premium"   (default: paid)
+MODEL_PRESET     — "openrouter" | "free" | "paid" | "premium"   (default: paid)
 SOLVER_MODEL     — override model for the Solver role
 CHALLENGER_MODEL — override model for the Challenger role
 SCOUT_MODEL      — override model for the Scout role
 
 API keys (set whichever providers you use)
-GROQ_API_KEY       — from https://console.groq.com          (free)
+OPENROUTER_API_KEY — from https://openrouter.ai/keys  (host-supplied; never share)
+GROQ_API_KEY       — from https://console.groq.com          (free, per-user)
 ANTHROPIC_API_KEY  — from https://console.anthropic.com     (paid)
 OPENAI_API_KEY     — from https://platform.openai.com       (paid)
 """
@@ -64,6 +71,36 @@ class ModelConfig:
 # ════════════════════════════════════════════════════════════
 
 AVAILABLE_MODELS: Dict[str, ModelInfo] = {
+
+    # ── Free / Open-source via your OpenRouter key ──────────
+    # Users don't need their own key — you supply OPENROUTER_API_KEY server-side.
+    "openrouter/meta-llama/llama-3.3-70b-instruct": ModelInfo(
+        model_id="openrouter/meta-llama/llama-3.3-70b-instruct",
+        display_name="Llama 3.3 70B (OpenRouter)",
+        provider="OpenRouter",
+        tier="openrouter",
+        description="Llama 3.3 70B via host-supplied OpenRouter key — no user sign-up needed",
+        api_key_env="OPENROUTER_API_KEY",
+        api_key_url="https://openrouter.ai/keys",
+    ),
+    "openrouter/mistralai/mixtral-8x7b-instruct": ModelInfo(
+        model_id="openrouter/mistralai/mixtral-8x7b-instruct",
+        display_name="Mixtral 8x7B (OpenRouter)",
+        provider="OpenRouter",
+        tier="openrouter",
+        description="Mixtral 8x7B via host-supplied OpenRouter key — strong structured reasoning",
+        api_key_env="OPENROUTER_API_KEY",
+        api_key_url="https://openrouter.ai/keys",
+    ),
+    "openrouter/google/gemma-2-9b-it": ModelInfo(
+        model_id="openrouter/google/gemma-2-9b-it",
+        display_name="Gemma 2 9B (OpenRouter)",
+        provider="OpenRouter",
+        tier="openrouter",
+        description="Gemma 2 9B via host-supplied OpenRouter key — distinct Scout perspective",
+        api_key_env="OPENROUTER_API_KEY",
+        api_key_url="https://openrouter.ai/keys",
+    ),
 
     # ── Free / Open-source  (Groq free tier) ────────────────
     "groq/llama-3.3-70b-versatile": ModelInfo(
@@ -180,6 +217,12 @@ def resolve_model_id(model: str) -> str:
 # Presets
 # ════════════════════════════════════════════════════════════
 
+OPENROUTER_PRESET = ModelConfig(
+    solver="openrouter/meta-llama/llama-3.3-70b-instruct",
+    challenger="openrouter/mistralai/mixtral-8x7b-instruct",
+    scout="openrouter/google/gemma-2-9b-it",
+)
+
 FREE_PRESET = ModelConfig(
     solver="groq/llama-3.3-70b-versatile",
     challenger="groq/mixtral-8x7b-32768",
@@ -199,9 +242,10 @@ PREMIUM_PRESET = ModelConfig(
 )
 
 PRESETS: Dict[str, ModelConfig] = {
-    "free": FREE_PRESET,
-    "paid": PAID_PRESET,
-    "premium": PREMIUM_PRESET,
+    "openrouter": OPENROUTER_PRESET,
+    "free":       FREE_PRESET,
+    "paid":       PAID_PRESET,
+    "premium":    PREMIUM_PRESET,
 }
 
 
@@ -234,6 +278,7 @@ def load_config() -> ModelConfig:
 
 def print_catalogue() -> None:
     """Print the full model catalogue with tier grouping."""
+    openrouter_models = [m for m in AVAILABLE_MODELS.values() if m.tier == "openrouter"]
     free = [m for m in AVAILABLE_MODELS.values() if m.tier == "free"]
     paid = [m for m in AVAILABLE_MODELS.values() if m.tier == "paid"]
 
@@ -241,7 +286,16 @@ def print_catalogue() -> None:
     print("│                     AVAILABLE MODELS                               │")
     print("├─────────────────────────────────────────────────────────────────────┤")
 
-    print("│  FREE  (Groq — get a free key at https://console.groq.com)         │")
+    print("│  OPENROUTER  (host-supplied key — no user sign-up needed)          │")
+    print("│  Set OPENROUTER_API_KEY in your server env / secrets manager.      │")
+    print("│                                                                     │")
+    for m in openrouter_models:
+        key = next(k for k, v in AVAILABLE_MODELS.items() if v.model_id == m.model_id)
+        print(f"│  {key:<40} {m.display_name:<22}│")
+        print(f"│    {m.description:<67}│")
+    print("│                                                                     │")
+    print("├─────────────────────────────────────────────────────────────────────┤")
+    print("│  FREE  (Groq — each user needs a free key at console.groq.com)     │")
     print("│                                                                     │")
     for m in free:
         key = next(k for k, v in AVAILABLE_MODELS.items() if v.model_id == m.model_id)
