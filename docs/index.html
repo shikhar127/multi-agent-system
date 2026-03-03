@@ -607,7 +607,7 @@
     }
     .reframe-note {
       font-family: 'Inter', sans-serif; font-size: 13px;
-      color: #5A5650; line-height: 1.5;
+      color: #7A7268; line-height: 1.5;
     }
     .reframe-buttons { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
     .reframe-btn-primary {
@@ -617,15 +617,15 @@
     .reframe-btn-primary:hover { background: #D4A800; }
     .reframe-btn-secondary {
       background: transparent; border: 2px solid #3A3830; padding: 13px 24px; cursor: pointer;
-      font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 0.12em; color: #7A7268;
+      font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 0.12em; color: #9A9080;
     }
-    .reframe-btn-secondary:hover { border-color: #6A6860; color: #9A9060; }
+    .reframe-btn-secondary:hover { border-color: #6A6860; color: #BAB0A0; }
     .reframe-dismiss {
       background: none; border: none; cursor: pointer;
       font-family: 'Bebas Neue', sans-serif; font-size: 12px;
-      letter-spacing: 0.15em; color: #4A4840; padding: 13px 8px;
+      letter-spacing: 0.15em; color: #6A6860; padding: 13px 8px;
     }
-    .reframe-dismiss:hover { color: #7A7268; }
+    .reframe-dismiss:hover { color: #9A9080; }
 
     /* Reframe notice banner inside battle-results */
     #reframe-notice {
@@ -921,6 +921,11 @@
       /* More options panel */
       .robot-model-row { flex-direction: column; gap: 6px; }
       .model-select { width: 100%; }
+
+      /* Phase 3 new elements — mobile padding */
+      .position-delta { padding: 10px 12px; }
+      .attack-target { padding: 8px 12px; }
+      .delta-text { font-size: 12px; }
     }
   </style>
 </head>
@@ -1175,7 +1180,7 @@
         </div>
         <div class="arg-card" style="background:#F0F0FF;">
           <div class="arg-role-line" style="color:#4A6FD4;"><div class="role-pip scout-pip"></div>SCOUT — INDEPENDENT SCAN</div>
-          <div class="independent-badge">⊕ NOT A RESPONSE — ORTHOGONAL ANALYSIS</div>
+          <div class="independent-badge">⊕ INDEPENDENT ANALYSIS</div>
           <div class="arg-headline-text" id="r2-scout-hl">Scanning for alternatives…</div>
           <div class="scout-overflow" id="r2-scout-overflow">
             <div class="arg-body-text" id="r2-scout-body"></div>
@@ -1962,7 +1967,10 @@ function showReframePanel(c) {
   const noteEl = document.getElementById('reframe-note');
   if (noteEl) noteEl.textContent = c.reframe_note || '';
   panel.style.display = 'block';
-  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  setTimeout(() => {
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    panel.querySelector('.reframe-btn-primary')?.focus();
+  }, 150);
 }
 
 function dismissReframe() {
@@ -2574,7 +2582,7 @@ async function generateNextQuestions(question, verdictText) {
       const chip = document.createElement('div');
       chip.className = 'nq-chip';
       chip.innerHTML = `
-        <div class="nq-hint">CLICK TO EDIT</div>
+        <div class="nq-hint">TAP OR CLICK TO EDIT</div>
         <div class="nq-question" contenteditable="true" data-placeholder="Type your question…" spellcheck="false">${q}</div>
         <button class="nq-fight-btn" onclick="event.stopPropagation(); fightWithChip(this)">⚡ FIGHT THIS →</button>`;
       grid.appendChild(chip);
