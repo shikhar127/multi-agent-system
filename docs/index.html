@@ -1581,6 +1581,20 @@ let originalQuestion = '';
 let activeQuestion = '';
 let pendingFightConfig = null; // { apiKey, solverModel, challengerModel, scoutModel }
 
+// ── CONSTANTS ────────────────────────────────────
+const CALL_TIMEOUT_MS      = 90000;  // per-model API call timeout
+const PREFLIGHT_TIMEOUT_MS = 8000;   // question classifier timeout
+const NEXTQ_TIMEOUT_MS     = 15000;  // next-question suggestions timeout
+const RATE_LIMIT_DELAY_MS  = 3000;   // backoff after 429 before next fallback
+const MAX_FREE_FALLBACKS   = 5;      // max fallback attempts on free tier
+const FREE_MODEL_LIMIT     = 10;     // max free models loaded into selects
+const MAX_TOKENS_ROUND     = 600;    // token cap for solver/challenger/scout calls
+const MAX_TOKENS_PREFLIGHT = 250;    // token cap for question classifier
+const MAX_TOKENS_NEXTQ     = 300;    // token cap for next-question suggestions
+const HEADLINE_CHAR_LIMIT  = 87;     // char limit before word-boundary truncation
+const MIN_WORD_BOUNDARY    = 50;     // minimum cut point for headline truncation
+const MIN_QUESTION_LEN     = 20;     // minimum chars for a valid follow-up question
+
 // ── PAID MODELS ──────────────────────────────────
 const PAID_MODELS = {
   solver: 'anthropic/claude-opus-4-6',     // best: deepest reasoning
@@ -1680,7 +1694,7 @@ async function callModel(apiKey, model, systemPrompt, userMessage) {
   const controller = currentAbortController;
   if (!controller) throw new Error('Fight not active');
   // 90-second per-call timeout
-  const timeoutId = setTimeout(() => { if (!controller.signal.aborted) controller.abort('timeout'); }, 90000);
+  const timeoutId = setTimeout(() => { if (!controller.signal.aborted) controller.abort('timeout'); }, CALL_TIMEOUT_MS);
   try {
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -1691,7 +1705,7 @@ async function callModel(apiKey, model, systemPrompt, userMessage) {
         'X-Title': 'Robots versus Robots',
       },
       body: JSON.stringify({
-        model, max_tokens: 600,
+        model, max_tokens: MAX_TOKENS_ROUND,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userMessage },
@@ -1709,7 +1723,7 @@ async function callModel(apiKey, model, systemPrompt, userMessage) {
   } catch (err) {
     if (err.name === 'AbortError') {
       const reason = controller.signal.reason;
-      throw new Error(reason === 'timeout' ? 'Request timed out (90s). Try again.' : 'Fight cancelled.');
+      throw new Error(reason === 'timeout' ? `Request timed out (${CALL_TIMEOUT_MS / 1000}s). Try again.` : 'Fight cancelled.');
     }
     throw err;
   } finally {
@@ -1751,7 +1765,7 @@ function populateFreeSelects(models) {
     const sel = document.getElementById(selId);
     if (!sel) return;
     sel.innerHTML = '';
-    models.slice(0, 10).forEach((id, idx) => {
+    models.slice(0, FREE_MODEL_LIMIT).forEach((id, idx) => {
       const o = document.createElement('option');
       o.value = id;
       o.textContent = id.split('/')[1].toUpperCase().replace(/-/g, ' ');
@@ -1765,7 +1779,7 @@ async function callWithFallback(apiKey, primaryModel, systemPrompt, userMessage)
   const isFree = primaryModel.endsWith(':free') || liveFreeModels.includes(primaryModel);
   const pool = isFree ? liveFreeModels : PAID_FALLBACKS;
   // Cap free attempts at 5 to avoid iterating 100+ models
-  const chain = [primaryModel, ...pool.filter(m => m !== primaryModel)].slice(0, isFree ? 5 : pool.length);
+  const chain = [primaryModel, ...pool.filter(m => m !== primaryModel)].slice(0, isFree ? MAX_FREE_FALLBACKS : pool.length);
   const errors = [];
   for (const model of chain) {
     try {
@@ -1777,7 +1791,7 @@ async function callWithFallback(apiKey, primaryModel, systemPrompt, userMessage)
       errors.push(`${model}: ${err.message}`);
       // 3-second backoff on rate limit before trying next model
       if (/429|rate.?limit|too many requests/i.test(err.message)) {
-        await new Promise(r => setTimeout(r, 3000));
+        await new Promise(r => setTimeout(r, RATE_LIMIT_DELAY_MS));
       }
     }
   }
@@ -1790,8 +1804,8 @@ function extractHeadline(text) {
   const lines = text.trim().split('\n').filter(l => l.trim());
   const first = lines[0].replace(/^["']|["']$/g, '').trim();
   if (first.length <= 90) return first;
-  const cut = first.slice(0, 87).lastIndexOf(' ');
-  return first.slice(0, cut > 50 ? cut : 87) + '…';
+  const cut = first.slice(0, HEADLINE_CHAR_LIMIT).lastIndexOf(' ');
+  return first.slice(0, cut > MIN_WORD_BOUNDARY ? cut : HEADLINE_CHAR_LIMIT) + '…';
 }
 
 function extractBody(text) {
@@ -1913,7 +1927,7 @@ function cancelFight() {
 
 async function classifyQuestion(apiKey, question) {
   const ctrl = new AbortController();
-  const timeoutId = setTimeout(() => ctrl.abort(), 8000);
+  const timeoutId = setTimeout(() => ctrl.abort(), PREFLIGHT_TIMEOUT_MS);
   const model = pendingFightConfig?.solverModel || PAID_MODELS.solver;
   const sys = `You are a question analyst. Classify whether the user's question has a defensible, evidence-based answer.
 
@@ -1940,7 +1954,7 @@ Rules:
         'HTTP-Referer': window.location.href,
         'X-Title': 'Robots versus Robots',
       },
-      body: JSON.stringify({ model, max_tokens: 250, messages: [
+      body: JSON.stringify({ model, max_tokens: MAX_TOKENS_PREFLIGHT, messages: [
         { role: 'system', content: sys },
         { role: 'user', content: question },
       ]}),
@@ -2540,7 +2554,7 @@ async function generateNextQuestions(question, verdictText) {
   section.style.display = 'block';
 
   const ctrl = new AbortController();
-  const timeoutId = setTimeout(() => ctrl.abort(), 15000);
+  const timeoutId = setTimeout(() => ctrl.abort(), NEXTQ_TIMEOUT_MS);
 
   const sys = `You are a debate curator. Given a debate question and its verdict, suggest 3 follow-up questions for the next fight. Make each one probe a distinct angle: one that goes deeper on the same topic, one that challenges the verdict's core assumption, one that applies the same tension to a different context. Return ONLY a raw JSON array of 3 question strings. No preamble, no markdown, no numbering.`;
   const msg = `Original question: "${question}"\n\nVerdict: "${verdictText}"\n\nReturn a JSON array of 3 follow-up debate questions.`;
@@ -2556,7 +2570,7 @@ async function generateNextQuestions(question, verdictText) {
       },
       body: JSON.stringify({
         model: lastSolverModel,
-        max_tokens: 300,
+        max_tokens: MAX_TOKENS_NEXTQ,
         messages: [{ role: 'system', content: sys }, { role: 'user', content: msg }],
       }),
       signal: ctrl.signal,
@@ -2571,7 +2585,7 @@ async function generateNextQuestions(question, verdictText) {
       const m = raw.match(/\[[\s\S]*?\]/);
       if (m) questions = JSON.parse(m[0]);
     } catch (_) {
-      questions = raw.split('\n').map(l => l.replace(/^[\d\.\-\*"]+\s*/, '').replace(/[",]+$/, '').trim()).filter(l => l.length > 20).slice(0, 3);
+      questions = raw.split('\n').map(l => l.replace(/^[\d\.\-\*"]+\s*/, '').replace(/[",]+$/, '').trim()).filter(l => l.length > MIN_QUESTION_LEN).slice(0, 3);
     }
     if (!questions.length) { section.style.display = 'none'; return; }
 
